@@ -1,5 +1,6 @@
 import { usePreferences } from '../../app/Preferences'
 import { SECTION_HREFS } from '../navigation/sections'
+import { CHANNELS } from '../../data/channels'
 import styles from './Footer.module.css'
 
 /**
@@ -23,11 +24,12 @@ import styles from './Footer.module.css'
  * already collapses.
  *
  * SOCIAL LINKS
- * Exactly the three destinations that were supplied, written as literals so
- * there is no indirection between this file and what ships. They are typographic
- * labels rather than brand marks: the site bundles no third-party logo files
- * anywhere (Hero's Featured-In strip recreates its wordmarks with type for the
- * same reason), and a text label is its own accessible name.
+ * Exactly the three destinations that were supplied. They now come from
+ * `data/channels.ts` rather than a private const here, because the Hero's
+ * channel row links to the same three and two hand-maintained copies of a URL
+ * list is exactly how one of them goes stale. They are typographic labels
+ * rather than brand marks: the site bundles no third-party logo files
+ * anywhere, and a text label is its own accessible name.
  *
  * Each carries `target="_blank"` with `rel="noreferrer"`, and an accessible
  * name that appends a translated "opens in a new tab" AFTER the visible
@@ -39,12 +41,6 @@ import styles from './Footer.module.css'
 
 /** Language-neutral; the translated part is the name in `footer.copyright`. */
 const COPYRIGHT_YEAR = 2026
-
-const SOCIAL_LINKS = [
-  { name: 'YouTube', href: 'https://www.youtube.com/@actuallycarterpcs' },
-  { name: 'Instagram', href: 'https://www.instagram.com/carterpcs_/?hl=en' },
-  { name: 'TikTok', href: 'https://www.tiktok.com/@carterpcs?lang=en' },
-] as const
 
 function Footer() {
   const { t, navigationLabels } = usePreferences()
@@ -69,7 +65,7 @@ function Footer() {
         </nav>
 
         <ul className={styles.social} aria-label={t.footer.a11y.socialLinks}>
-          {SOCIAL_LINKS.map(({ name, href }) => (
+          {CHANNELS.map(({ name, href }) => (
             <li key={name}>
               <a
                 className={styles.link}

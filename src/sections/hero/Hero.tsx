@@ -7,7 +7,7 @@ import audienceAvatars from '../../assets/hero/about-audience-avatars.webp'
 import tileBuilds from '../../assets/hero/tile-media-builds.webp'
 import tileStudio from '../../assets/hero/tile-media-studio.webp'
 import tileUniverse from '../../assets/hero/tile-media-universe.webp'
-import appleLogo from '../../assets/hero/apple-logo.svg'
+import { CHANNELS } from '../../data/channels'
 import styles from './Hero.module.css'
 
 interface HeroProps {
@@ -19,22 +19,27 @@ const REVEAL_SELECTOR =
   '[data-reveal], [data-headline-line], [data-stage], [data-about], [data-stats]'
 
 /**
- * Hero — a 1:1 recreation of the approved reference composition. The
- * reference image is the single visual source of truth for this section:
- * nav bar, left index rail, eyebrow, "Built / Different." headline,
- * three-line support, twin CTAs, Carter portrait region, environmental
- * disc, About Carter card, By The Numbers card, three lower content
- * tiles, and the Featured-In strip, in the reference's positions and
- * proportions.
+ * Hero — a recreation of the approved reference composition. The
+ * reference image is the visual source of truth for this section: nav bar,
+ * eyebrow, "Built / Different." headline, three-line support, twin CTAs,
+ * Carter portrait region, environmental disc, About Carter card, By The
+ * Numbers card, three lower content tiles, and the row at the foot, in the
+ * reference's positions and proportions.
+ *
+ * Two of the reference's elements are deliberately not reproduced: its left
+ * editorial index rail (removed as the page's redundant second progression
+ * language — see the note where it used to be mounted below) and its
+ * "Featured in" wordmark row (see the FACTUAL-INTEGRITY note that follows).
  *
  * FACTUAL-INTEGRITY DEVIATIONS (the only intentional ones):
  * - The By The Numbers card keeps the reference's container geometry but
  *   carries user-verified statistics (see STATS' provenance notes),
  *   never the concept image's illustrative 1.2M+ / 100M+ / 4K+.
- * - The Featured-In strip is a VISUAL recreation only (see PRESS_MARKS):
- *   aria-hidden typographic approximations plus a supplied Apple mark,
- *   with the visible disclaimer directly beneath — never an
- *   endorsement claim anywhere semantic.
+ * - The reference's "Featured in" wordmark row is NOT reproduced. It has
+ *   been replaced by the real channel row (see data/channels.ts for the
+ *   full reasoning): the same quiet full-width beat at the composition's
+ *   foot, but carrying three destinations a visitor can actually open
+ *   instead of six publication names this project cannot support.
  * - The About card reproduces the reference's avatar-row geometry with
  *   finished circular crops from the approved reference render and the
  *   supported qualitative claim "Millions across platforms" — the
@@ -60,8 +65,9 @@ const REVEAL_SELECTOR =
  * Visible headline lines are aria-hidden; the h1 carries the accessible
  * name "CarterPCs — Built Different". The portrait is editorial media
  * whose subject the h1 already names, so it carries alt="" rather than
- * duplicating that for screen readers. Environment and index rail are
- * aria-hidden. Every control is a real link to a real section.
+ * duplicating that for screen readers. The environmental layers are
+ * aria-hidden. Every control is a real link: the two CTAs and the three
+ * tiles to real sections, the channel row to the real channels.
  */
 
 /**
@@ -99,17 +105,29 @@ const TILES = [
 
 /**
  * USER-VERIFIED STATISTICS (discrepancy resolved by the user,
- * 2026-08-08): a newer Social Blade read — 2.94M subscribers and
- * 6,868,093,822 total YouTube views as of 28 July 2026, gaining tens of
- * millions of views per day — supersedes the stale ~4.5B tracker figure
- * and supports "7.0B+" as the current rounded threshold. The label
- * reads "Total YouTube Views" precisely so the figure is never taken
- * as a cross-platform total.
+ * 2026-08-08): a Social Blade read — 2.94M subscribers and
+ * 6,868,093,822 total YouTube views as of 28 July 2026 — supersedes the
+ * stale ~4.5B tracker figure. The label reads "Total YouTube Views"
+ * precisely so the figure is never taken as a cross-platform total.
+ *
+ * ROUNDING DIRECTION (corrected): these were displayed as "3.0M+" and
+ * "7.0B+", and both rounded the verified reading UP past a threshold the
+ * source does not reach — 2.94M is not "3.0M or more", and 6.87B is not
+ * "7.0B or more". The "+" makes each one a floor claim, so rounding up
+ * turns a verified number into an overstatement of it. Both now round
+ * DOWN to the nearest tenth, which is the only direction a "+" figure can
+ * safely be rounded: every visitor-facing number here is now one the
+ * cited reading actually clears.
  * - "Dozens" stays qualitative: no verified lifetime build counter
  *   exists, so no precise total may be invented.
- * Social metrics are time-sensitive — refresh all three against live
- * sources before any future production release. Never substitute the
- * concept image's illustrative figures (1.2M+ / 100M+ / 4K+).
+ *
+ * The card now also carries its own dated provenance line on screen
+ * (`t.hero.statsSource`) rather than keeping it in this comment alone. A
+ * figure a visitor cannot date is a figure they have to take on trust;
+ * social metrics are time-sensitive, and the reading is already two months
+ * old at the time of writing. Refresh the values AND that date together
+ * against live sources before any production release, and never substitute
+ * the concept image's illustrative figures (1.2M+ / 100M+ / 4K+).
  *
  * LOCALIZATION: the two numeric values are rendered from this module
  * constant in every language and are never passed through the dictionary —
@@ -119,37 +137,10 @@ const TILES = [
  * figure and is resolved from `t.hero.stats.dozens` (see `statLines`).
  */
 const STATS = [
-  { value: '3.0M+', label: 'subscribers' },
-  { value: '7.0B+', label: 'views' },
+  { value: '2.9M+', label: 'subscribers' },
+  { value: '6.8B+', label: 'views' },
   { value: null, label: 'builds' },
 ] as const
-
-/**
- * Featured-In strip — VISUAL RECREATION of the approved reference only,
- * per the user's explicit direction (2026-08-09). These are typographic
- * approximations of the reference's wordmarks, NOT verified
- * relationships: the strip is aria-hidden, the visible disclaimer sits
- * directly beneath it, and these names must never appear in metadata,
- * SEO, structured data or accessibility text as endorsements. No logo
- * files are bundled — type styling only.
- */
-const PRESS_MARKS = [
-  { name: 'Apple', style: styles.markGlyph },
-  { name: 'Forbes', style: styles.markSerif },
-  { name: 'The Verge', style: styles.markVerge },
-  { name: 'HYPEBEAST', style: styles.markCaps },
-  { name: 'Linus Tech Tips', style: styles.markSans },
-  { name: 'uncrate', style: styles.markLower },
-]
-
-/**
- * The supplied Apple logo is decorative and rendered only inside the
- * aria-hidden strip. The nearby disclaimer clarifies that this concept
- * makes no affiliation or endorsement claim.
- */
-function AppleMark() {
-  return <img src={appleLogo} alt="" />
-}
 
 function Hero({ ready }: HeroProps) {
   const reducedMotion = useReducedMotion()
@@ -214,7 +205,6 @@ function Hero({ ready }: HeroProps) {
           1.12,
         )
         .from('[data-reveal="strip"]', { opacity: 0, duration: 0.8 }, 1.3)
-        .from('[data-reveal="rail"]', { opacity: 0, duration: 0.8 }, 1.2)
 
       // Scroll depth — a few pixels of differential drift, desktop only.
       // Restrained so the resting frame stays the reference composition;
@@ -274,17 +264,16 @@ function Hero({ ready }: HeroProps) {
           />
         </div>
 
-        {/* Left editorial index rail. Decorative. */}
-        <div className={styles.index} aria-hidden="true" data-reveal="rail">
-          <span className={styles.indexLine} />
-          <span className={styles.indexActive} />
-          <span className={styles.indexTick} />
-          <span className={styles.indexTick} />
-          <p className={styles.indexCount}>
-            <span>01</span>
-            <span className={styles.indexTotal}>/06</span>
-          </p>
-        </div>
+        {/* The left editorial index rail ("01 /06" over a hairline with two
+            tick marks) was removed here and in Creator. It was the page's
+            SECOND progression language, competing with the "NN / Name" meta
+            label every section already carries, and it was the one that
+            could not be read: its tick count was decorative rather than
+            structural (two marks in Hero, five in Creator, both claiming a
+            denominator of six), so it described a position no visitor could
+            verify and no other element agreed with. The meta labels and the
+            environmental numerals now carry section identity on their own —
+            one language, stated once per section. */}
 
         {/* 2 — Type column */}
         <div className={styles.inner}>
@@ -431,23 +420,52 @@ function Hero({ ready }: HeroProps) {
             ))}
           </div>
 
-          {/* Featured-In strip — a VISUAL recreation of the reference
-              only. aria-hidden keeps the brand names out of the
-              accessibility tree (they are not endorsements and must
-              never read as such to assistive tech, metadata or SEO);
-              the visible disclaimer below is the honest counterpart
-              and stays fully readable. */}
-          <div className={styles.strip} data-reveal="strip" aria-hidden="true">
-            <span className={styles.stripLabel}>{t.hero.featuredIn}</span>
-            <ul className={styles.stripSlots}>
-              {PRESS_MARKS.map(({ name, style }) => (
-                <li key={name} className={`${styles.stripSlot} ${style}`}>
-                  {name === 'Apple' ? <AppleMark /> : name}
+          {/* Channel row — occupies the same quiet full-width beat the
+              reference's "Featured in" wordmark row held, but every entry
+              here is a real destination the visitor can open and check
+              (see data/channels.ts for why the wordmark row could not
+              stay). It is NOT aria-hidden: unlike the row it replaces,
+              this one is real, so hiding it from assistive tech would
+              withhold three working links rather than suppress a claim.
+              The disclaimer below is unchanged and still carries the
+              unofficial/non-affiliation message. */}
+          <div className={styles.strip} data-reveal="strip">
+            <span className={styles.stripLabel} aria-hidden="true">
+              {t.hero.channelsLabel}
+            </span>
+            <ul className={styles.stripSlots} aria-label={t.hero.channelsLabel}>
+              {CHANNELS.map(({ name, href }) => (
+                <li key={name} className={styles.stripSlot}>
+                  <a
+                    className={styles.stripLink}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${name} — ${t.footer.a11y.opensInNewTab}`}
+                  >
+                    {name}
+                    <span className={styles.stripArrow} aria-hidden="true">
+                      ↗
+                    </span>
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
+          {/* The Hero's fine print. The unofficial-concept line is unchanged;
+              the provenance line beneath it dates the two YouTube figures in
+              the By The Numbers card, because a "+" number with no date
+              behind it is the exact shape of an invented statistic and these
+              are real.
+
+              It sits here rather than inside that card on purpose: the card
+              is held to the reference composition's geometry and already
+              reaches the tile rail, so a third block of text inside it ran
+              68px into the tiles at 1440 and 107px at 1280 (measured). This
+              row is the one place in the Hero built for small print, and it
+              is directly below the figures in the reading order either way. */}
           <p className={styles.disclaimer}>{t.hero.disclaimer}</p>
+          <p className={styles.statsSource}>{t.hero.statsSource}</p>
         </div>
       </div>
 

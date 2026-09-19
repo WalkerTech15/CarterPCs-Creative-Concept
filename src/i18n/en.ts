@@ -14,14 +14,16 @@
  * those files own.
  *
  * NOT TRANSLATED, deliberately:
- * - "CarterPCs" and the third-party wordmarks in Hero's Featured-In strip are
- *   proper nouns.
+ * - "CarterPCs" is a proper noun, as are the platform names in Hero's channel
+ *   row (YouTube / Instagram / TikTok), which live in data/channels.ts
+ *   alongside their real URLs — only that row's LABEL is localized here.
  * - Platform names (TikTok / YouTube Shorts / Instagram Reels) are proper
  *   nouns; they carry a per-language entry only so the separator/order stays
  *   editable per locale.
- * - Hero's numeric statistics ("3.0M+", "7.0B+") are user-verified figures and
- *   are rendered from `Hero.tsx`'s STATS unchanged. Only their LABELS and the
- *   qualitative "Dozens" value are localized (see hero.stats below).
+ * - Hero's numeric statistics ("2.9M+", "6.8B+") are user-verified figures and
+ *   are rendered from `Hero.tsx`'s STATS unchanged. Only their LABELS, the
+ *   qualitative "Dozens" value and the dated `statsSource` line are localized
+ *   (see hero.stats below).
  * - Section numerals ("02 / …") stay Arabic numerals in every language; only
  *   the word after the slash is translated.
  */
@@ -76,7 +78,9 @@ export const en = {
     support:
       'Making tech interesting. PC builds, hardware, and the everyday technology decisions in between.',
     ctaPrimary: 'Explore the Universe',
-    ctaSecondary: 'Watch Reel',
+    /** Names the three real Shorts in Featured, which is where it goes. The
+        reference's "Watch Reel" promised a showreel that does not exist. */
+    ctaSecondary: 'Watch the Shorts',
     aboutTitle: 'About Carter',
     aboutText:
       'Carter creates fast, accessible technology content across hardware, mobile tech, builds and the wider tech world.',
@@ -90,6 +94,14 @@ export const en = {
       /** Qualitative value — no verified lifetime build counter exists. */
       dozens: 'Dozens',
     },
+    /**
+     * Dates the two YouTube figures on screen. The date is the one the
+     * reading was actually taken on (see Hero.tsx's STATS note) — update
+     * this string and the values in that file together, never separately.
+     * "Rounded down" is stated because both figures carry a "+".
+     */
+    statsSource:
+      'YouTube figures from a public tracker reading, 28 July 2026, rounded down. Builds are not counted publicly.',
     tiles: {
       builds: {
         title: 'Custom Builds',
@@ -104,7 +116,12 @@ export const en = {
         body: 'Explore the systems, philosophy, and process behind everything.',
       },
     },
-    featuredIn: 'Featured in',
+    /**
+     * Labels the real channel row at the foot of the Hero. It replaced
+     * `featuredIn` ("Featured in"), whose row of publication names claimed
+     * press coverage this project has no source for — see data/channels.ts.
+     */
+    channelsLabel: 'Watch on',
     disclaimer: 'Unofficial concept. No affiliation or endorsement implied.',
   },
 

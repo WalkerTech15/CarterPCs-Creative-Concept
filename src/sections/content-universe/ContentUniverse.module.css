@@ -119,10 +119,10 @@
 /* ===== Field — the connected composition =====
    Layering model (why the ecosystem reads as one space):
      z 0 — the two "05" digits: shared environmental ground
-     z 1 — the connecting thread: travels OVER the digits...
-     z 2 — entries (type + media crops): ...and UNDER the territories,
-           so media visibly interrupts the thread — real occlusion depth,
-           not three flat decorations stacked side by side. */
+     z 2 — entries (type + Short crops): they genuinely occlude the digits,
+           which is real depth rather than two flat layers side by side.
+   z 1 held a decorative connecting thread and is now unused (see
+   ContentUniverse.tsx for why the thread was removed). */
 
 .field {
   position: relative;
@@ -182,21 +182,6 @@
   opacity: 0.35;
 }
 
-/* ---- Connecting thread (desktop only) ---- */
-
-.thread {
-  display: none;
-}
-
-.threadPath {
-  fill: none;
-  stroke: url(#content-universe-thread-gradient);
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.75;
-}
-
 /* ---- Entries ---- */
 
 .entry {
@@ -233,15 +218,16 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-accent-secondary);
-  /* The label occludes the thread and the digits, exactly as the media crops
-     do — the section's own idiom, applied to its smallest text. Without
-     this, the connecting thread's cyan hairline crossed these 12px labels
-     ("Budget Gear" at every desktop width, most of the others somewhere in
-     the A/B/C states across the three languages — probed at 600 points per
-     state), and a cyan line through a 9px glyph is a 1.55:1 ground no
-     accessible violet exists for. On the plain base ground the plate is
-     invisible: it IS the base token. fit-content keeps it the width of the
-     words, not the column. */
+  /* The label occludes the digits, exactly as the Short crops do — the
+     section's own idiom, applied to its smallest text. The plate was first
+     added for the connecting thread, whose cyan hairline crossed these 12px
+     labels ("Budget Gear" at every desktop width, most of the others
+     somewhere in the states across the three languages — probed at 600
+     points per state); a cyan line through a 9px glyph is a 1.55:1 ground no
+     accessible violet exists for. The thread is gone, but the plate is kept:
+     the digits are still behind these labels, and on the plain base ground it
+     is invisible anyway — it IS the base token. fit-content keeps it the
+     width of the words, not the column. */
   width: fit-content;
   padding-inline: 0.375rem;
   margin-inline-start: -0.375rem;
@@ -276,101 +262,87 @@
   color: var(--color-text-muted);
 }
 
-/* ---- Media windows =====
-   Deliberately obscured future footage, not empty rectangles: an
-   asymmetric silhouette (hard clipped corners — different per territory),
-   a directional internal gradient, and ONE oversized blurred light source.
-   No icons, grids, captions, or fake screenshots. Real approved media
-   later replaces .mediaSurface's background without structural change. */
+/* ---- Short windows ----
+   Each tier-1 territory's real Short, in an asymmetric silhouette (hard
+   clipped corners, different per territory). The silhouettes are kept from
+   the placeholder pass that preceded these — they are what stops the crops
+   reading as two stock image cards — but what they now hold is the Short's
+   own poster rather than a blurred colour field. No icons, grids, captions
+   or invented UI chrome: the frame is the image, and the whole frame is the
+   link. */
 
 .entryMedia {
   position: relative;
   z-index: 0;
   order: -1;
   overflow: hidden;
+  display: block;
+  /* The crop is clipped to a polygon, so an outline on the box itself would
+     be drawn outside the shape and clipped to nothing. The ring is drawn
+     INSIDE instead, as an inset shadow on the image. */
+  outline: none;
 }
 
-.mediaSurface {
-  position: absolute;
-  inset: 0;
-}
-
-.mediaGlow {
-  position: absolute;
-  width: 58%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  filter: blur(2.5rem);
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-/* Hardware: wide crop, hard diagonal-cut upper-right corner — landscape
-   b-roll energy. Overlaps its own headline on mobile via negative margin. */
-.entryMedia[data-media='hardware'] {
+.mediaImage {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
+  object-fit: cover;
+  /* The posters are 1280x720 YouTube thumbnails whose real portrait frame is
+     the centre column (see Featured.module.css's note) — `cover` on these
+     narrower boxes shows that column and crops the blurred filler bars. */
+  object-position: center;
+  display: block;
+  /* Seats the footage in the section's own ground rather than letting two
+     bright rectangles punch out of a restrained editorial field. Both values
+     lift on hover/focus, which is the only motion in this section that a
+     visitor drives directly. */
+  filter: saturate(0.92) contrast(1.02) brightness(0.9);
+  transition:
+    filter var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.entryMedia:hover .mediaImage,
+.entryMedia:focus-visible .mediaImage {
+  filter: saturate(1) contrast(1) brightness(1);
+}
+
+.entryMedia:focus-visible .mediaImage {
+  box-shadow: inset 0 0 0 3px var(--color-accent-primary);
+}
+
+/* BOTH windows are 9:16, which is not a style choice — it is arithmetic.
+   These posters are 1280x720 YouTube thumbnails, and YouTube pads a Short's
+   portrait frame with a blurred, darkened zoom of itself to fill that
+   landscape box; the real frame is the centre 31.6% of the width (the same
+   measurement Featured.module.css derives). `cover` on a 9:16 box shows
+   0.5625/1.7778 = exactly that centre column, so the filler never appears.
+   The previous 16:9 and 4:5 windows showed it: the wide one rendered as
+   three visible vertical bands — blurred, real, blurred — which reads as a
+   broken image rather than a crop.
+
+   The two silhouettes stay distinct through their corner cuts and their very
+   different sizes and positions in the field, not through their ratio. And
+   9:16 is the shape of the thing itself, which is the more honest frame for
+   an index of Shorts to use. */
+
+/* Hardware — the "$250k PC" Short. Diagonal-cut lower-left corner; overlaps
+   its own headline on mobile via negative margin. */
+.entryMedia[data-media='hardware'] {
+  width: 46%;
+  aspect-ratio: 9 / 16;
   margin-block-end: calc(-1 * var(--space-4));
-  clip-path: polygon(0% 0%, 70% 0%, 86% 28%, 86% 100%, 8% 100%, 0% 84%);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 78% 100%, 0% 100%);
 }
 
-.entryMedia[data-media='hardware'] .mediaSurface {
-  background:
-    radial-gradient(
-      60% 70% at 24% 30%,
-      color-mix(in srgb, var(--color-accent-primary) 18%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--color-bg-surface) 96%, transparent) 0%,
-      var(--color-bg-base) 78%
-    );
-}
-
-.entryMedia[data-media='hardware'] .mediaGlow {
-  inset-block-start: -14%;
-  inset-inline-start: 8%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-accent-primary) 32%, transparent),
-    transparent 70%
-  );
-}
-
-/* Mobile Tech: vertical 9:16-proportioned crop — the native shape of the
-   short-form content this site documents — with a clipped top-left corner.
-   Different silhouette from Hardware's on purpose. */
+/* Mobile Tech — the Apple/Samsung Short. Clipped top-left corner, mirroring
+   Hardware's cut rather than repeating it. */
 .entryMedia[data-media='mobile'] {
-  width: 66%;
+  width: 52%;
   margin-inline-start: auto;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 9 / 16;
   margin-block-end: calc(-1 * var(--space-5));
-  clip-path: polygon(22% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 22%);
-}
-
-.entryMedia[data-media='mobile'] .mediaSurface {
-  background:
-    radial-gradient(
-      70% 55% at 70% 78%,
-      color-mix(in srgb, var(--color-accent-secondary) 20%, transparent),
-      transparent 72%
-    ),
-    linear-gradient(
-      195deg,
-      color-mix(in srgb, var(--color-bg-surface) 94%, transparent) 0%,
-      var(--color-bg-base) 74%
-    );
-}
-
-.entryMedia[data-media='mobile'] .mediaGlow {
-  inset-block-end: 2%;
-  inset-inline-end: -16%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-accent-secondary) 30%, transparent),
-    transparent 70%
-  );
+  clip-path: polygon(24% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 18%);
 }
 
 /* ---- Tier scale — deliberately unequal ---- */
@@ -498,8 +470,8 @@
    layout (display: contents) so every entry places directly on the field's
    12-column grid. The composition's main axis runs from the "0" (upper
    left, Hardware's ground) to the "5" (lower right, Mobile Tech's ground);
-   media crops cross the former dead center and genuinely occlude digits
-   and thread. */
+   the Short crops cross the former dead center and genuinely occlude the
+   digits. */
 
 @media (min-width: 1024px) {
   .canvas {
@@ -546,16 +518,6 @@
     display: none;
   }
 
-  .thread {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
   .entry {
     max-width: none;
   }
@@ -594,12 +556,23 @@
     align-self: start;
   }
 
+  /* Sized and placed against the real rendered grid at 1280/1440/1920, with
+     one constraint that did not exist while these windows held a faint
+     gradient: a photograph must not pass behind display type. The crop used
+     to start at 42% of this entry and run 86% wide, which put a dark frame
+     directly under the "Hardware" headline — invisible when the window was a
+     10%-opacity wash, and near-black-on-near-black (light theme: dark type on
+     dark footage) the moment it held a real poster. It now begins after the
+     headline's ink and occupies the field's empty middle instead, which is
+     also where it still crosses the "0" — so the intended depth is kept and
+     only the collision is gone. */
   .entryMedia[data-media='hardware'] {
     position: absolute;
-    inset-block-start: -10%;
-    inset-inline-start: 42%;
-    width: 86%;
-    aspect-ratio: 16 / 7.5;
+    inset-block-start: -6%;
+    /* Far enough right of Mobile Tech's window that the two upright crops
+       read as two points in the field rather than as one column. */
+    inset-inline-start: 80%;
+    width: 27%;
     margin: 0;
   }
 
@@ -620,12 +593,15 @@
     margin-inline-start: auto;
   }
 
+  /* Same correction as Hardware's, mirrored: this entry is right-aligned, so
+     its crop is pulled left and narrowed until it clears the "Mobile Tech"
+     headline's ink rather than running under it. It still crosses the "5",
+     which is the overlap this composition is actually about. */
   .entryMedia[data-media='mobile'] {
     position: absolute;
-    inset-block-end: -2%;
-    inset-inline-start: 10%;
-    width: 44%;
-    aspect-ratio: 9 / 13;
+    inset-block-end: 0%;
+    inset-inline-start: 4%;
+    width: 25%;
     margin: 0;
   }
 

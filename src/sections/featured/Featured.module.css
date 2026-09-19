@@ -616,7 +616,8 @@
   z-index: 1;
   inline-size: 0.75rem;
   aspect-ratio: 1;
-  border: 2px solid color-mix(in srgb, var(--color-text-primary) 28%, transparent);
+  border: 2px solid
+    color-mix(in srgb, var(--color-text-primary) 28%, transparent);
   border-radius: 50%;
   background-color: var(--color-bg-base);
   transition:
@@ -632,16 +633,11 @@
     color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
 }
 
-/* ===== Sequence rail — the far-right vertical position mark =====
-   Off by default; the wide-pinned query near the bottom of this file is the
-   only thing that turns it on, and the note there is where the reasoning
-   lives. Everywhere else — mobile, tablet, narrow desktop, and the
-   reduced-motion stack at any width — the panels are a plain vertical list
-   with no far-right region to mark, so nothing about those layouts changes. */
-
-.sequence {
-  display: none;
-}
+/* The far-right vertical "sequence rail" that used to be defined here (and
+   switched on in a ≥1280px query at the foot of this file) is gone. It drew
+   the same three positions .progress already draws, on a second axis, to fill
+   the panel's empty right margin — a third statement of one scroll position.
+   The margin stays empty, which is what an editorial measure is for. */
 
 /* ===== Desktop ===== */
 
@@ -649,7 +645,6 @@
   .intro {
     padding-block: calc(var(--space-8) + var(--space-1)) var(--space-6);
   }
-
 }
 
 /* Full-bleed horizontal panels, native scroll-snap fallback, enhanced by
@@ -891,82 +886,5 @@
     align-items: center;
     justify-content: space-between;
     inline-size: 8.5rem;
-  }
-}
-
-/* ===== Sequence rail =====
-   The right side of a panel is deliberately empty — copy left, the Short and
-   its actions through the middle, nothing after that but the stage's own glow.
-   Empty and *intentionally* empty look the same until something marks the
-   edge, and the section already owns the right mark: this is the bottom
-   timeline read vertically. Same three positions, same active accent, same
-   idea — one restated on the reading axis and one on the sequence's own axis
-   of travel.
-
-   It carries no new information and no new content: three hairlines, no
-   labels, no numerals, no control. Hence aria-hidden in the markup (the
-   horizontal timeline it echoes is aria-hidden for the same reason) and
-   pointer-events: none, so the empty right side stays as inert to the pointer
-   as it looks.
-
-   1280px, not this section's own 1024px desktop breakpoint, because below
-   1280 there is no empty right side to mark. The copy column is a fixed 36rem
-   at every width, so the plate is held right by its own left floor and the
-   space left after the action rail is 302px at 1280 but only 70px at 1024 —
-   and a hairline dropped into 70px doesn't read as the far edge of the
-   composition, it reads as a scrollbar stuck to the rail (screenshotted, and
-   that is exactly what it looked like). The mark exists where the space it is
-   marking exists.
-
-   The inline end is the SECTION's own container padding — the same margin the
-   "Selected Stories" header above sits on — so it lands on an edge the page
-   has already established rather than on a number invented for it.
-
-   Vertically centred on the panel rather than on the plate: the plate's own
-   height is a min() of three terms, and duplicating that expression here to
-   be 20-odd px more precise would mean two places to keep in step for a
-   difference nobody can see. */
-@media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
-  .sequence {
-    display: flex;
-    position: absolute;
-    z-index: 1;
-    inset-block-start: 50%;
-    inset-inline-end: var(--container-padding-inline);
-    translate: 0 -50%;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.625rem;
-    pointer-events: none;
-  }
-
-  .sequenceMark {
-    inline-size: 2px;
-    block-size: 2.5rem;
-    border-radius: 999px;
-    /* A notch under the horizontal timeline's own connecting line (24%): the
-       same family of hairline, pitched one step quieter because this one sits
-       in open space rather than under a row of markers. 16% was tried first
-       and all but vanished on the light theme's near-white ground. */
-    background-color: color-mix(
-      in srgb,
-      var(--color-text-primary) 20%,
-      transparent
-    );
-    /* Colour only, exactly like .tick — the global reduced-motion rule
-       collapses the duration and nothing is left moving. Nothing here
-       resizes, travels or pulses. */
-    transition:
-      background-color var(--duration-base) var(--ease-standard),
-      box-shadow var(--duration-base) var(--ease-standard);
-  }
-
-  .sequenceMarkActive {
-    background-color: var(--color-accent-primary);
-    /* A quarter of the strength the horizontal timeline's active dot carries:
-       the same cue, pitched to a mark that should be found rather than
-       noticed. */
-    box-shadow: 0 0 0.5rem
-      color-mix(in srgb, var(--color-accent-primary) 40%, transparent);
   }
 }

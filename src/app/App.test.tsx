@@ -175,7 +175,9 @@ describe('App', () => {
       }),
     ).toBeInTheDocument()
 
-    expect(screen.getByText(/^hardware$/i, { selector: 'p' })).toBeInTheDocument()
+    expect(
+      screen.getByText(/^hardware$/i, { selector: 'p' }),
+    ).toBeInTheDocument()
     expect(screen.getByText(/^tech$/i, { selector: 'p' })).toBeInTheDocument()
     expect(
       screen.getByText(/^commentary$/i, { selector: 'p' }),
@@ -742,6 +744,113 @@ describe('App', () => {
     expect(digits).toEqual(['2026'])
   })
 
+  it('claims no press coverage in the Hero — the row at its foot is the real channels, not publications', () => {
+    render(<App />)
+
+    const hero = document.querySelector('#hero') as HTMLElement
+
+    // The six wordmarks that used to sit under a "Featured in" label are
+    // gone, in every form: visible text, accessibility text, and markup. An
+    // `aria-hidden` on that row was never enough — a sighted visitor reads a
+    // list of publication names under "Featured in" as a claim, and this
+    // project has no source for any of them.
+    for (const name of [
+      'Featured in',
+      'Forbes',
+      'The Verge',
+      'HYPEBEAST',
+      'Linus Tech Tips',
+      'uncrate',
+    ]) {
+      expect(hero.innerHTML).not.toMatch(new RegExp(name, 'i'))
+    }
+    expect(hero.querySelectorAll('img[src*="apple"]')).toHaveLength(0)
+
+    // What replaced it goes to the same three real destinations the footer
+    // uses, from the same shared list — and is NOT hidden from assistive
+    // tech, because unlike the row it replaced it is real.
+    const external = Array.from(
+      hero.querySelectorAll('a[href^="http"]'),
+    ) as HTMLAnchorElement[]
+    expect(external.map((a) => a.href)).toEqual([
+      'https://www.youtube.com/@actuallycarterpcs',
+      'https://www.instagram.com/carterpcs_/?hl=en',
+      'https://www.tiktok.com/@carterpcs?lang=en',
+    ])
+    external.forEach((link) => {
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noreferrer')
+      expect(link.closest('[aria-hidden="true"]')).toBeNull()
+    })
+
+    // The unofficial/non-affiliation message stays exactly where it was.
+    expect(screen.getByText(en.hero.disclaimer)).toBeInTheDocument()
+  })
+
+  it('states no figure the cited reading does not clear, and dates the ones it shows', () => {
+    render(<App />)
+
+    const hero = document.querySelector('#hero') as HTMLElement
+    const stats = document.querySelector('#hero aside:last-of-type')
+      ?.textContent as string
+
+    // Rounded DOWN from 2.94M / 6,868,093,822 (see Hero.tsx's STATS note):
+    // a "+" is a floor claim, so the old 3.0M+/7.0B+ overstated the source.
+    expect(stats).toContain('2.9M+')
+    expect(stats).toContain('6.8B+')
+    expect(hero.textContent).not.toContain('3.0M+')
+    expect(hero.textContent).not.toContain('7.0B+')
+
+    // The build count stays qualitative — no counter exists to invent from.
+    expect(stats).toContain(en.hero.stats.dozens)
+
+    // And the figures carry their date somewhere a visitor can read it, not
+    // only in a source comment. It sits in the Hero's fine-print row rather
+    // than in the card itself — see Hero.tsx for the measured reason.
+    expect(screen.getByText(en.hero.statsSource)).toBeInTheDocument()
+
+    // Exactly three values, and the third is a word rather than a figure —
+    // read off the value elements themselves, because the card's textContent
+    // runs its "02" index straight into the first value.
+    const values = Array.from(
+      document.querySelectorAll(
+        '#hero aside:last-of-type li > span:first-child',
+      ),
+    ).map((el) => el.textContent)
+    expect(values).toEqual(['2.9M+', '6.8B+', en.hero.stats.dozens])
+  })
+
+  it('points the Content Universe media slots at real Shorts rather than placeholders', () => {
+    render(<App />)
+
+    const universe = document.querySelector('#content-universe') as HTMLElement
+
+    // The two tier-1 territories link to the same two videos Featured plays,
+    // resolved from the same data — never a second URL for the same Short.
+    const links = Array.from(
+      universe.querySelectorAll('a[href^="http"]'),
+    ) as HTMLAnchorElement[]
+    expect(links.map((a) => a.href)).toEqual([
+      'https://www.youtube.com/shorts/JekaYRzZRfU',
+      'https://www.youtube.com/shorts/1iBOP4Gyfi8',
+    ])
+
+    // Each names the Short it opens and says that it leaves the page, so the
+    // poster is never an unlabelled image that happens to be clickable.
+    links.forEach((link) => {
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noreferrer')
+      expect(link.getAttribute('aria-label')).toMatch(
+        new RegExp(en.featured.a11y.opensInNewTab, 'i'),
+      )
+      // The poster is decorative INSIDE a link that is already named.
+      expect(link.querySelector('img')).toHaveAttribute('alt', '')
+    })
+
+    // No empty decorative crop survives anywhere in the section.
+    expect(universe.querySelectorAll('[data-dev-placeholder]')).toHaveLength(0)
+  })
+
   it('invents nothing in the Closing section — no links other than back-to-top, and no contact or audience claims', () => {
     render(<App />)
 
@@ -1036,8 +1145,13 @@ describe('localization', () => {
       expect(screen.getByText(dictionary.hero.disclaimer)).toBeInTheDocument()
 
       // The verified figures are NOT localized — see Hero.tsx's STATS note.
-      expect(screen.getByText('3.0M+')).toBeInTheDocument()
-      expect(screen.getByText('7.0B+')).toBeInTheDocument()
+      // Both round DOWN from the cited reading (2.94M / 6.87B): a "+" figure
+      // is a floor claim, so rounding up would overstate the source.
+      expect(screen.getByText('2.9M+')).toBeInTheDocument()
+      expect(screen.getByText('6.8B+')).toBeInTheDocument()
+
+      // The dated provenance line beneath them IS localized.
+      expect(screen.getByText(dictionary.hero.statsSource)).toBeInTheDocument()
 
       // Creator / Featured / Hardware / Content Universe section copy
       expect(

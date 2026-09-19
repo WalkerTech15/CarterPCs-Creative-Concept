@@ -1,13 +1,13 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import {
   gsap,
-  ScrollTrigger,
   HEADLINE_WIPE_FROM,
   HEADLINE_WIPE_TO,
 } from '../../animations/gsap'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
 import { getHardwareBeats } from '../../data/hardware'
+import hardwareWorkshopBuild from '../../assets/hardware/hardware-workshop-build.png'
 import styles from './Hardware.module.css'
 
 /**
@@ -33,10 +33,9 @@ import styles from './Hardware.module.css'
  * visually sit "in" the numeral's environment — integrated background
  * typography, not a decorative corner label.
  *
- * No approved CarterPCs media exists yet. `.mediaLayer` is the single
- * primary drop-in target (see the media-stage contract note above it in
- * JSX) — the two accent planes around it are decorative depth/composition
- * elements, not additional required media slots.
+ * The single primary media surface uses original workshop photography. The
+ * two accent planes around it remain decorative depth/composition elements,
+ * not additional media slots.
  *
  * Copy: headline/support/beat text is original editorial development
  * language grounded in RESEARCH.md §7's "Custom PCs vs. Overpriced
@@ -45,16 +44,14 @@ import styles from './Hardware.module.css'
  * top comment for the full sourcing note. No specs, benchmarks, prices, or
  * quotes are used anywhere.
  *
- * Motion grammar deliberately differs from Featured's horizontal pin+scrub:
- * this section introduces a brief VERTICAL pin (desktop only, ~0.65 of a
- * viewport of scroll) during which only the background numeral and the
- * stage's two accent planes visibly separate in depth and then recompose —
- * headline, beats, and tags stay completely still throughout, so the
- * motion clearly belongs to the hardware object, not the page. Entrance
- * reveal (headline clip, stage fade, staggered text) is a separate,
- * independent trigger — the same one-time "top 75%" pattern
- * Hero/Creator/Featured already use — so the two motion concerns never
- * fight over the same elements or timing.
+ * Motion: one entrance reveal and nothing else — the headline clip, the
+ * stage fade, and the staggered beats/tags, on the same one-time "top 75%"
+ * trigger Hero/Creator/Featured already use. The section previously also
+ * borrowed 0.65 of a viewport for a pinned depth-separation effect on its
+ * decorative planes; see the note where that timeline used to be built for
+ * why it was removed rather than tuned. Featured's horizontal pin is now the
+ * page's only borrowed-scroll moment on the desktop path, which is also what
+ * makes it read as this page's one signature move rather than as a habit.
  */
 function Hardware() {
   const reducedMotion = useReducedMotion()
@@ -105,74 +102,18 @@ function Hardware() {
           '-=0.8',
         )
 
-      // Brief depth-separation pin — desktop only. Foreground content
-      // (headline/beats/tags) is intentionally left untouched here; only
-      // the background numeral and the stage's two accent planes move.
-      // Movement was increased from an earlier, too-subtle pass (±22px,
-      // ±4% scale) after a real recording showed the separation was barely
-      // perceptible — values below are tuned so the "layers pulling apart"
-      // moment reads clearly on screen without becoming showy. The rear
-      // plate and foreground slab each carry a static base `rotate()` in
-      // CSS (see stageAccentBack/stageAccentFront) — recompose targets
-      // that exact base angle, not 0, so "recomposed" matches the settled
-      // static frame precisely rather than flattening the tilt out.
-      ScrollTrigger.matchMedia({
-        '(min-width: 1024px)': () => {
-          const BACK_BASE_ROTATE = -2
-          const FRONT_BASE_ROTATE = 1.4
-
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: rootRef.current,
-              // The section's BOTTOM edge, not its top. When the composition
-              // fits the viewport — which, after the layout fix in
-              // Hardware.module.css, it does at every standard desktop size —
-              // the two are the same scroll position to the pixel, because the
-              // section is exactly 100vh tall. They differ only when it does
-              // NOT fit: a short desktop window, a long translation, a large
-              // browser zoom. Pinning from the top there froze the section for
-              // 0.65 of a viewport with the rest of it still below the fold —
-              // measured before this change at 1024/1440/1920, where the tags
-              // line was off-screen for the pin's entire duration and the
-              // third beat was too at 1024. Hanging the pin off the bottom
-              // edge means the visitor has always reached the end of the
-              // section before its scroll is borrowed.
-              start: 'bottom bottom',
-              end: () => `+=${Math.round(window.innerHeight * 0.65)}`,
-              scrub: 1,
-              pin: true,
-              invalidateOnRefresh: true,
-            },
-          })
-
-          // Rear plate drifts further back/up and tilts slightly more.
-          tl.to(
-            '[data-stage-plane="back"]',
-            { y: -55, x: -16, scale: 0.92, rotate: BACK_BASE_ROTATE - 3 },
-            0,
-          )
-            // Foreground slab pushes forward/down and laterally, tilting
-            // the other way — the largest, most legible move of the three.
-            .to(
-              '[data-stage-plane="front"]',
-              { y: 60, x: 18, scale: 1.06, rotate: FRONT_BASE_ROTATE + 3 },
-              0,
-            )
-            // Numeral moves least of all — the deepest, slowest layer.
-            .to('[data-numeral]', { y: -14 }, 0)
-            .to(
-              '[data-stage-plane="back"]',
-              { y: 0, x: 0, scale: 1, rotate: BACK_BASE_ROTATE },
-              1,
-            )
-            .to(
-              '[data-stage-plane="front"]',
-              { y: 0, x: 0, scale: 1, rotate: FRONT_BASE_ROTATE },
-              1,
-            )
-            .to('[data-numeral]', { y: 0 }, 1)
-        },
-      })
+      // The depth-separation pin that used to live here is gone. It held the
+      // page for 0.65 of a viewport while the two decorative accent planes
+      // and the background numeral pulled apart and then recomposed to
+      // exactly the frame they started from — a round trip that ended where
+      // it began, so nothing it showed survived it. Its own history says as
+      // much: the movement had been enlarged once already because a recording
+      // showed the effect was imperceptible, which is the tell that the
+      // motion was there to be noticed rather than to communicate. Borrowing
+      // a visitor's scroll is the most expensive thing a section can do, and
+      // this section now spends it on nothing: the stage's depth is real
+      // static layering, the photograph is the subject, and the entrance
+      // reveal above still introduces both.
     }, rootRef)
 
     return () => ctx.revert()
@@ -207,18 +148,20 @@ function Hardware() {
           </p>
         </div>
 
-        {/* Development placeholder hardware stage — no CarterPCs assets are
-            used. `.mediaLayer` is the drop-in target for future approved
-            hardware photography/video/cutouts; the accent planes around it
-            are decorative depth, not additional required media slots. */}
+        {/* Workshop image is decorative: the adjacent copy provides the
+            section's meaning, while the accent planes retain the stage depth. */}
         <figure
           className={styles.hardwareStage}
           aria-hidden="true"
           data-reveal-stage
-          data-dev-placeholder="true"
         >
           <div className={styles.stageAccentBack} data-stage-plane="back" />
           <div className={styles.mediaLayer} data-stage-plane="mid">
+            <img
+              className={styles.mediaImage}
+              src={hardwareWorkshopBuild}
+              alt=""
+            />
             <span className={styles.stageGuide} aria-hidden="true" />
             <span className={styles.stageCorner} aria-hidden="true" />
             <span className={styles.stageCornerEnd} aria-hidden="true" />

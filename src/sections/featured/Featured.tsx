@@ -770,30 +770,15 @@ function Featured() {
                   ))}
                 </div>
 
-                {/* The same three positions again, read vertically at the far
-                  right — the one mark in the panel's deliberately empty right
-                  side, so that emptiness reads as composed rather than as
-                  space the layout failed to use. Only where that space
-                  actually exists — see .sequence for the width it starts at
-                  and why.
-
-                  Decorative in the strictest sense — it restates the
+                {/* A second copy of those three positions used to be drawn
+                  vertically at the far right, to fill the panel's empty right
+                  margin. It is gone: by its own description it restated the
                   indicator directly above it, which itself restates scroll
-                  position — hence aria-hidden and, in CSS, pointer-events:
-                  none. Nothing here is a control and nothing here is new
-                  information. */}
-                <div className={styles.sequence} aria-hidden="true" data-sequence-rail>
-                  {stories.map((other, i) => (
-                    <span
-                      key={other.index}
-                      className={
-                        i === activeIndex
-                          ? `${styles.sequenceMark} ${styles.sequenceMarkActive}`
-                          : styles.sequenceMark
-                      }
-                    />
-                  ))}
-                </div>
+                  position, so the panel carried the same one fact three
+                  times. The margin is left empty on purpose — an empty margin
+                  in an editorial layout is a measure, not a gap to fill, and
+                  the panel now has exactly one progress indicator, which is
+                  the one a visitor can act on. */}
               </article>
             )
           })}

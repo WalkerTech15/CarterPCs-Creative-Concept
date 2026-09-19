@@ -29,9 +29,9 @@ import styles from './Closing.module.css'
  * COPY
  * Everything visible comes from the dictionary except the identity, which is
  * the proper noun "CarterPCs" and is written as a literal in every language,
- * exactly as the nav bar and Hero's Featured-In strip already do. There are no
- * links, handles, counts or contact details of any kind — the only interactive
- * element is the back-to-top control, which targets #hero.
+ * exactly as the nav bar already does. There are no links, handles, counts or
+ * contact details of any kind — the only interactive element is the
+ * back-to-top control, which targets #hero.
  *
  * The headline is one sentence broken across two display lines, and each
  * language chooses its own break point (see the dictionary comment) rather

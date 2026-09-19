@@ -127,21 +127,12 @@ function Creator() {
     <section id="creator" className={styles.creator} ref={rootRef}>
       <span className={styles.seam} aria-hidden="true" />
 
-      {/* Section index rail: mirrors the Hero's page-progress language while
-          keeping the photograph free of the oversized environmental numeral. */}
-      <div className={styles.index} aria-hidden="true">
-        <span className={styles.indexLine} />
-        <span className={styles.indexActive} />
-        <span className={styles.indexTick} />
-        <span className={styles.indexTick} />
-        <span className={styles.indexTick} />
-        <span className={styles.indexTick} />
-        <span className={styles.indexTick} />
-        <p className={styles.indexCount}>
-          <span>02</span>
-          <span className={styles.indexTotal}>/06</span>
-        </p>
-      </div>
+      {/* The section index rail that used to sit here (a hairline with five
+          tick marks and a "02 /06" count) is gone, with Hero's. It restated
+          what the meta label immediately below it already says in words —
+          "02 / Creator" — in a second, weaker notation whose tick count was
+          decorative rather than structural. One progression language per
+          page, and the readable one wins. */}
 
       <div className={styles.canvas}>
         <p className={styles.meta} data-reveal>

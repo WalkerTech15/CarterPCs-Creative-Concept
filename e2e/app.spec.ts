@@ -426,101 +426,11 @@ test('desktop: the timeline shares the text column’s left edge exactly', async
   }
 })
 
-test('desktop: the far-right sequence mark is decorative, on the section margin, and touches nothing', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/')
-  await parkFeatured(page)
-
-  const marks = await page.evaluate(() => {
-    const r = (el: Element) => el.getBoundingClientRect()
-    const cross = (a: DOMRect, b: DOMRect) =>
-      Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
-      Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
-    const nav = r(document.querySelector('nav')!)
-    // The margin the section header itself sits on — the mark is on that same
-    // line by construction, so this reads it rather than hard-coding a number.
-    const margin = parseFloat(
-      getComputedStyle(document.querySelector('#featured [class*="intro"]')!)
-        .paddingRight,
-    )
-    return Array.from(document.querySelectorAll('#featured [data-panel]')).map(
-      (panel) => {
-        const seq = panel.querySelector('[data-sequence-rail]')!
-        const rail = panel.querySelector('[class*="actions"]')!
-        const frame = panel.querySelector('[data-media-frame]')!
-        const content = panel.querySelector('[data-panel-content]')!
-        const timeline = panel.querySelector('[class*="progress"]')!
-        const box = r(seq)
-        const segments = Array.from(seq.querySelectorAll('span'))
-        const accent = getComputedStyle(
-          timeline.querySelector('[class*="tickActive"]')!,
-        ).backgroundColor
-        const centre = document.elementFromPoint(
-          (box.left + box.right) / 2,
-          (box.top + box.bottom) / 2,
-        )
-        return {
-          segments: segments.length,
-          // Quiet: hairlines, and each one a fraction of the video's height.
-          widths: segments.map((s) => r(s).width),
-          tallestRelativeToVideo: box.height / r(frame).height,
-          // Decorative: announced to nobody, and the pointer goes through it.
-          ariaHidden: seq.getAttribute('aria-hidden'),
-          pointerEvents: getComputedStyle(segments[0]).pointerEvents,
-          catchesPointer: centre === seq || segments.some((s) => s === centre),
-          // Exactly one active, and in the site's accent — the same colour the
-          // horizontal timeline's active dot carries.
-          active: segments.filter(
-            (s) => getComputedStyle(s).backgroundColor === accent,
-          ).length,
-          // Placement: on the section's own right margin, right of the rail.
-          // Measured against the PANEL's right edge, not the viewport's — at
-          // rest only the first panel is on screen; the other two are parked a
-          // viewport-width apart to the right, waiting their turn.
-          fromRightEdge: r(panel).right - box.right,
-          margin,
-          gapToRail: box.left - r(rail).right,
-          overNav: cross(box, nav),
-          overFrame: cross(box, r(frame)),
-          overRail: cross(box, r(rail)),
-          overCopy: cross(box, r(content)),
-          overTimeline: cross(box, r(timeline)),
-        }
-      },
-    )
-  })
-
-  expect(marks).toHaveLength(3)
-  for (const m of marks) {
-    expect(m.segments).toBe(3)
-    expect(m.widths).toEqual([2, 2, 2])
-    expect(m.tallestRelativeToVideo).toBeLessThan(0.25)
-    expect(m.ariaHidden).toBe('true')
-    expect(m.pointerEvents).toBe('none')
-    expect(m.catchesPointer).toBe(false)
-    expect(m.active).toBe(1)
-    expect(Math.abs(m.fromRightEdge - m.margin)).toBeLessThan(1)
-    expect(m.gapToRail).toBeGreaterThan(0)
-    expect(m.overNav).toBe(0)
-    expect(m.overFrame).toBe(0)
-    expect(m.overRail).toBe(0)
-    expect(m.overCopy).toBe(0)
-    expect(m.overTimeline).toBe(0)
-  }
-
-  // Below 1280 there is no empty right side to mark — the copy column, the
-  // plate and the action rail take the panel — so it is not drawn at all.
-  await page.setViewportSize({ width: 1024, height: 768 })
-  await page.reload()
-  await parkFeatured(page)
-  expect(
-    await page.evaluate(() =>
-      getComputedStyle(document.querySelector('[data-sequence-rail]')!).display,
-    ),
-  ).toBe('none')
-})
+/* The far-right vertical sequence mark this block used to cover has been
+   removed from the section (see Featured.tsx and Featured.module.css): it
+   drew the same three scroll positions the bottom timeline already draws,
+   so the panel stated one fact three times. The timeline's own geometry
+   test directly above still covers the indicator that remains. */
 
 /* ===== Featured: the action rail ===== */
 
@@ -766,6 +676,13 @@ const jumpToHardware = async (page: Page) => {
 test('the #hardware anchor lands below the fixed bar at every width, in every language', async ({
   page,
 }) => {
+  // Twelve full iterations (4 widths x 3 languages), each a reload plus a
+  // smooth scroll polled to rest — this does not fit the default 30s budget
+  // once the suite is running workers in parallel, and it is the budget that
+  // runs out, never an assertion. Marked slow rather than trimmed: the widths
+  // and the languages are the point of the test.
+  test.slow()
+
   // The bar is 5rem tall only from 1024px up: below that its link row wraps to
   // two lines, then to three, and where it wraps depends on how long the
   // translated labels are. A single scroll-margin was landing the section
@@ -798,6 +715,11 @@ test('the #hardware anchor lands below the fixed bar at every width, in every la
 test('Hardware: the object never crosses the copy, and the pin never strands the tail', async ({
   page,
 }) => {
+  // Nine iterations (3 widths x 3 languages) of reload + polled smooth
+  // scroll — same budget problem as the anchor test above, same reason for
+  // widening it rather than cutting coverage.
+  test.slow()
+
   for (const [width, height] of [
     [1024, 768],
     [1440, 900],

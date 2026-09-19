@@ -27,7 +27,7 @@
  * breadth of CarterPCs' content categories" framing.
  *
  * LOCALIZATION: every text field is a `Localized` record stored next to the
- * `id`/`tier`/`media` structure it describes, and `getContentCategories(
+ * `id`/`tier`/`shortIndex` structure it describes, and `getContentCategories(
  * language)` resolves one language into the flat shape the section renders.
  * `id` is NEVER localized — it is the animation selector (`[data-cat="…"]`,
  * `[data-media="…"]`) the pinned choreography addresses, so the timeline is
@@ -52,14 +52,31 @@ export interface ContentCategory {
   tags: string[]
   /** Scale tier, from RESEARCH.md §3's Importance column: 1 = Core/Primary, 2 = High, 3 = Medium(-High). */
   tier: 1 | 2 | 3
-  /** Whether this entry gets a development media-crop window (see top-of-file contract note in ContentUniverse.tsx). Reserved for the two tier-1 categories so media stays a rare accent, not a per-item default. */
-  media: boolean
+  /**
+   * The `index` of the Featured story (see data/featured.ts) that actually
+   * belongs to this territory, or null where none does.
+   *
+   * This replaced a `media: boolean` flag that switched on an empty
+   * decorative crop window — a clipped rectangle holding a blurred colour
+   * field, described in the code as "deliberately obscured future footage".
+   * On the light theme it read as an image that had failed to load, and on
+   * either theme it was a picture of nothing: the section's two most
+   * important territories were illustrated with placeholders while three
+   * real, already-licensed Shorts sat one section above it. Pointing the
+   * same two slots at those Shorts costs no new assets and makes the field
+   * an index of real work rather than a taxonomy diagram.
+   *
+   * Only the two tier-1 territories carry one, so media stays a deliberate
+   * accent rather than a per-item default — and the mapping lives here, as
+   * data, instead of being inferred from a category name in the view.
+   */
+  shortIndex: string | null
 }
 
 interface ContentCategorySource {
   id: string
   tier: ContentCategory['tier']
-  media: boolean
+  shortIndex: string | null
   fullName: Localized<string>
   primary: Localized<string[]>
   secondary: Localized<string>
@@ -71,7 +88,8 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'hardware',
     tier: 1,
-    media: true,
+    // "What's the best PC you can get for $250k??" — featured.ts story 01.
+    shortIndex: '01',
     fullName: {
       en: 'PC Hardware & Custom Builds',
       fr: 'Matériel PC et PC sur mesure',
@@ -101,7 +119,8 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'mobile',
     tier: 1,
-    media: true,
+    // "What has Apple copied from Samsung??" — featured.ts story 02.
+    shortIndex: '02',
     fullName: {
       en: 'Smartphones & Mobile Tech',
       fr: 'Smartphones et tech mobile',
@@ -131,7 +150,7 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'tech-news',
     tier: 2,
-    media: false,
+    shortIndex: null,
     fullName: {
       en: 'Tech News & Controversies',
       fr: 'Actus tech et controverses',
@@ -165,7 +184,7 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'scam-tech',
     tier: 2,
-    media: false,
+    shortIndex: null,
     fullName: {
       en: 'Scam Tech & Budget Gear',
       fr: 'Arnaques tech et matériel discount',
@@ -195,7 +214,7 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'emerging-tech',
     tier: 3,
-    media: false,
+    shortIndex: null,
     fullName: {
       en: 'Emerging Tech & AI Tools',
       fr: 'Tech émergente et outils IA',
@@ -225,7 +244,7 @@ const contentCategorySources: ContentCategorySource[] = [
   {
     id: 'community',
     tier: 3,
-    media: false,
+    shortIndex: null,
     fullName: {
       en: 'Community & Storytelling',
       fr: 'Communauté et récits',
@@ -258,7 +277,7 @@ export function getContentCategories(language: Language): ContentCategory[] {
   return contentCategorySources.map((category) => ({
     id: category.id,
     tier: category.tier,
-    media: category.media,
+    shortIndex: category.shortIndex,
     fullName: localize(category.fullName, language),
     primary: localize(category.primary, language),
     secondary: localize(category.secondary, language),

@@ -51,7 +51,9 @@ export const es: Dictionary = {
     support:
       'Tecnología que engancha. Montajes de PC, hardware y las decisiones tecnológicas del día a día.',
     ctaPrimary: 'Explorar el universo',
-    ctaSecondary: 'Ver el vídeo',
+    // Names the three real Shorts this button scrolls to. "Ver el vídeo"
+    // implied a single showreel that does not exist.
+    ctaSecondary: 'Ver los Shorts',
     aboutTitle: 'Sobre Carter',
     aboutText:
       'Carter crea contenido tecnológico rápido y accesible: hardware, móviles, montajes y todo el mundo tech.',
@@ -70,6 +72,9 @@ export const es: Dictionary = {
       builds: 'PC a medida',
       dozens: 'Decenas',
     },
+    // Keep the date and the figures in Hero.tsx's STATS in sync.
+    statsSource:
+      'Cifras de YouTube tomadas de un contador público el 28 de julio de 2026, redondeadas a la baja. Los montajes no se contabilizan públicamente.',
     tiles: {
       builds: {
         title: 'PC a medida',
@@ -84,7 +89,9 @@ export const es: Dictionary = {
         body: 'Explora los sistemas, la filosofía y el proceso detrás de todo.',
       },
     },
-    featuredIn: 'Aparece en',
+    // Labels the real channel row. Replaced `featuredIn` ("Aparece en"),
+    // which introduced publications this project cannot substantiate.
+    channelsLabel: 'Ver en',
     disclaimer: 'Concepto no oficial. No implica afiliación ni respaldo.',
   },
 

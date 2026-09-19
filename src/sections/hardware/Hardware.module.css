@@ -212,43 +212,12 @@
   transform: rotate(-2deg);
 }
 
-/* Primary future-media surface — the single obvious drop-in target (see
-   Hardware.tsx's media-stage contract comment). The clipped top-right
-   corner is what stops this from reading as a plain rectangle/card; the
-   mask keeps its trailing edge dissolving into the backdrop rather than
-   cutting hard, and the inset box-shadows describe an engineered edge
-   (material), not a decorative glow. */
+/* Primary media surface. The clipped top-right corner keeps the workshop
+   photograph part of the engineered stage rather than a plain image card. */
 .mediaLayer {
   inset: 3% 6% 26% 19%;
   clip-path: polygon(0 0, 86% 0, 100% 9%, 100% 100%, 0 100%);
-  background:
-    radial-gradient(
-      55% 50% at 20% 15%,
-      color-mix(in srgb, var(--color-accent-primary) 13%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      45% 45% at 88% 92%,
-      color-mix(in srgb, var(--color-accent-secondary) 11%, transparent),
-      transparent 70%
-    ),
-    /* The surface token alone is one step off the page ground — #1a1a1a on
-       #0d0d0d, a ratio of 1.16:1 — and the old gradient then diluted it with
-       transparency and ran it back to the base colour by 82%. The result
-       measured as, and photographed as, nothing: the largest element in the
-       section carried the least information in it. Lifting the near end with
-       a mix of the TEXT token (rather than a new colour) puts the lit face at
-       ~1.6:1 and keeps the far end at the base, so the plane reads as a
-       surface turning away from a light rather than as a hole. The same one
-       rule inverts correctly on the light theme, where the mix darkens
-       instead. */
-    linear-gradient(
-      168deg,
-      color-mix(in srgb, var(--color-bg-surface) 82%, var(--color-text-primary))
-        0%,
-      color-mix(in srgb, var(--color-bg-surface) 92%, transparent) 58%,
-      var(--color-bg-base) 100%
-    );
+  background-color: var(--color-bg-surface);
   box-shadow:
     /* An engineered edge all the way round, and a brighter lit top — the
        silhouette was previously described only by where the gradient
@@ -257,16 +226,14 @@
       color-mix(in srgb, var(--color-text-primary) 12%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 22%, transparent),
     inset 0 0 3.5rem rgb(0 0 0 / 35%);
-  /* Still dissolving into the backdrop at the trailing corner, but over the
-     last 18% rather than the last 32%, and never to fully transparent — the
-     old ramp erased the corner cut and the edge line with it. */
-  mask-image: linear-gradient(
-    150deg,
-    rgb(0 0 0) 0%,
-    rgb(0 0 0) 82%,
-    rgb(0 0 0 / 72%) 93%,
-    rgb(0 0 0 / 45%) 100%
-  );
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+  filter: saturate(0.9) contrast(1.04) brightness(0.82);
 }
 
 /* Foreground slab — thin, wide, and crosses .mediaLayer's own lower edge

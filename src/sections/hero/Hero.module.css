@@ -8,13 +8,15 @@
  *                image is supplied — see Hero.tsx's media contract)
  *   2  .inner    eyebrow + headline + support + CTAs
  *   3  .about / .stats   the two right-side glass cards
- *   4  .lower    three content tiles + Featured-In strip
- *   4  .index    left editorial index rail
+ *   4  .lower    three content tiles + the channel row
  *
  * Desktop positions are percentages taken from the reference frame
  * (1536×1024, mapped onto a 1440-wide viewport): content column at 11%,
- * right cards inset 3.4% from the right edge, index rail at 4.6%,
- * About card top at 24.5% and stats card at 53% of section height.
+ * right cards inset 3.4% from the right edge, About card top at 24.5%
+ * and stats card at 53% of section height.
+ *
+ * The reference's left editorial index rail (formerly layer 4, at 4.6%)
+ * is gone — see the note where it used to be mounted in Hero.tsx.
  */
 
 .hero {
@@ -27,8 +29,8 @@
 }
 
 /* THE SHARED COMPOSITION CANVAS — 96rem (1536px), the reference frame's
-   exact width, centred. Every major element (index rail, type column,
-   portrait, disc, cards, tiles, strip — and the nav via its own .bar)
+   exact width, centred. Every major element (type column, portrait,
+   disc, cards, tiles, channel row — and the nav via its own .bar)
    is positioned against this one frame, so viewports wider than the
    canvas keep the composition intact instead of spreading it apart.
    Only the environmental wash and the seam stay full-bleed. */
@@ -522,7 +524,7 @@
   color: color-mix(in srgb, var(--color-text-primary) 52%, transparent);
 }
 
-/* ===== 4 — Lower rail: tiles + Featured-In strip ===== */
+/* ===== 4 — Lower rail: tiles + channel row ===== */
 
 .lower {
   position: relative;
@@ -657,13 +659,15 @@
   transform: translateX(0.125rem);
 }
 
-/* Featured-In strip — visual recreation of the reference's wordmark
-   row using TYPE ONLY (no bundled logo files). aria-hidden in the
-   markup; the visible disclaimer sits directly beneath. */
+/* Channel row — the real destinations, in the compositional slot the
+   reference's "Featured in" wordmark row used to hold (see Hero.tsx and
+   data/channels.ts). The row keeps that slot's restraint: one small
+   label, quiet ink, one baseline. What changed is that every entry is now
+   a link rather than a typographic imitation of a publication's logo. */
 .strip {
   display: flex;
   flex-wrap: wrap;
-  /* Label and wordmarks share one baseline in the reference. */
+  /* Label and links share one baseline. */
   align-items: baseline;
   gap: 0.75rem 2.5rem;
   margin-block-start: var(--space-4);
@@ -684,8 +688,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 0.625rem 1.5rem;
+  /* Three real links, not six imitation wordmarks: they sit together at
+     the start of the row rather than being justified across its full
+     width, which at three items would read as three isolated labels
+     rather than one row. */
+  gap: 0.625rem 2rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -693,50 +700,35 @@
 
 .stripSlot {
   white-space: nowrap;
-  color: color-mix(in srgb, var(--color-text-primary) 44%, transparent);
 }
 
-/* Typographic approximations of the reference wordmarks' visual mass —
-   per-mark sizes ink-matched to the reference slots (Apple glyph 17px,
-   Forbes 55, The Verge 80, HYPEBEAST 93, LTT 125, uncrate 67). */
-.markSans {
-  font-size: 1.0625rem;
+.stripLink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3125rem;
+  font-size: 0.9375rem;
   font-weight: 600;
-  letter-spacing: 0.005em;
-}
-
-.markSerif {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1rem;
-  font-weight: 700;
   letter-spacing: 0.01em;
+  text-decoration: none;
+  color: color-mix(in srgb, var(--color-text-primary) 62%, transparent);
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
-.markVerge {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.005em;
+.stripLink:hover,
+.stripLink:focus-visible {
+  color: var(--color-text-primary);
 }
 
-.markCaps {
-  font-size: 0.875rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.stripArrow {
+  font-size: 0.6875rem;
+  /* The one moving part, and it moves only under a pointer/focus: a
+     hairline nudge along the direction the link actually goes. */
+  transition: translate var(--duration-fast) var(--ease-standard);
 }
 
-.markLower {
-  font-size: 1.0625rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: lowercase;
-}
-
-.markGlyph img {
-  width: 1.25rem;
-  height: 1.46875rem;
-  translate: 0 0.3125rem;
-  filter: brightness(0) invert(1);
+.stripLink:hover .stripArrow,
+.stripLink:focus-visible .stripArrow {
+  translate: 0.125rem -0.125rem;
 }
 
 .disclaimer {
@@ -747,10 +739,19 @@
   color: color-mix(in srgb, var(--color-text-primary) 32%, transparent);
 }
 
-/* ===== Left editorial index rail (desktop only) ===== */
-
-.index {
-  display: none;
+/* The provenance line for the By The Numbers figures — see Hero.tsx for why
+   it is down here rather than in that card. One step quieter again than the
+   disclaimer above it: it is a citation, not a statement. */
+.statsSource {
+  margin-block-start: 0.25rem;
+  max-width: 48rem;
+  margin-inline: auto;
+  font-size: 0.5625rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-wrap: balance;
+  color: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
 }
 
 /* Hero → Creator transition: unchanged hairline motif, picked up by
@@ -939,13 +940,29 @@
   }
 
   /* Keep the three frozen labels on one line, but leave a clear gutter
-     between columns at the approved control width. */
+     between columns at the approved control width.
+     The middle column carries the longest label in every language ("Total
+     YouTube Views" / "Vues YouTube totales" / "Total vistas YouTube") while
+     its value ("6.8B+") is the narrowest of the three, so the base 1.12/1/1
+     split — which is derived from the reference's VALUE positions — starves
+     exactly the column that needs the most room. Widening it here, at the
+     expense of the third column (whose "Dozens" value and label are both
+     short), is what buys the last few pixels fr needs. */
   .statsList {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.22fr) minmax(0, 0.78fr);
     column-gap: 1rem;
   }
 
+  /* 9px, not 10px. These labels are `nowrap` inside fixed grid columns, so a
+     label wider than its column does not wrap or clip — it runs straight
+     into its neighbour, and at 10px it did, in all three languages: measured
+     ink-to-ink gaps of -6px (en), -11px (fr) and -5px (es) at 1240–1280,
+     with fr still touching at exactly 0px at 1440. The labels' own lengths
+     are fixed by the dictionary and the column widths by the reference
+     composition, so type size is the only term left to move. At 9px the
+     worst case (fr @1240) clears by 6px and every other case by more. */
   .statLabel {
-    font-size: 0.625rem;
+    font-size: 0.5625rem;
     letter-spacing: 0;
     white-space: nowrap;
   }
@@ -994,100 +1011,22 @@
   }
 
   .strip {
-    /* Thin divider between the 03–05 tile rail and the Featured-In row,
+    /* Thin divider between the 03–05 tile rail and the channel row,
        matching the supplied reference's section break. */
     margin-block-start: 1.5rem;
     padding-block-start: 1.75rem;
     border-block-start: 1px solid
       color-mix(in srgb, var(--color-text-primary) 11%, transparent);
-    /* The reference insets the strip from the tile rail on both sides:
-       label ink starts at x202 (13.15% of frame) and the last mark ends
-       at x1402 — these paddings add to .lower's 11.1%/3.45%. The wide
-       column gap reproduces the 116px label→first-mark interval. */
-    padding-inline: 2.44% 6.2%;
-    gap: 0.75rem 7rem;
+    /* Left inset adds to .lower's own 11.1%, so the label's ink starts on
+       the tile rail's left edge. The right inset the reference needed is
+       gone with the wordmarks: it existed to pull a justified six-item row
+       in off the frame edge, and three left-aligned links do not reach it. */
+    padding-inline: 2.44% 0;
+    gap: 0.75rem 4rem;
   }
 
   .disclaimer {
     margin-block-start: 0.375rem;
-  }
-
-  /* Left index rail: hairline, violet active point, two subtle progress
-     markers, and the 01 /06 count at its base. */
-  .index {
-    display: block;
-    position: absolute;
-    inset-block: 17% 8.8%;
-    inset-inline-start: 4.56%;
-    z-index: 4;
-    width: 1px;
-    pointer-events: none;
-  }
-
-  .indexLine {
-    position: absolute;
-    inset-block: 0 3.25rem;
-    inset-inline-start: 0;
-    width: 1px;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      color-mix(in srgb, var(--color-text-primary) 13%, transparent) 10%,
-      color-mix(in srgb, var(--color-text-primary) 13%, transparent) 88%,
-      transparent 100%
-    );
-  }
-
-  .indexActive {
-    position: absolute;
-    inset-block-start: 7%;
-    inset-inline-start: 0.5px;
-    width: 0.375rem;
-    height: 0.375rem;
-    translate: -50% -50%;
-    border-radius: 50%;
-    background-color: var(--color-accent-secondary);
-    box-shadow: 0 0 0 0.1875rem
-      color-mix(in srgb, var(--color-accent-secondary) 16%, transparent);
-  }
-
-  .indexTick {
-    position: absolute;
-    inset-block-start: 42%;
-    inset-inline-start: 0.5px;
-    width: 0.1875rem;
-    height: 0.1875rem;
-    translate: -50% -50%;
-    border-radius: 50%;
-    background-color: color-mix(
-      in srgb,
-      var(--color-text-primary) 22%,
-      transparent
-    );
-  }
-
-  .indexTick + .indexTick {
-    inset-block-start: 55%;
-  }
-
-  .indexCount {
-    position: absolute;
-    inset-block-end: 0;
-    inset-inline-start: -0.125rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    /* Reference ink: the 01/06 block spans y888→928 (40px) — larger
-       than the surrounding micro-labels. */
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: color-mix(in srgb, var(--color-text-primary) 78%, transparent);
-  }
-
-  .indexTotal {
-    font-size: 0.8125rem;
-    color: color-mix(in srgb, var(--color-text-primary) 36%, transparent);
   }
 }
 

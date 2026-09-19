@@ -51,13 +51,9 @@ html[data-theme='light'] #hero [class*='ctaPrimary'] {
   border-color: #151516;
 }
 
-/* The one Featured-In mark that is an image rather than type is forced to
-   flat white for the dark ground (`brightness(0) invert(1)`), which left it
-   invisible on the light one — measured as a blank crop where the glyph
-   should be. Dropping the invert keeps the same flattening, in ink. */
-html[data-theme='light'] #hero [class*='markGlyph'] img {
-  filter: brightness(0);
-}
+/* A light-theme correction for the Apple glyph in the Hero's "Featured in"
+   strip used to live here. Both the strip and the bundled logo are gone —
+   see data/channels.ts — so there is nothing left for it to correct. */
 
 /* LARGE-DESKTOP PRESENTATION SCALE
    The whole composition system (the Hero's shared 96rem canvas, the nav

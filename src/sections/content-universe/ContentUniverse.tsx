@@ -8,6 +8,7 @@ import {
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
 import { getContentCategories } from '../../data/contentUniverse'
+import { getFeaturedStories } from '../../data/featured'
 import styles from './ContentUniverse.module.css'
 
 /**
@@ -30,43 +31,47 @@ import styles from './ContentUniverse.module.css'
  *    and both digits move during the pin, so the numeral participates in
  *    every compositional state instead of sitting inert behind them.
  *
- * 2. The connecting thread is one continuous path (single <path>, drawn
- *    progressively) that travels the field in category order — entering at
- *    Tech News, sweeping under Hardware's baseline, down past Scam Tech,
- *    across Community, up through Mobile Tech's headline, exiting through
- *    Emerging Tech. It sits BETWEEN the digits (below) and the entries/
- *    media (above), so media crops visibly interrupt it — the occlusion is
- *    what makes it read as a path traveling through one space rather than
- *    decorative line fragments. Anchor coordinates are tuned against the
- *    real rendered grid (measured, not guessed).
- *
- * 3. Media windows are no longer letterbox rectangles in document flow.
- *    Each tier-1 entry carries one absolutely-positioned crop that OVERLAPS
- *    its own typography and crosses into neighboring grid regions:
- *    Hardware's is a wide crop with a hard diagonal-cut corner extending
- *    right into the field's former dead center (across the "0"); Mobile
- *    Tech's is a vertical 9:16-proportioned crop — the native shape of the
+ * 2. The two tier-1 entries each carry one absolutely-positioned media crop
+ *    that OVERLAPS its own typography and crosses into neighboring grid
+ *    regions: Hardware's is a wide crop with a hard diagonal-cut corner
+ *    extending right into the field's former dead center (across the "0");
+ *    Mobile Tech's is a vertical crop — closer to the native shape of the
  *    short-form content the site documents — slipping behind the headline
  *    and across the "5". Different silhouettes on purpose: identical
- *    windows read as a grid. Internally each carries one oversized blurred
- *    light source + directional gradient so they read as deliberately
- *    obscured future footage, not empty placeholders. Still dev-only
- *    (data-dev-placeholder) — real approved media drops into
- *    .mediaSurface without structural change.
+ *    windows read as a grid.
  *
- * MOTION (three compositional states, one pinned timeline):
- *  - State A (entry): the full field — breadth, hierarchy, thread partially
- *    drawn, both digits framing the diagonal.
- *  - A→B: the composition's center of gravity travels down-right: Hardware
- *    recedes and slides left as its crop narrows, Mobile Tech advances
- *    toward center as its crop opens taller, the "5" slides toward center
- *    while the "0" retreats, tier-2/3 territories re-space around the new
- *    dominant, and the thread draws further. Real x/y/clip recomposition,
- *    not opacity-only emphasis.
- *  - B→C: everything resolves into a third, more evenly-weighted
- *    constellation (not a rewind to A — settled offsets differ from both
- *    prior states), the thread completes end-to-end, and the closing index
- *    line below the field restates the six territories as one list.
+ *    Those two crops now hold the REAL Shorts that belong to those two
+ *    territories (data/contentUniverse.ts's `shortIndex` names which, and
+ *    says why), as links out to the videos themselves. They previously held
+ *    a blurred colour field standing in for footage that did not exist —
+ *    which is what made this section an abstract taxonomy rather than an
+ *    index of anything. The territories a visitor can actually go and watch
+ *    are now the two the composition gives the most space to.
+ *
+ * REMOVED — the connecting thread: a single SVG path that wandered the
+ *    field in category order and drew itself across two viewports of
+ *    scroll. It joined six territories the section's own copy calls
+ *    coexisting rather than sequential, so the one thing it asserted was
+ *    the opposite of the point, and on the light theme it read as a stray
+ *    hairline across the composition. The `.spine` that performs the same
+ *    connective job in the sub-desktop stacked layout is kept: there the
+ *    entries genuinely are one vertical list, so a line down them is
+ *    describing the layout rather than decorating it.
+ *
+ * MOTION (two compositional states, one pinned timeline):
+ *  - State A (entry): the full field — breadth, hierarchy, both digits
+ *    framing the diagonal.
+ *  - A→B: the composition's center of gravity travels down-right, once:
+ *    Hardware recedes and slides left as its crop narrows, Mobile Tech
+ *    advances toward center as its crop opens taller, the "5" slides toward
+ *    center while the "0" retreats, and the tier-2/3 territories re-space
+ *    around the new dominant. Real x/y/clip recomposition, not opacity-only
+ *    emphasis.
+ *  A third state used to follow — a further resettling into a more evenly
+ *  weighted constellation, deliberately not a rewind to A. It was dropped:
+ *  two states make one legible statement about where the weight of this
+ *  content sits, and the third turned that statement into drifting. The pin
+ *  is correspondingly shorter, so the section gives the scroll back sooner.
  *  All six categories stay mounted and legible throughout — never a
  *  slideshow. Coordinated per-territory groups (one tween per article via
  *  data-cat), one timeline, one ScrollTrigger.
@@ -86,31 +91,20 @@ function ContentUniverse() {
   const secondary = categories.filter((c) => c.tier === 2)
   const tertiary = categories.filter((c) => c.tier === 3)
 
+  // The same three Shorts Featured renders, resolved by index so the two
+  // sections can never show a different title or link for the same video.
+  // Only the two tier-1 territories name one (see `shortIndex`).
+  const shortsByIndex = useMemo(() => {
+    const stories = getFeaturedStories(language)
+    return new Map(stories.map((story) => [story.index, story]))
+  }, [language])
+
   useLayoutEffect(() => {
     if (reducedMotion) {
       return
     }
 
     const ctx = gsap.context(() => {
-      // getTotalLength() isn't implemented in every SVG environment (jsdom's
-      // test DOM, most notably) — guarded so the draw-on-scroll effect is
-      // simply skipped rather than throwing and aborting the whole
-      // timeline/context setup below.
-      const threadEl =
-        rootRef.current?.querySelector<SVGPathElement>('[data-thread-path]') ??
-        null
-      const threadPath =
-        threadEl && typeof threadEl.getTotalLength === 'function'
-          ? threadEl
-          : null
-      const threadLength = threadPath ? threadPath.getTotalLength() : 0
-      if (threadPath) {
-        gsap.set(threadPath, {
-          strokeDasharray: threadLength,
-          strokeDashoffset: threadLength,
-        })
-      }
-
       // Resolved once, inside the context, so the onComplete below acts on
       // the same scoped elements (see Creator.tsx for the same note).
       const headlineLines = gsap.utils.toArray<HTMLElement>(
@@ -158,42 +152,18 @@ function ContentUniverse() {
       // Recomposition pin — desktop only, triggered on the field itself so
       // its frozen crop holds all six territories and both digits at once
       // (see the earlier session's measured fix for why the trigger is the
-      // field, not the section). Two phases = three compositional states.
+      // field, not the section). One phase = two compositional states.
       ScrollTrigger.matchMedia({
         '(min-width: 1024px)': () => {
-          // The thread draw has exactly ONE writer: a single scrubbed tween
-          // whose scroll range spans the field's approach AND the entire
-          // pin (0.95vh approach + 1.1vh pin). Splitting it into an
-          // approach tween + pin-timeline tweens left two scrub tweens
-          // whose ~1s smoothing windows overlap on fast jumps — they raced
-          // on strokeDashoffset and the loser's value stuck (found by
-          // probing computed dash values, which showed State A's offset
-          // persisting deep into the pin). One tween, one property owner,
-          // no race in either scroll direction.
-          if (threadPath) {
-            gsap.fromTo(
-              threadPath,
-              { strokeDashoffset: threadLength },
-              {
-                strokeDashoffset: 0,
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: fieldRef.current,
-                  start: 'top 95%',
-                  end: () => `+=${Math.round(window.innerHeight * 2.05)}`,
-                  scrub: 1,
-                  invalidateOnRefresh: true,
-                },
-              },
-            )
-          }
-
           const pin = gsap.timeline({
             defaults: { ease: 'none' },
             scrollTrigger: {
               trigger: fieldRef.current,
               start: 'top top',
-              end: () => `+=${Math.round(window.innerHeight * 1.1)}`,
+              // 0.7 of a viewport, down from 1.1: with the third state gone
+              // there is one move to read, and holding the page past the end
+              // of it is just holding the page.
+              end: () => `+=${Math.round(window.innerHeight * 0.7)}`,
               scrub: 1,
               pin: true,
               // The field's parent (.canvas) is a flex container, and
@@ -207,8 +177,8 @@ function ContentUniverse() {
             },
           })
 
-          // ---- Phase 1 (0 → 0.45): State A → State B ----
-          // Center of gravity travels down-right toward Mobile Tech.
+          // ---- State A → State B, and that is the whole timeline ----
+          // Center of gravity travels down-right toward Mobile Tech, once.
           // Purely spatial (x/y/scale/clip) — never opacity, which the
           // entrance owns; see the entrance timeline's comment.
           pin
@@ -260,57 +230,6 @@ function ContentUniverse() {
               { x: -150, y: -40, scale: 1.05, duration: 0.45 },
               0,
             )
-
-          // ---- Phase 2 (0.55 → 1): State B → State C ----
-          // Settle into a third, more even constellation — offsets are
-          // deliberately NOT a rewind to State A.
-          pin
-            .to(
-              '[data-cat="hardware"]',
-              { x: -12, y: 0, scale: 0.97, duration: 0.45 },
-              0.55,
-            )
-            .to(
-              '[data-media="hardware"]',
-              {
-                clipPath:
-                  'polygon(0% 0%, 76% 0%, 94% 28%, 94% 100%, 4% 100%, 0% 88%)',
-                duration: 0.45,
-              },
-              0.55,
-            )
-            .to(
-              '[data-cat="mobile"]',
-              { x: -28, y: -12, scale: 1.02, duration: 0.45 },
-              0.55,
-            )
-            .to(
-              '[data-media="mobile"]',
-              {
-                clipPath:
-                  'polygon(12% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12%)',
-                duration: 0.45,
-              },
-              0.55,
-            )
-            .to('[data-cat="tech-news"]', { x: 0, y: 12, duration: 0.45 }, 0.55)
-            .to('[data-cat="scam-tech"]', { x: 16, y: 0, duration: 0.45 }, 0.55)
-            .to(
-              '[data-cat="emerging-tech"]',
-              { x: -16, scale: 1.06, duration: 0.45 },
-              0.55,
-            )
-            .to(
-              '[data-cat="community"]',
-              { x: 10, y: 0, scale: 1.04, duration: 0.45 },
-              0.55,
-            )
-            .to('[data-digit="0"]', { x: -28, y: -18, duration: 0.45 }, 0.55)
-            .to(
-              '[data-digit="5"]',
-              { x: -60, y: -14, scale: 1.02, duration: 0.45 },
-              0.55,
-            )
         },
       })
     }, rootRef)
@@ -359,83 +278,70 @@ function ContentUniverse() {
               a vertical stack — the desktop thread takes over at 1024px. */}
           <span className={styles.spine} aria-hidden="true" />
 
-          {/* Connecting thread — ONE continuous path traveling the field in
-              category order (Tech News → Hardware → Scam Tech → Community →
-              Mobile Tech → Emerging Tech), layered between the digits and
-              the entries so media crops genuinely occlude it. Coordinates
-              are tuned against the real rendered 1440×900 grid. Reduced
-              motion: the JS above never runs, so it renders fully drawn. */}
-          <svg
-            className={styles.thread}
-            aria-hidden="true"
-            viewBox="0 0 1000 1000"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="content-universe-thread-gradient"
-                x1="0"
-                y1="0"
-                x2="1"
-                y2="1"
-              >
-                <stop offset="0%" stopColor="var(--color-accent-primary)" />
-                <stop offset="55%" stopColor="var(--color-accent-primary)" />
-                <stop offset="100%" stopColor="var(--color-accent-secondary)" />
-              </linearGradient>
-            </defs>
-            <path
-              data-thread-path
-              className={styles.threadPath}
-              d="M 985,160
-                 C 900,190 700,175 560,185
-                 C 380,197 150,205 70,260
-                 C 20,310 15,390 25,470
-                 C 35,580 60,760 140,880
-                 C 200,955 260,985 340,990
-                 C 480,998 560,900 640,820
-                 C 700,760 720,700 760,640
-                 C 820,555 900,420 945,300"
-            />
-          </svg>
-
           <div className={styles.tierRow} data-row="dominant">
-            {dominant.map((category) => (
-              <article
-                key={category.id}
-                className={styles.entry}
-                data-tier="1"
-                data-cat={category.id}
-                data-field-reveal
-              >
-                {category.media && (
-                  <div
-                    className={styles.entryMedia}
-                    aria-hidden="true"
-                    data-dev-placeholder="true"
-                    data-media={category.id}
-                  >
-                    <span className={styles.mediaSurface} />
-                    <span className={styles.mediaGlow} />
-                  </div>
-                )}
-                <h3 className={styles.entryName} aria-label={category.fullName}>
-                  {category.primary.map((line, lineIndex) => (
-                    <span
-                      key={`${category.id}-${lineIndex}`}
-                      className={styles.entryLine}
-                      aria-hidden="true"
+            {dominant.map((category) => {
+              const short = category.shortIndex
+                ? shortsByIndex.get(category.shortIndex)
+                : undefined
+
+              return (
+                <article
+                  key={category.id}
+                  className={styles.entry}
+                  data-tier="1"
+                  data-cat={category.id}
+                  data-field-reveal
+                >
+                  {/* The territory's real Short. A link, not decoration: the
+                    crop is the poster and the whole crop is the target, so
+                    the accessible name has to state the destination before
+                    it is followed — hence the full title plus the same
+                    "Watch on YouTube" / new-tab wording the Featured action
+                    rail already uses, rather than a bare thumbnail. The
+                    title itself is the published English title in every
+                    language (see data/featured.ts). */}
+                  {short && (
+                    <a
+                      className={styles.entryMedia}
+                      data-media={category.id}
+                      href={short.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${short.headlineLines.join(' ')} — ${
+                        t.featured.actions.watch
+                      } (${t.featured.a11y.opensInNewTab})`}
                     >
-                      {line}
-                    </span>
-                  ))}
-                </h3>
-                <p className={styles.entrySecondary}>{category.secondary}</p>
-                <p className={styles.entryDescription}>
-                  {category.description}
-                </p>
-              </article>
-            ))}
+                      <img
+                        className={styles.mediaImage}
+                        src={short.thumbnail}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                      />
+                    </a>
+                  )}
+                  <h3
+                    className={styles.entryName}
+                    aria-label={category.fullName}
+                  >
+                    {category.primary.map((line, lineIndex) => (
+                      <span
+                        key={`${category.id}-${lineIndex}`}
+                        className={styles.entryLine}
+                        aria-hidden="true"
+                      >
+                        {line}
+                      </span>
+                    ))}
+                  </h3>
+                  <p className={styles.entrySecondary}>{category.secondary}</p>
+                  <p className={styles.entryDescription}>
+                    {category.description}
+                  </p>
+                </article>
+              )
+            })}
           </div>
 
           <div className={styles.tierRow} data-row="secondary">

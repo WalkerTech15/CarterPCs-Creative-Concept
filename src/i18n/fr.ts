@@ -51,7 +51,9 @@ export const fr: Dictionary = {
     support:
       'La tech rendue intéressante. Montages PC, matériel et les décisions technologiques du quotidien.',
     ctaPrimary: 'Explorer l’univers',
-    ctaSecondary: 'Voir la vidéo',
+    // Names the three real Shorts this button scrolls to. "Voir la vidéo"
+    // implied a single showreel that does not exist.
+    ctaSecondary: 'Voir les Shorts',
     aboutTitle: 'À propos de Carter',
     aboutText:
       'Carter crée des contenus tech rapides et accessibles : matériel, mobile, montages et tout l’univers de la tech.',
@@ -72,6 +74,9 @@ export const fr: Dictionary = {
       // stats card taller than the reference geometry allows.
       dozens: 'Dizaines',
     },
+    // Keep the date and the figures in Hero.tsx's STATS in sync.
+    statsSource:
+      'Chiffres YouTube relevés sur un compteur public le 28 juillet 2026, arrondis à la baisse. Les montages ne sont pas comptabilisés publiquement.',
     tiles: {
       builds: {
         title: 'PC sur mesure',
@@ -86,7 +91,9 @@ export const fr: Dictionary = {
         body: 'Découvrez les systèmes, la philosophie et le processus derrière tout cela.',
       },
     },
-    featuredIn: 'Vu dans',
+    // Labels the real channel row. Replaced `featuredIn` ("Vu dans"), which
+    // introduced a list of publications this project cannot substantiate.
+    channelsLabel: 'À regarder sur',
     disclaimer:
       'Concept non officiel. Aucune affiliation ni approbation implicite.',
   },
