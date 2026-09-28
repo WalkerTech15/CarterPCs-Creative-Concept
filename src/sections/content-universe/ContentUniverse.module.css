@@ -288,7 +288,7 @@
   height: 100%;
   object-fit: cover;
   /* The posters are 1280x720 YouTube thumbnails whose real portrait frame is
-     the centre column (see Featured.module.css's note) — `cover` on these
+     the centre column (see Featured.media.module.css's note) — `cover` on these
      narrower boxes shows that column and crops the blurred filler bars. */
   object-position: center;
   display: block;
@@ -315,7 +315,7 @@
    These posters are 1280x720 YouTube thumbnails, and YouTube pads a Short's
    portrait frame with a blurred, darkened zoom of itself to fill that
    landscape box; the real frame is the centre 31.6% of the width (the same
-   measurement Featured.module.css derives). `cover` on a 9:16 box shows
+   measurement Featured.media.module.css derives). `cover` on a 9:16 box shows
    0.5625/1.7778 = exactly that centre column, so the filler never appears.
    The previous 16:9 and 4:5 windows showed it: the wide one rendered as
    three visible vertical bands — blurred, real, blurred — which reads as a
