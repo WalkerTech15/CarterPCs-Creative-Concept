@@ -1,0 +1,124 @@
+== Fingerprint diff: baseline(HEAD) vs refactor ==
+
+DOM diffs=0 rect diffs=0 style diffs=0
+screenshots: 40 total, 35 pixel-identical
+  0.000%  1440x900-no-preference-light-en-pin1.png  bbox=(14, 0, 1435, 900) >8Δ px=2
+  0.000%  1440x900-no-preference-dark-fr-pin1.png  bbox=(81, 692, 436, 705) >8Δ px=0
+  0.000%  1440x900-no-preference-dark-es-pin1.png  bbox=(81, 673, 430, 702) >8Δ px=0
+  0.000%  1280x800-no-preference-dark-en-pin1.png  bbox=(3, 95, 1273, 796) >8Δ px=0
+  0.000%  1024x768-no-preference-dark-en-pin1.png  bbox=(0, 22, 1023, 768) >8Δ px=0
+
+== Noise: baseline vs baseline (before posters were force-decoded) ==
+DOM diffs=0 rect diffs=0 style diffs=0
+screenshots: 40 total, 21 pixel-identical
+
+== Behavioural checks (after) ==
+320x568-no-preference: anchorGap=177 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+320x568-reduce: anchorGap=177 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+375x812-no-preference: anchorGap=178 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+375x812-reduce: anchorGap=178 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+390x844-no-preference: anchorGap=163 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+390x844-reduce: anchorGap=163 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+768x1024-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+768x1024-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1024x768-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1024x768-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1280x800-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1280x800-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1440x900-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1440x900-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1920x1080-no-preference: anchorGap=215 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1920x1080-reduce: anchorGap=215 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+844x390-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+844x390-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+667x375-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+667x375-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+DONE
+
+== Behavioural checks (baseline) ==
+320x568-no-preference: anchorGap=177 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+320x568-reduce: anchorGap=177 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+375x812-no-preference: anchorGap=178 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+375x812-reduce: anchorGap=178 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+390x844-no-preference: anchorGap=163 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+390x844-reduce: anchorGap=163 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+768x1024-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+768x1024-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1024x768-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1024x768-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1280x800-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1280x800-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1440x900-no-preference: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1440x900-reduce: anchorGap=191 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1920x1080-no-preference: anchorGap=215 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+1920x1080-reduce: anchorGap=215 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+844x390-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+844x390-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+667x375-no-preference: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+667x375-reduce: anchorGap=161 posters=3/3 overflow=0 iframeOpen=1 closed=0 errors=0 failed1p=0
+
+== E2E baseline ==
+[73/73] [chromium] › e2e\app.spec.ts:2239:1 › reduced motion: the scrim state still switches, as an instant change
+  73 passed (1.2m)
+EXIT: 0
+== E2E after ==
+[73/73] [chromium] › e2e\featured.spec.ts:529:1 › mobile: the rail sits under the video, still reachable and inside the panel
+  73 passed (1.4m)
+EXIT: 0
+
+== git status ==
+ M AI_REPORT.md
+ M docs/ARCHITECTURE.md
+ M docs/TECH_STACK.md
+ M e2e/app.spec.ts
+ M src/app/App.test.tsx
+ M src/data/contentUniverse.ts
+ M src/data/featured.ts
+ M src/data/hardware.ts
+ M src/sections/content-universe/ContentUniverse.module.css
+ M src/sections/featured/Featured.module.css
+ M src/sections/featured/Featured.tsx
+?? "Claude report/fix-v20/"
+?? e2e/featured.spec.ts
+?? e2e/helpers.ts
+?? src/data/data.test.ts
+?? src/data/types.ts
+?? src/sections/featured/Featured.media.module.css
+?? src/sections/featured/Featured.progress.module.css
+?? src/sections/featured/Featured.rail.module.css
+?? src/sections/featured/Featured.test.tsx
+?? src/sections/featured/FeaturedActionRail.tsx
+?? src/sections/featured/FeaturedMedia.tsx
+?? src/sections/featured/FeaturedPanel.tsx
+?? src/sections/featured/FeaturedProgress.tsx
+?? src/sections/featured/featured.types.ts
+?? src/sections/featured/featured.utils.test.ts
+?? src/sections/featured/featured.utils.ts
+?? src/sections/featured/useFeaturedActions.ts
+?? src/sections/featured/useFeaturedPlayer.ts
+?? src/sections/featured/useFeaturedSequence.ts
+
+== diff stat (tracked) ==
+warning: in the working copy of 'AI_REPORT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/ARCHITECTURE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/TECH_STACK.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'e2e/app.spec.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/App.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/contentUniverse.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/featured.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/data/hardware.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/sections/content-universe/ContentUniverse.module.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/sections/featured/Featured.module.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/sections/featured/Featured.tsx', LF will be replaced by CRLF the next time Git touches it
+ AI_REPORT.md                                       | 235 ++++++-
+ docs/ARCHITECTURE.md                               | 195 ++++-
+ docs/TECH_STACK.md                                 |   2 +-
+ e2e/app.spec.ts                                    | 561 +--------------
+ src/app/App.test.tsx                               | 313 +--------
+ src/data/contentUniverse.ts                        |  50 +-
+ src/data/featured.ts                               |  42 +-
+ src/data/hardware.ts                               |  15 +-
+ .../content-universe/ContentUniverse.module.css    |   4 +-
+ src/sections/featured/Featured.module.css          | 409 +----------
+ src/sections/featured/Featured.tsx                 | 781 ++-------------------
+ 11 files changed, 456 insertions(+), 2151 deletions(-)
