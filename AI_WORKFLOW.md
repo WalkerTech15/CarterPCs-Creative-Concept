@@ -13,7 +13,7 @@ This document defines how Claude Code and Codex collaborate on the CarterPCs por
 ## Required startup
 
 - Read this file completely before starting work.
-- Read `AI_REPORT.md` before inspecting or changing the project; verify important claims directly.
+- Read `AGENTS.md` if it exists, then read `AI_REPORT.md` before inspecting or changing the project; verify important claims directly.
 - Begin every implementation task with a short checklist and a one-to-three-bullet plan.
 - Tick checklist items only after they are actually completed and verified.
 
@@ -35,6 +35,7 @@ This document defines how Claude Code and Codex collaborate on the CarterPCs por
 - Do not invent statistics, creator claims, project history, images, video metadata, or testimonials.
 - Do not expose secrets, tokens, or `.env` values.
 - Do not commit, push, deploy, reset, clean, or rewrite history unless the user explicitly authorizes that exact action.
+- Do not create external resources, databases, integrations, or change Vercel settings without explicit approval.
 - Do not delete files merely because they look unused; prove they are safe and get approval for consequential deletion.
 
 ## CarterPCs architecture and preview
@@ -118,6 +119,7 @@ behavior at 375px/768px/1024px/1440px, and zero horizontal overflow.
 - Record it as `In progress` or `Blocked`, including the visible output and likely scope.
 - Do not launch duplicate test, build, or browser processes while the original is still running.
 - Investigate a hanging test with a focused command before making a commit-readiness claim.
+- Fix test failures and in-scope bugs directly when they can be safely repaired; do not only report them.
 
 ## Minimal-solution ladder
 
@@ -197,6 +199,19 @@ responsive, and regression checks.
 - Never ask the user to fix a safe in-scope defect that can be fixed directly.
 - Do not commit, push, deploy, or change hosting settings without explicit authorization.
 
+## “Go to VS Code and check” shorthand
+
+Treat this request as a full repository and runtime inspection:
+
+1. Inspect the actual worktree, current commit, branch, and running preview.
+2. Read `AGENTS.md`, `AI_WORKFLOW.md`, and `AI_REPORT.md` when present.
+3. Check modified, staged, unstaged, and untracked files.
+4. Inspect the actual diff and compare it with the requested task.
+5. Check relevant tests, typecheck, lint, build, browser behavior, console errors, and network failures.
+6. Check desktop, tablet, mobile, accessibility, reduced motion, and performance when relevant.
+7. Identify unrelated changes and exact blockers.
+8. Give a direct Yes/No commit verdict and fix safe in-scope issues before reporting.
+
 ## Required `AI_REPORT.md` contents
 
 Every completed implementation or verification phase must report:
@@ -213,4 +228,12 @@ Every completed implementation or verification phase must report:
 - Known limitations or unresolved failures
 - Direct commit verdict and suggested `type: short description` message
 - Whether anything was committed, pushed, or deployed
+- Pre-existing failures and how they were distinguished from the current change
+
+## Commit format and staging
+
+- Stage intended files explicitly when unrelated files, reports, generated output, or user changes are present.
+- Never stage unrelated files just to make the status look clean.
+- Suggested commit messages must use `type: short description`, for example `style: refine editorial section spacing`.
+- A commit recommendation must identify the exact intended files and any remaining untracked files.
 
