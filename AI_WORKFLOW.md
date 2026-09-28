@@ -104,6 +104,50 @@ behavior at 375px/768px/1024px/1440px, and zero horizontal overflow.
 - Check both dark and light themes and EN/FR/ES when the affected content is translated.
 - For production work, repeat the important checks against the deployed URL after deployment.
 
+## Efficient visual evidence
+
+- Do not generate screenshots, PNGs, PDFs, or videos by default.
+- For code-only changes, use text diagnostics and automated tests only.
+- For visual changes, capture the smallest evidence set that proves the result: one desktop before/after pair, one mobile before/after pair, and one capture for each confirmed defect.
+- Capture accessibility or reduced-motion screenshots only when those states are relevant to the change.
+- Prefer temporary evidence outside the repository. Never place QA screenshots, PDFs, or recordings in `src/`, `public/`, or production asset folders.
+- Do not create a new `Claude report/fix-v*` folder unless the user requests a formal report.
+- Keep `AI_REPORT.md` concise: summarize measurements and reference temporary evidence rather than embedding a full screenshot matrix.
+- Use WebP or JPEG for visual evidence when lossless PNG is unnecessary.
+- Do not commit evidence artifacts automatically. Stage them only when the user explicitly requests archival.
+- Delete temporary evidence after the report is complete when it is no longer needed for review.
+
+For visual tasks, follow this order: run text-based checks and DOM measurements
+first, identify a real visual defect, then capture only the evidence needed to
+prove the fix. Do not create a PDF or full screenshot matrix unless explicitly
+requested.
+
+## Imported skill practices
+
+These are project rules distilled from the supplied Claude skills; do not copy
+their full plugin implementations into CarterPCs.
+
+- Treat each behavior, token, component, and report as having one source of
+  truth. Update the owner file and references, not generated mirrors or copies.
+- Front-load the task: state the target files, requested behavior, non-goals,
+  acceptance criteria, and verification commands before editing. Do not invent
+  adjacent features when the request is specific.
+- For UI work, inspect the existing tokens, representative component, and
+  rendered route before choosing a pattern. Preserve the site's editorial
+  register and reuse working primitives before adding new ones.
+- Run an anti-slop review before delivery: reject decorative gradients,
+  default glass cards, repeated identical card grids, arbitrary huge radii,
+  gradient text, fake metrics, redundant section numbering, and motion that
+  hides content. Keep real content and hierarchy in charge.
+- For interaction or layout changes, prefer semantic HTML and browser APIs;
+  keep focus, keyboard access, reduced motion, contrast, and responsive
+  wrapping as acceptance criteria rather than polish tasks.
+- Keep implementation and review separate: Claude may fix safe in-scope issues,
+  but a report must distinguish Verified, Failed, Not run, In progress,
+  Pre-existing, and Blocked. Never convert an unfinished command into PASS.
+- When a task grows beyond the named surface, stop and ask before refactoring
+  broadly. Prefer a small reversible patch and one focused regression check.
+
 ## Git and commit workflow
 
 - Before and after work, inspect `git status`, the current commit, staged diff, and untracked files.
@@ -112,6 +156,21 @@ behavior at 375px/768px/1024px/1440px, and zero horizontal overflow.
 - Use one focused commit per change set and a descriptive Conventional Commit message such as `style: refine editorial section spacing`.
 - Before recommending a commit, run relevant tests, typecheck, lint, build, `git diff --check`, and rendered UI checks.
 - Never rewrite history, amend, push, or deploy without explicit user authorization.
+
+## Scope, assets, and cleanup safeguards
+
+- For every new asset, record its source, license or permission, dimensions,
+  format, and whether it is production media or temporary QA evidence.
+- Do not add a dependency when existing HTML, CSS, browser APIs, or installed
+  packages can solve the requirement safely.
+- Before a risky refactor, record the starting commit and keep the change
+  reversible until focused and regression checks pass.
+- Keep one task focused on one section or concern. Split broad redesigns into
+  separate, reviewable tasks instead of mixing unrelated changes.
+- Remove temporary screenshots, PDFs, recordings, and generated reports after
+  review unless the user explicitly requests archival.
+- Verify the deployed URL only after local checks pass. Local success is not
+  evidence that deployment succeeded.
 
 ## Long-running and incomplete checks
 
