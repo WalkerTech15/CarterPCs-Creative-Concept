@@ -98,8 +98,8 @@
    disabled, with media blank, and with JS absent entirely. The ≥1024px
    query below is the ONLY thing that turns this into a horizontal
    sequence, and it does so with a native scroll-snap fallback that works
-   with zero JS; GSAP (see Featured.tsx) only additionally pins + scrubs
-   that same layout when motion is allowed. */
+   with zero JS; GSAP (see useFeaturedSequence.ts) only additionally pins +
+   scrubs that same layout when motion is allowed. */
 
 .track {
   position: relative;
@@ -142,188 +142,6 @@
     rgb(0 0 0 / 45%) 14%,
     rgb(0 0 0) 40%
   );
-}
-
-/* ===== Media frame =====
-   A Short is 9:16, so its frame is 9:16 — on every viewport. The poster is a
-   1280x720 YouTube thumbnail that carries the real portrait frame as its
-   centre column (YouTube pads the sides with a blurred, darkened zoom of the
-   same frame). `cover` on a 9:16 box shows 0.5625/1.7778 = 31.6% of that
-   width, centred: precisely the portrait column, with only the filler bars
-   cropped. Nothing of the actual Short is lost.
-
-   The frame is also the player's box. The iframe fills it and never leaves it,
-   which is what keeps the video off the headline — the previous embed sat at
-   inset: 0 on the whole panel and painted straight over the copy. */
-
-.media {
-  position: relative;
-  z-index: 1;
-  order: 3;
-  display: flex;
-  /* Stacked at these widths: frame, then its rail directly beneath it, both
-     centred on the panel. The rail beside the frame would cost the frame the
-     width it needs to stay a readable portrait on a 320px screen. */
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.mediaFrame {
-  position: relative;
-  aspect-ratio: 9 / 16;
-  /* Capped so a portrait frame cannot run away with the page on a narrow
-     screen; min() with 100% is what keeps it inside the panel's padding at
-     320px, so the frame can never introduce horizontal overflow — the cap
-     itself is what grew, from 16rem, and 100% is what still holds it. */
-  inline-size: min(100%, 20rem);
-  overflow: hidden;
-  border-radius: 0.5rem;
-  background-color: color-mix(in srgb, var(--color-bg-base) 92%, black);
-  box-shadow: 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 55%);
-}
-
-.poster {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.player {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  inline-size: 100%;
-  block-size: 100%;
-  border: 0;
-}
-
-/* ===== Play / close controls =====
-   Real buttons, so they are in the tab order and fire on Enter and Space for
-   free. Both carry the site's own focus ring rather than a bespoke one. */
-
-.play {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* Grew with the disc: at 0.625rem the label sat against a 4rem disc. */
-  gap: 0.875rem;
-  inline-size: 100%;
-  /* The whole poster is the target — far beyond the 24x24 minimum — while the
-     visible affordance stays the disc plus its label, centred in the plate.
-     The disc used to be nudged 14% off-centre, which was a correction for a
-     small plate hugging the panel's right edge; on a plate this size, sitting
-     near the middle of the panel, an off-centre disc just reads as a mistake. */
-  padding: 0;
-  border: 0;
-  background: linear-gradient(
-    to bottom,
-    rgb(0 0 0 / 45%) 0%,
-    rgb(0 0 0 / 15%) 45%,
-    rgb(0 0 0 / 55%) 100%
-  );
-  color: #f5f5f3;
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  /* Colour only. No transform, no scale — the global reduced-motion rule
-     collapses the duration and nothing is left moving. */
-  transition: background-color var(--duration-base) var(--ease-standard);
-}
-
-.play:hover {
-  background-color: rgb(0 0 0 / 18%);
-}
-
-.play:focus-visible {
-  outline: 2px solid var(--color-accent-primary);
-  outline-offset: -4px;
-}
-
-/* The disc: a CSS triangle, so there is no icon asset and nothing to
-   mistranslate. Purely presentational — the button's accessible name is what
-   is announced. */
-.playIcon {
-  display: block;
-  inline-size: 4rem;
-  block-size: 4rem;
-  border-radius: 50%;
-  border: 1px solid rgb(245 245 243 / 55%);
-  background-color: rgb(20 20 20 / 55%);
-  background-image: linear-gradient(
-    to right,
-    transparent 0 50%,
-    transparent 50% 100%
-  );
-  position: relative;
-}
-
-.playIcon::after {
-  content: '';
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 50%;
-  translate: -40% -50%;
-  border-block: 0.625rem solid transparent;
-  border-inline-start: 1rem solid #f5f5f3;
-  border-inline-end: 0;
-}
-
-.play:hover .playIcon {
-  border-color: var(--color-accent-primary);
-}
-
-/* The label carries its own ground rather than relying on the scrim. A poster
-   is arbitrary photography: measured against the worst case the scrim allows
-   (a white frame under it) the bare label came to 4.34:1, just under AA for
-   13px text. On this pill the same worst case is 9.1:1, and it no longer
-   depends on which frame YouTube happened to pick. */
-.playLabel {
-  padding: 0.4375rem 0.875rem;
-  border-radius: 999px;
-  background-color: rgb(13 13 13 / 78%);
-  font-size: 0.875rem;
-}
-
-.close {
-  position: absolute;
-  z-index: 2;
-  inset-block-start: 0.5rem;
-  inset-inline-end: 0.5rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-block-size: 2rem;
-  padding: 0.375rem 0.625rem;
-  border: 1px solid rgb(245 245 243 / 30%);
-  border-radius: 999px;
-  background-color: rgb(13 13 13 / 82%);
-  color: #f5f5f3;
-  font-family: inherit;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: border-color var(--duration-fast) var(--ease-out);
-}
-
-.close:hover {
-  border-color: var(--color-accent-primary);
-}
-
-.close:focus-visible {
-  outline: 2px solid var(--color-accent-primary);
-  outline-offset: 2px;
 }
 
 .panelGuide {
@@ -445,6 +263,19 @@
   height: 1px;
 }
 
+.media {
+  position: relative;
+  z-index: 1;
+  order: 3;
+  display: flex;
+  /* Stacked at these widths: frame, then its rail directly beneath it, both
+     centred on the panel. The rail beside the frame would cost the frame the
+     width it needs to stay a readable portrait on a 320px screen. */
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* ===== Panel content ===== */
 
 .panelContent {
@@ -488,157 +319,6 @@
   opacity: 0.85;
 }
 
-/* ===== Action rail =====
-   The editorial reading of a Shorts viewer's right-hand column: the same four
-   affordances, in the same order, drawn in this site's own quiet register
-   rather than the platform's. No red, no logo, no counters.
-
-   Every control keeps its text label at every width. "Visible on desktop,
-   revealed on hover" was available, but a rail of four unlabelled glyphs is a
-   guessing game for everyone and unusable for anyone relying on speech-input
-   ("click Share" needs a visible "Share"). What hover and focus do instead is
-   ENHANCE: the label lifts to full ink and a soft plate appears behind it.
-   Both are colour changes with a duration the global reduced-motion rule
-   collapses to nothing, so no motion is introduced here at all. */
-
-.actions {
-  /* Two columns, not a wrapping row and not four across. A wrapping row breaks
-     wherever the longest translated label happens to land — 3 + 1 in English,
-     somewhere else in Spanish — so the rail's shape would be decided by
-     translation length. Four across was deterministic but too tight for the
-     longer words: at 320px "Commentaires" and "Partager" ran into each other
-     in 70px cells. 2 x 2 gives every label ~138px at the narrowest width this
-     site supports, which is more than the longest of the twelve needs.
-     min() with 100% is what keeps the block inside the panel's padding. */
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.25rem;
-  inline-size: min(100%, 20rem);
-}
-
-.action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.375rem;
-  /* 2.75rem square clears WCAG 2.5.8's 24px minimum with room to spare, which
-     matters most here: on a phone this rail is a row of four. */
-  min-inline-size: 3.25rem;
-  min-block-size: 2.75rem;
-  padding: 0.5rem 0.375rem;
-  border: 0;
-  border-radius: 0.5rem;
-  background-color: transparent;
-  color: var(--color-text-muted);
-  font-family: inherit;
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  line-height: 1.3;
-  text-align: center;
-  text-transform: uppercase;
-  /* Last-resort guard: these labels are single words, so without a break
-     opportunity a long one would paint straight out of its cell rather than
-     wrap. Nothing should reach this — the columns are sized for the longest
-     of the twelve — but a future translation is not this file's to predict. */
-  overflow-wrap: anywhere;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    color var(--duration-base) var(--ease-standard),
-    background-color var(--duration-base) var(--ease-standard);
-}
-
-.action svg {
-  inline-size: 1.375rem;
-  block-size: 1.375rem;
-}
-
-.action:hover,
-.action:focus-visible {
-  color: var(--color-text-primary);
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 8%,
-    transparent
-  );
-}
-
-.action:focus-visible {
-  outline: 2px solid var(--color-accent-primary);
-  outline-offset: 2px;
-}
-
-/* Liked: the heart fills, and only the heart takes the accent. The label stays
-   on the text tokens because at 10px it is small text, and the violet accent
-   measures 3.56:1 on the dark ground — enough for a graphic (WCAG 1.4.11's
-   3:1) and not enough for type (1.4.3's 4.5:1). */
-.actionLike[aria-pressed='true'] {
-  color: var(--color-text-primary);
-}
-
-.actionLike[aria-pressed='true'] svg {
-  color: var(--color-accent-secondary);
-}
-
-.actionNotice {
-  grid-column: 1 / -1;
-  min-block-size: 1.125rem;
-  margin: 0;
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-align: center;
-  color: var(--color-accent-primary);
-}
-
-/* ===== Progress ticks — desktop pin only, hidden otherwise ===== */
-
-.progress {
-  display: none;
-}
-
-.progress::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 50%;
-  height: 1px;
-  translate: 0 -50%;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 24%,
-    transparent
-  );
-}
-
-.tick {
-  position: relative;
-  z-index: 1;
-  inline-size: 0.75rem;
-  aspect-ratio: 1;
-  border: 2px solid
-    color-mix(in srgb, var(--color-text-primary) 28%, transparent);
-  border-radius: 50%;
-  background-color: var(--color-bg-base);
-  transition:
-    border-color var(--duration-base) var(--ease-standard),
-    background-color var(--duration-base) var(--ease-standard),
-    box-shadow var(--duration-base) var(--ease-standard);
-}
-
-.tickActive {
-  border-color: var(--color-accent-primary);
-  background-color: var(--color-accent-primary);
-  box-shadow: 0 0 0.625rem
-    color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
-}
-
-/* The far-right vertical "sequence rail" that used to be defined here (and
-   switched on in a ≥1280px query at the foot of this file) is gone. It drew
-   the same three positions .progress already draws, on a second axis, to fill
-   the panel's empty right margin — a third statement of one scroll position.
-   The margin stays empty, which is what an editorial measure is for. */
-
 /* ===== Desktop ===== */
 
 @media (min-width: 1024px) {
@@ -648,8 +328,8 @@
 }
 
 /* Full-bleed horizontal panels, native scroll-snap fallback, enhanced by
-   GSAP's pin/scrub (see Featured.tsx) — gated on prefers-reduced-motion,
-   not just width. Reduced-motion visitors at any viewport get the plain
+   GSAP's pin/scrub (see useFeaturedSequence.ts) — gated on
+   prefers-reduced-motion, not just width. Reduced-motion visitors at any viewport get the plain
    vertical stack above instead: it's already a fully keyboard/reading-order
    accessible "natural layout" (per the task's reduced-motion requirement),
    whereas the horizontal track's native scroll-snap fallback has no
@@ -726,46 +406,6 @@
     flex-direction: row;
     align-items: center;
     gap: clamp(0.25rem, 0.5vw, 0.5rem);
-  }
-
-  /* One column from here up: the rail is a stack of four beside the video,
-     which is the shape being referenced. */
-  .actions {
-    grid-template-columns: minmax(0, 1fr);
-    inline-size: clamp(4.5rem, 6vw, 5.75rem);
-  }
-
-  .action {
-    min-inline-size: 0;
-    padding-block: 0.625rem;
-  }
-
-  .action svg {
-    inline-size: 1.125rem;
-    block-size: 1.125rem;
-  }
-
-  .actionNotice {
-    /* Its own row under the column, rather than a fifth item in it. */
-    min-block-size: 2.25rem;
-    font-size: 0.625rem;
-  }
-
-  .mediaFrame {
-    /* The frame is sized by its own height and aspect ratio; without this it
-       is a flex item and would be shrunk by the rail beside it. */
-    flex: none;
-    inline-size: auto;
-    /* 48rem rather than 44rem: at 1920 the rem cap was binding before 78vh
-       was, which held the plate to 443px wide while the gap between the copy
-       and it grew to 204px — the "excess empty space" between the two. Letting
-       the viewport-height term bind instead makes the plate 474px there and
-       closes that gap from the other side. Below ~1600px nothing changes:
-       78vh was already the smallest of the three. */
-    block-size: min(78vh, 48rem, 100vh - 11rem);
-    /* Softer corners than the small plate carried: at 8px a 700px-tall frame
-       reads as a hard rectangle. */
-    border-radius: 1rem;
   }
 
   .panelNumeral {
@@ -871,20 +511,5 @@
     max-width: 36rem;
     padding: 10rem calc(var(--container-padding-inline) * 1.4)
       calc(var(--space-8) + 4rem);
-  }
-
-  /* Lives inside the panel (see Featured.tsx), so this inline start is the
-     SAME declaration the copy column uses for its own padding — the two are
-     aligned by construction rather than by two values that have to be kept
-     equal by hand. */
-  .progress {
-    display: flex;
-    position: absolute;
-    inset-block-end: calc(var(--space-4) + 6rem);
-    inset-inline-start: calc(var(--container-padding-inline) * 1.4);
-    z-index: 1;
-    align-items: center;
-    justify-content: space-between;
-    inline-size: 8.5rem;
   }
 }

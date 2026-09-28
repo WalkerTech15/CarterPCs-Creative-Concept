@@ -2,7 +2,7 @@
 
 > Final technical implementation strategy for the CarterPCs Portfolio Concept.
 > Derived from PROJECT.md, DESIGN.md, CONTENT.md, RESEARCH.md, and ARCHITECTURE.md.
-> This document is planning only — no dependencies are installed, no build tool is initialized, and no source code exists yet.
+> **Status:** written before implementation. The core stack it recommends is what shipped: React, Vite, TypeScript, GSAP/ScrollTrigger, Lenis, CSS Modules, Vitest and Playwright. Several planned items — Three.js, a custom cursor, per-section code splitting, and the `<picture>`/asset-manifest pipeline — were deferred. See ARCHITECTURE.md Parts 1 and 5 for the implemented state.
 
 ---
 

@@ -18,19 +18,10 @@
  * kept as-is in every language — they are the terms used in all three.
  */
 
-import { localize, type Language, type Localized } from '../i18n'
+import { localize, type Language } from '../i18n'
+import type { HardwareBeat, LocalizedSource } from './types'
 
-export interface HardwareBeat {
-  index: string
-  label: string
-  description: string
-}
-
-interface HardwareBeatSource {
-  index: string
-  label: Localized<string>
-  description: Localized<string>
-}
+type HardwareBeatSource = LocalizedSource<HardwareBeat, 'label' | 'description'>
 
 const hardwareBeatSources: HardwareBeatSource[] = [
   {

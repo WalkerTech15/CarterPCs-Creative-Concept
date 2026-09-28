@@ -23,6 +23,9 @@
  * measure. Nothing here is machine-translated at runtime.
  */
 
+import { localize, type Language } from '../i18n'
+import type { FeaturedStory, LocalizedSource } from './types'
+
 const pc250kShort = new URL(
   '../assets/featured/pc-250k-short.webp',
   import.meta.url,
@@ -35,43 +38,12 @@ const thinkpadShort = new URL(
   '../assets/featured/thinkpad-short.webp',
   import.meta.url,
 ).href
-import { localize, type Language, type Localized } from '../i18n'
-
-export interface FeaturedStory {
-  /** Panel index within Featured, distinct from the global "03 / Featured" section number. */
-  index: string
-  category: string
-  headlineLines: string[]
-  support: string
-  /** Restrained editorial metadata, sourced from RESEARCH.md §3's category names. */
-  tags: string[]
-  /** Selects the panel's decorative media-stage variant (see Featured.module.css). */
-  variant: 'hardware' | 'tech' | 'commentary'
-  /** youtube.com watch page — the "Watch the Short" fallback link. */
-  videoUrl: string
-  /**
-   * Privacy-enhanced embed, on youtube-nocookie.com. This is a BASE url: no
-   * iframe carries it until a visitor presses Play, and Featured.tsx appends
-   * `&autoplay=1` at that point (see the comment there for why autoplay is
-   * withheld under prefers-reduced-motion). `rel=0` keeps end-cards on the
-   * same channel; `playsinline=1` stops iOS hijacking the whole screen.
-   */
-  embedUrl: string
-  thumbnail: string
-}
 
 /** Authoring shape: structure once, copy three times. */
-interface FeaturedStorySource {
-  index: string
-  variant: FeaturedStory['variant']
-  category: Localized<string>
-  headlineLines: Localized<string[]>
-  support: Localized<string>
-  tags: Localized<string[]>
-  videoUrl: string
-  embedUrl: string
-  thumbnail: string
-}
+type FeaturedStorySource = LocalizedSource<
+  FeaturedStory,
+  'category' | 'headlineLines' | 'support' | 'tags'
+>
 
 const featuredStorySources: FeaturedStorySource[] = [
   {

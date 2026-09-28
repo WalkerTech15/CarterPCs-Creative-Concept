@@ -1,0 +1,193 @@
+/* Featured — the Short's media frame: poster, player, and the Play / Close
+   controls that swap between them (FeaturedMedia.tsx). Where the frame sits in
+   its panel is panel layout, and lives on .media in Featured.module.css. */
+
+/* ===== Media frame =====
+   A Short is 9:16, so its frame is 9:16 — on every viewport. The poster is a
+   1280x720 YouTube thumbnail that carries the real portrait frame as its
+   centre column (YouTube pads the sides with a blurred, darkened zoom of the
+   same frame). `cover` on a 9:16 box shows 0.5625/1.7778 = 31.6% of that
+   width, centred: precisely the portrait column, with only the filler bars
+   cropped. Nothing of the actual Short is lost.
+
+   The frame is also the player's box. The iframe fills it and never leaves it,
+   which is what keeps the video off the headline — the previous embed sat at
+   inset: 0 on the whole panel and painted straight over the copy. */
+
+.mediaFrame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  /* Capped so a portrait frame cannot run away with the page on a narrow
+     screen; min() with 100% is what keeps it inside the panel's padding at
+     320px, so the frame can never introduce horizontal overflow — the cap
+     itself is what grew, from 16rem, and 100% is what still holds it. */
+  inline-size: min(100%, 20rem);
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: color-mix(in srgb, var(--color-bg-base) 92%, black);
+  box-shadow: 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 55%);
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.player {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+}
+
+/* ===== Play / close controls =====
+   Real buttons, so they are in the tab order and fire on Enter and Space for
+   free. Both carry the site's own focus ring rather than a bespoke one. */
+
+.play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Grew with the disc: at 0.625rem the label sat against a 4rem disc. */
+  gap: 0.875rem;
+  inline-size: 100%;
+  /* The whole poster is the target — far beyond the 24x24 minimum — while the
+     visible affordance stays the disc plus its label, centred in the plate.
+     The disc used to be nudged 14% off-centre, which was a correction for a
+     small plate hugging the panel's right edge; on a plate this size, sitting
+     near the middle of the panel, an off-centre disc just reads as a mistake. */
+  padding: 0;
+  border: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 45%) 0%,
+    rgb(0 0 0 / 15%) 45%,
+    rgb(0 0 0 / 55%) 100%
+  );
+  color: #f5f5f3;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  /* Colour only. No transform, no scale — the global reduced-motion rule
+     collapses the duration and nothing is left moving. */
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+
+.play:hover {
+  background-color: rgb(0 0 0 / 18%);
+}
+
+.play:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: -4px;
+}
+
+/* The disc: a CSS triangle, so there is no icon asset and nothing to
+   mistranslate. Purely presentational — the button's accessible name is what
+   is announced. */
+.playIcon {
+  display: block;
+  inline-size: 4rem;
+  block-size: 4rem;
+  border-radius: 50%;
+  border: 1px solid rgb(245 245 243 / 55%);
+  background-color: rgb(20 20 20 / 55%);
+  background-image: linear-gradient(
+    to right,
+    transparent 0 50%,
+    transparent 50% 100%
+  );
+  position: relative;
+}
+
+.playIcon::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -40% -50%;
+  border-block: 0.625rem solid transparent;
+  border-inline-start: 1rem solid #f5f5f3;
+  border-inline-end: 0;
+}
+
+.play:hover .playIcon {
+  border-color: var(--color-accent-primary);
+}
+
+/* The label carries its own ground rather than relying on the scrim. A poster
+   is arbitrary photography: measured against the worst case the scrim allows
+   (a white frame under it) the bare label came to 4.34:1, just under AA for
+   13px text. On this pill the same worst case is 9.1:1, and it no longer
+   depends on which frame YouTube happened to pick. */
+.playLabel {
+  padding: 0.4375rem 0.875rem;
+  border-radius: 999px;
+  background-color: rgb(13 13 13 / 78%);
+  font-size: 0.875rem;
+}
+
+.close {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid rgb(245 245 243 / 30%);
+  border-radius: 999px;
+  background-color: rgb(13 13 13 / 82%);
+  color: #f5f5f3;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.close:hover {
+  border-color: var(--color-accent-primary);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Desktop pinned sequence — same query as Featured.module.css, which explains
+   why it is gated on motion as well as width. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .mediaFrame {
+    /* The frame is sized by its own height and aspect ratio; without this it
+       is a flex item and would be shrunk by the rail beside it. */
+    flex: none;
+    inline-size: auto;
+    /* 48rem rather than 44rem: at 1920 the rem cap was binding before 78vh
+       was, which held the plate to 443px wide while the gap between the copy
+       and it grew to 204px — the "excess empty space" between the two. Letting
+       the viewport-height term bind instead makes the plate 474px there and
+       closes that gap from the other side. Below ~1600px nothing changes:
+       78vh was already the smallest of the three. */
+    block-size: min(78vh, 48rem, 100vh - 11rem);
+    /* Softer corners than the small plate carried: at 8px a 700px-tall frame
+       reads as a hard rectangle. */
+    border-radius: 1rem;
+  }
+}

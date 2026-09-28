@@ -38,51 +38,13 @@
  * still joins into a natural phrase in the closing index line).
  */
 
-import { localize, type Language, type Localized } from '../i18n'
+import { localize, type Language } from '../i18n'
+import type { ContentCategory, LocalizedSource } from './types'
 
-export interface ContentCategory {
-  id: string
-  /** Full RESEARCH.md §3 category name — used as the accessible heading name. */
-  fullName: string
-  /** Visual kinetic-type treatment: one word per line. */
-  primary: string[]
-  /** Short qualifier shown beneath the primary word(s). */
-  secondary: string
-  description: string
-  tags: string[]
-  /** Scale tier, from RESEARCH.md §3's Importance column: 1 = Core/Primary, 2 = High, 3 = Medium(-High). */
-  tier: 1 | 2 | 3
-  /**
-   * The `index` of the Featured story (see data/featured.ts) that actually
-   * belongs to this territory, or null where none does.
-   *
-   * This replaced a `media: boolean` flag that switched on an empty
-   * decorative crop window — a clipped rectangle holding a blurred colour
-   * field, described in the code as "deliberately obscured future footage".
-   * On the light theme it read as an image that had failed to load, and on
-   * either theme it was a picture of nothing: the section's two most
-   * important territories were illustrated with placeholders while three
-   * real, already-licensed Shorts sat one section above it. Pointing the
-   * same two slots at those Shorts costs no new assets and makes the field
-   * an index of real work rather than a taxonomy diagram.
-   *
-   * Only the two tier-1 territories carry one, so media stays a deliberate
-   * accent rather than a per-item default — and the mapping lives here, as
-   * data, instead of being inferred from a category name in the view.
-   */
-  shortIndex: string | null
-}
-
-interface ContentCategorySource {
-  id: string
-  tier: ContentCategory['tier']
-  shortIndex: string | null
-  fullName: Localized<string>
-  primary: Localized<string[]>
-  secondary: Localized<string>
-  description: Localized<string>
-  tags: Localized<string[]>
-}
+type ContentCategorySource = LocalizedSource<
+  ContentCategory,
+  'fullName' | 'primary' | 'secondary' | 'description' | 'tags'
+>
 
 const contentCategorySources: ContentCategorySource[] = [
   {

@@ -1,0 +1,131 @@
+/* Featured — the action rail beside each Short (FeaturedActionRail.tsx). */
+
+/* ===== Action rail =====
+   The editorial reading of a Shorts viewer's right-hand column: the same four
+   affordances, in the same order, drawn in this site's own quiet register
+   rather than the platform's. No red, no logo, no counters.
+
+   Every control keeps its text label at every width. "Visible on desktop,
+   revealed on hover" was available, but a rail of four unlabelled glyphs is a
+   guessing game for everyone and unusable for anyone relying on speech-input
+   ("click Share" needs a visible "Share"). What hover and focus do instead is
+   ENHANCE: the label lifts to full ink and a soft plate appears behind it.
+   Both are colour changes with a duration the global reduced-motion rule
+   collapses to nothing, so no motion is introduced here at all. */
+
+.actions {
+  /* Two columns, not a wrapping row and not four across. A wrapping row breaks
+     wherever the longest translated label happens to land — 3 + 1 in English,
+     somewhere else in Spanish — so the rail's shape would be decided by
+     translation length. Four across was deterministic but too tight for the
+     longer words: at 320px "Commentaires" and "Partager" ran into each other
+     in 70px cells. 2 x 2 gives every label ~138px at the narrowest width this
+     site supports, which is more than the longest of the twelve needs.
+     min() with 100% is what keeps the block inside the panel's padding. */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  inline-size: min(100%, 20rem);
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  /* 2.75rem square clears WCAG 2.5.8's 24px minimum with room to spare, which
+     matters most here: on a phone this rail is a row of four. */
+  min-inline-size: 3.25rem;
+  min-block-size: 2.75rem;
+  padding: 0.5rem 0.375rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+  /* Last-resort guard: these labels are single words, so without a break
+     opportunity a long one would paint straight out of its cell rather than
+     wrap. Nothing should reach this — the columns are sized for the longest
+     of the twelve — but a future translation is not this file's to predict. */
+  overflow-wrap: anywhere;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard);
+}
+
+.action svg {
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+}
+
+.action:hover,
+.action:focus-visible {
+  color: var(--color-text-primary);
+  background-color: color-mix(
+    in srgb,
+    var(--color-text-primary) 8%,
+    transparent
+  );
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Liked: the heart fills, and only the heart takes the accent. The label stays
+   on the text tokens because at 10px it is small text, and the violet accent
+   measures 3.56:1 on the dark ground — enough for a graphic (WCAG 1.4.11's
+   3:1) and not enough for type (1.4.3's 4.5:1). */
+.actionLike[aria-pressed='true'] {
+  color: var(--color-text-primary);
+}
+
+.actionLike[aria-pressed='true'] svg {
+  color: var(--color-accent-secondary);
+}
+
+.actionNotice {
+  grid-column: 1 / -1;
+  min-block-size: 1.125rem;
+  margin: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--color-accent-primary);
+}
+
+/* Desktop pinned sequence — same query as Featured.module.css, which explains
+   why it is gated on motion as well as width. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  /* One column from here up: the rail is a stack of four beside the video,
+     which is the shape being referenced. */
+  .actions {
+    grid-template-columns: minmax(0, 1fr);
+    inline-size: clamp(4.5rem, 6vw, 5.75rem);
+  }
+
+  .action {
+    min-inline-size: 0;
+    padding-block: 0.625rem;
+  }
+
+  .action svg {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+  }
+
+  .actionNotice {
+    /* Its own row under the column, rather than a fifth item in it. */
+    min-block-size: 2.25rem;
+    font-size: 0.625rem;
+  }
+}

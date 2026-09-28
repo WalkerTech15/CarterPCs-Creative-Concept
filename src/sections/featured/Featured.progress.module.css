@@ -1,0 +1,70 @@
+/* Featured — the per-panel sequence position indicator
+   (FeaturedProgress.tsx). */
+
+/* ===== Progress ticks — desktop pin only, hidden otherwise ===== */
+
+.progress {
+  display: none;
+}
+
+.progress::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  height: 1px;
+  translate: 0 -50%;
+  background-color: color-mix(
+    in srgb,
+    var(--color-text-primary) 24%,
+    transparent
+  );
+}
+
+.tick {
+  position: relative;
+  z-index: 1;
+  inline-size: 0.75rem;
+  aspect-ratio: 1;
+  border: 2px solid
+    color-mix(in srgb, var(--color-text-primary) 28%, transparent);
+  border-radius: 50%;
+  background-color: var(--color-bg-base);
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    background-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.tickActive {
+  border-color: var(--color-accent-primary);
+  background-color: var(--color-accent-primary);
+  box-shadow: 0 0 0.625rem
+    color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
+}
+
+/* The far-right vertical "sequence rail" that used to be defined in
+   Featured.module.css (and switched on in a ≥1280px query at the foot of that
+   file) is gone. It drew
+   the same three positions .progress already draws, on a second axis, to fill
+   the panel's empty right margin — a third statement of one scroll position.
+   The margin stays empty, which is what an editorial measure is for. */
+
+/* Desktop pinned sequence — same query as Featured.module.css, which explains
+   why it is gated on motion as well as width. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  /* Lives inside the panel (see FeaturedProgress.tsx), so this inline start
+     is the SAME declaration the copy column uses for its own padding — the two are
+     aligned by construction rather than by two values that have to be kept
+     equal by hand. */
+  .progress {
+    display: flex;
+    position: absolute;
+    inset-block-end: calc(var(--space-4) + 6rem);
+    inset-inline-start: calc(var(--container-padding-inline) * 1.4);
+    z-index: 1;
+    align-items: center;
+    justify-content: space-between;
+    inline-size: 8.5rem;
+  }
+}
