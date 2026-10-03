@@ -103,7 +103,7 @@ For a new or substantially redesigned section, record before implementation:
 
 Before delivery, verify: no emoji icons, visible keyboard focus, normal-text
 contrast of at least 4.5:1, reduced motion, resilient label wrapping, responsive
-behavior at 375px/768px/1024px/1440px, and zero horizontal overflow.
+behavior across the Browser QA matrix widths, and zero horizontal overflow.
 
 ## Browser QA matrix
 
@@ -155,6 +155,36 @@ their full plugin implementations into CarterPCs.
   Pre-existing, and Blocked. Never convert an unfinished command into PASS.
 - When a task grows beyond the named surface, stop and ask before refactoring
   broadly. Prefer a small reversible patch and one focused regression check.
+
+## Motion and animation practices
+
+Distilled from public animation skills (web-animation-skills, GSAP/ScrollTrigger
+guides). These are guidance, not dependencies; the minimal-solution ladder still
+applies, so try CSS first and ask before adding GSAP or Motion.
+
+- Animate only `transform` and `opacity`. Never animate layout properties such as `width`, `height`, `top`, or `left`.
+- Use `will-change` sparingly and only on elements that are actively animating; remove it afterward.
+- Use tiered `prefers-reduced-motion` handling: replace large movement with a short fade or an instant state change instead of removing all feedback. Content must stay visible and usable with motion off.
+- Scroll-linked motion must be tied to a clear story beat (reveal, progression, orientation). Prefer CSS scroll-driven animation or `IntersectionObserver` before a scroll library.
+- If a library is approved, every trigger, timeline, and listener must be cleaned up on unmount, and scrubbed animations should use a linear ease.
+- Micro-interactions (hover, press, focus, toggles) should be fast, cancellable, and keep visible keyboard focus.
+- Page or section transitions must not hide content from keyboard users, break anchor landing, or delay first paint.
+- Glass or blur effects need a reduced-transparency fallback and must stay within the restrained editorial direction.
+- Verify with measurement, not by eye: no layout shift (CLS) and no long tasks during animation, plus the checks in the Browser QA matrix.
+
+## Token and context efficiency
+
+Distilled from public token-optimization guidance; keep it practical and safe.
+
+- Name exact file paths and line ranges instead of making the agent search the whole repository.
+- Read only the part of a file that is needed; avoid re-reading files already in context.
+- Keep `AI_WORKFLOW.md`, `AGENTS.md`, and `AI_REPORT.md` lean. Move long evidence into temporary notes and link to it.
+- Use read-only subagents for broad searches and have them return a short conclusion, not file dumps.
+- Follow the Efficient visual evidence rules: text and DOM diagnostics before screenshots.
+- Filter noisy command output (for example, tail failures only) while keeping the exact failing lines in the report.
+- Avoid changing configuration, plugins, or tools mid-task; do it between tasks so cached context stays valid.
+- Compact or restart a long session at a clean checkpoint (after a commit or finished report), not in the middle of a change.
+- Never trade away safety checks, accessibility checks, or evidence to save tokens.
 
 ## Git and commit workflow
 
@@ -256,7 +286,7 @@ responsive, and regression checks.
 4. Add or update focused tests.
 5. Verify desktop, tablet, mobile, accessibility, performance, and reduced motion as applicable.
 6. Run typecheck, lint, focused tests, build, diff checks, and secret checks.
-7. Replace `AI_REPORT.md` with a concise evidence-based report.
+7. Replace `AI_REPORT.md` with a concise evidence-based report, carrying over any open Codex QA/SEO findings.
 
 ## Codex responsibilities
 
@@ -271,7 +301,7 @@ responsive, and regression checks.
 
 - **Claude Code writes the code:** features, refactors, bug fixes, tests, and data/content wiring.
 - **Codex verifies and optimizes:** frontend QA (rendered UI, responsive, accessibility, console, network) and SEO, as defined above.
-- Handoff order: Claude implements and reports in `AI_REPORT.md`; Codex independently verifies against the real worktree and appends or updates its findings; Claude fixes confirmed findings that need code changes; Codex re-verifies only what changed.
+- Handoff order: Claude implements and reports in `AI_REPORT.md`; Codex independently verifies against the real worktree and records its findings in a separate "Codex QA/SEO findings" section of that file; Claude fixes confirmed findings that need code changes; Codex re-verifies only what changed.
 - Neither agent edits the other's findings to make them pass. A finding is closed only by fresh evidence.
 - Avoid overlapping edits: if both would touch the same file, Claude owns it and Codex leaves a finding instead, except for the small SEO and QA fixes listed above.
 - On disagreement, the explicit user request wins, then repository safety and security, then this workflow. Escalate unresolved disagreements to the user with both positions stated briefly.
@@ -288,7 +318,7 @@ Treat this request as a full repository and runtime inspection:
 5. Check relevant tests, typecheck, lint, build, browser behavior, console errors, and network failures.
 6. Check desktop, tablet, mobile, accessibility, reduced motion, and performance when relevant.
 7. Identify unrelated changes and exact blockers.
-8. Give a direct Yes/No commit verdict and fix safe in-scope issues before reporting.
+8. Give a direct Yes/No commit verdict. Claude fixes safe in-scope issues before reporting; Codex fixes only the small QA and SEO items allowed in its responsibilities and hands off the rest.
 
 ## Required `AI_REPORT.md` contents
 
