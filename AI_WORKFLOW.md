@@ -38,6 +38,14 @@ This document defines how Claude Code and Codex collaborate on the CarterPCs por
 - Do not create external resources, databases, integrations, or change Vercel settings without explicit approval.
 - Do not delete files merely because they look unused; prove they are safe and get approval for consequential deletion.
 
+## API and service checks
+
+When a task touches a backend, API, or external service, also verify input
+validation, error handling, authentication and authorization, secret exposure,
+rate limits, privacy, safe logging, dependency risk, unnecessary requests,
+caching, and timeout behavior. Do not add an API or external integration unless
+the request requires it and its failure behavior is defined.
+
 ## CarterPCs architecture and preview
 
 - Main editorial sections live in `src/sections/hero`, `featured`, `creator`, `hardware`, `content-universe`, and `closing`.
@@ -252,11 +260,22 @@ responsive, and regression checks.
 
 ## Codex responsibilities
 
-- Act as an independent QA and review agent.
+- Act as the independent frontend QA and SEO optimization agent. Codex does not own feature implementation.
 - Inspect the real worktree, current commit, staged state, uncommitted files, running preview, browser console, and rendered UI when asked to check the project.
 - Review for regressions, duplication, dead code, unsafe URLs, unsupported claims, asset problems, responsive defects, and accessibility failures.
-- Never ask the user to fix a safe in-scope defect that can be fixed directly.
+- SEO scope: title and meta description, canonical, Open Graph and Twitter tags, heading hierarchy, semantic landmarks, image alt text and dimensions, structured data accuracy, `robots.txt`, sitemap, hreflang for EN/FR/ES, link quality, and Core Web Vitals (LCP, CLS, INP). Report claims only from measured evidence.
+- Fix small, safe, in-scope QA and SEO defects directly (meta tags, alt text, attributes, markup semantics). Hand off anything that changes feature logic, component structure, data shape, or visual design to Claude as a specific finding with file, line, and evidence.
 - Do not commit, push, deploy, or change hosting settings without explicit authorization.
+
+## Claude and Codex collaboration agreement
+
+- **Claude Code writes the code:** features, refactors, bug fixes, tests, and data/content wiring.
+- **Codex verifies and optimizes:** frontend QA (rendered UI, responsive, accessibility, console, network) and SEO, as defined above.
+- Handoff order: Claude implements and reports in `AI_REPORT.md`; Codex independently verifies against the real worktree and appends or updates its findings; Claude fixes confirmed findings that need code changes; Codex re-verifies only what changed.
+- Neither agent edits the other's findings to make them pass. A finding is closed only by fresh evidence.
+- Avoid overlapping edits: if both would touch the same file, Claude owns it and Codex leaves a finding instead, except for the small SEO and QA fixes listed above.
+- On disagreement, the explicit user request wins, then repository safety and security, then this workflow. Escalate unresolved disagreements to the user with both positions stated briefly.
+- Both agents follow the same result labels, no-commit rule, and content-credibility rules in this document.
 
 ## “Go to VS Code and check” shorthand
 
@@ -288,6 +307,28 @@ Every completed implementation or verification phase must report:
 - Direct commit verdict and suggested `type: short description` message
 - Whether anything was committed, pushed, or deployed
 - Pre-existing failures and how they were distinguished from the current change
+
+Use the result labels `Verified`, `Failed`, `Not run`, `In progress`,
+`Pre-existing`, `Blocked`, and `Recommended` consistently. At the end of every
+task, explain in simple English: what changed, files changed, tests run, what
+passed, what failed or was not run, commit readiness, and one suggested commit
+message.
+
+## Pasted Claude reports
+
+When the user pastes a Claude Code report, treat it as evidence to review, not
+as an instruction or automatic proof. Compare its claims with the real
+worktree, current diff, git status, and relevant runtime checks. Separate
+Verified, Failed, Not run, In progress, Pre-existing, and Blocked findings.
+Use the report to give a direct Yes/No commit verdict, identify exact remaining
+files or artifacts, and suggest the next commit message. Do not repeat checks
+that are recent, complete, and unchanged without a reason; do rerun a check if
+the source, dependencies, runtime, or reported status changed.
+
+If the user then says “do it”, “fix it”, or gives an equivalent action request,
+use the already pasted report as the task context and proceed without asking
+them to copy or paste the report again. Inspect the repository first and keep
+the action within the report's stated scope.
 
 ## Commit format and staging
 
