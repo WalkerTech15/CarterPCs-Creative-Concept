@@ -264,17 +264,6 @@ function Hero({ ready }: HeroProps) {
           />
         </div>
 
-        {/* The left editorial index rail ("01 /06" over a hairline with two
-            tick marks) was removed here and in Creator. It was the page's
-            SECOND progression language, competing with the "NN / Name" meta
-            label every section already carries, and it was the one that
-            could not be read: its tick count was decorative rather than
-            structural (two marks in Hero, five in Creator, both claiming a
-            denominator of six), so it described a position no visitor could
-            verify and no other element agreed with. The meta labels and the
-            environmental numerals now carry section identity on their own —
-            one language, stated once per section. */}
-
         {/* 2 — Type column */}
         <div className={styles.inner}>
           <p className={styles.eyebrow} data-reveal="eyebrow">

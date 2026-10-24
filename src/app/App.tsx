@@ -8,6 +8,7 @@ import Hardware from '../sections/hardware/Hardware'
 import ContentUniverse from '../sections/content-universe/ContentUniverse'
 import Closing from '../sections/closing/Closing'
 import Footer from '../components/footer/Footer'
+import EditorialProgress from '../components/EditorialProgress'
 import { ScrollTrigger } from '../animations/gsap'
 import { useLenis } from '../hooks/useLenis'
 import { PreferencesProvider, usePreferences } from './Preferences'
@@ -37,6 +38,7 @@ function Site() {
       </a>
 
       <Nav />
+      <EditorialProgress />
 
       <main id="main-content">
         <Hero ready={introComplete} />

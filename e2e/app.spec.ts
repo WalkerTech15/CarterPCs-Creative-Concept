@@ -21,6 +21,107 @@ test('Hero loads with heading, subhead, and navigation', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: /primary/i })).toBeVisible()
 })
 
+test('Editorial progress rail follows all six sections and hides on mobile', async ({
+  page,
+}) => {
+  const rail = page.locator('[data-editorial-rail]')
+  const marker = page.locator('[data-editorial-marker]')
+  const index = page.locator('[data-editorial-index]')
+
+  await page.setViewportSize(DESKTOP)
+  await page.goto('/')
+  await expect(rail).toBeVisible()
+  await expect(rail).toHaveAttribute('aria-hidden', 'true')
+  await expect(index).toBeVisible()
+  await expect(index).toHaveText('01/06')
+  await page.waitForTimeout(500)
+  const railBox = await rail.boundingBox()
+  const indexBox = await index.boundingBox()
+  expect(railBox).not.toBeNull()
+  expect(indexBox).not.toBeNull()
+  const heroHeadline = await page.locator('#hero h1').boundingBox()
+  expect(heroHeadline).not.toBeNull()
+  expect(heroHeadline!.x - railBox!.x).toBeGreaterThan(80)
+  expect(Math.abs(railBox!.y - page.viewportSize()!.height * 0.087)).toBeLessThan(2)
+  expect(Math.abs(railBox!.height - page.viewportSize()!.height * 0.801)).toBeLessThan(2)
+  expect(Math.abs(indexBox!.x - railBox!.x)).toBeLessThan(2)
+  expect(
+    Math.abs(
+      indexBox!.y + indexBox!.height - page.viewportSize()!.height * 0.935,
+    ),
+  ).toBeLessThan(2)
+
+  // Check the supplied 2559×1269 reference viewport as well as the
+  // standard desktop viewport above.
+  await page.setViewportSize({ width: 2559, height: 1269 })
+  await page.waitForTimeout(500)
+  const referenceRailBox = await rail.boundingBox()
+  const referenceIndexBox = await index.boundingBox()
+  expect(referenceRailBox).not.toBeNull()
+  expect(referenceIndexBox).not.toBeNull()
+  const referenceHeadline = await page.locator('#hero h1').boundingBox()
+  expect(referenceHeadline).not.toBeNull()
+  expect(referenceHeadline!.x - referenceRailBox!.x).toBeGreaterThan(80)
+  expect(Math.abs(referenceRailBox!.x - referenceIndexBox!.x)).toBeLessThan(2)
+  expect(Math.abs(referenceRailBox!.y - 1269 * 0.087)).toBeLessThan(2)
+  expect(Math.abs(referenceIndexBox!.y + referenceIndexBox!.height - 1269 * 0.935)).toBeLessThan(2)
+
+  await page.setViewportSize(DESKTOP)
+  const markerTop = async () => {
+    const railBox = await rail.boundingBox()
+    const markerBox = await marker.boundingBox()
+    return markerBox!.y + markerBox!.height / 2 - railBox!.y
+  }
+  const sectionIds = [
+    'hero',
+    'creator',
+    'featured',
+    'hardware',
+    'content-universe',
+    'closing',
+  ]
+
+  for (const position of sectionIds.keys()) {
+    const expectedIndex = position + 1
+    for (let step = 0; step < 60; step += 1) {
+      const currentIndex = Number((await index.innerText()).slice(0, 2))
+      if (currentIndex >= expectedIndex) break
+      await page.evaluate(() => window.scrollBy({ top: 250, behavior: 'instant' }))
+      await page.waitForTimeout(30)
+    }
+    await expect(index).toHaveText(`${String(expectedIndex).padStart(2, '0')}/06`)
+    if (position > 0) {
+      await expect
+        .poll(() =>
+          page.evaluate((id) => {
+            const heading = document
+              .getElementById(id)!
+              .querySelector('h1, h2')!
+              .getBoundingClientRect()
+            const rail = document
+              .querySelector('[data-editorial-rail]')!
+              .getBoundingClientRect()
+            return heading.left - rail.left
+          }, sectionIds[position]),
+        )
+        .toBeGreaterThanOrEqual(23)
+    }
+    await expect
+      .poll(markerTop)
+      .toBeGreaterThanOrEqual((railBox!.height * position) / 5 - 2)
+  }
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+  await page.locator('#creator').scrollIntoViewIfNeeded()
+  await expect(index).toHaveText('02/06')
+
+  await page.setViewportSize(MOBILE)
+  await page.goto('/')
+  await expect(rail).toBeHidden()
+  await expect(index).toBeHidden()
+})
+
 test('skip link is keyboard-reachable and targets main content', async ({
   page,
 }) => {

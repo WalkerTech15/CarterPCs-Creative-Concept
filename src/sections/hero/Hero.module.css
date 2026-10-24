@@ -15,8 +15,8 @@
  * right cards inset 3.4% from the right edge, About card top at 24.5%
  * and stats card at 53% of section height.
  *
- * The reference's left editorial index rail (formerly layer 4, at 4.6%)
- * is gone — see the note where it used to be mounted in Hero.tsx.
+ * The reference's left progress rail is a restrained, decorative scroll cue
+ * (no misleading section count); it appears only in the desktop composition.
  */
 
 .hero {
