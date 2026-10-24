@@ -47,11 +47,64 @@ import {
  * walks through naturally, and Escape returns to the trigger.
  */
 
-const LANGUAGES: { code: Language; flag: string }[] = [
-  { code: 'en', flag: '🇺🇸' },
-  { code: 'fr', flag: '🇫🇷' },
-  { code: 'es', flag: '🇪🇸' },
+const LANGUAGES: { code: Language }[] = [
+  { code: 'en' },
+  { code: 'fr' },
+  { code: 'es' },
 ]
+
+function LanguageFlag({ language }: { language: Language }) {
+  return (
+    <svg
+      className={styles.flag}
+      data-language-flag={language}
+      viewBox="0 0 20 14"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {language === 'fr' && (
+        <>
+          <rect width="6.67" height="14" fill="#1b3f8b" />
+          <rect x="6.67" width="6.66" height="14" fill="#fff" />
+          <rect x="13.33" width="6.67" height="14" fill="#ed2939" />
+        </>
+      )}
+      {language === 'es' && (
+        <>
+          <rect width="20" height="14" fill="#aa151b" />
+          <rect y="3.5" width="20" height="7" fill="#f1bf00" />
+        </>
+      )}
+      {language === 'en' && (
+        <>
+          <rect width="20" height="14" fill="#fff" />
+          {[0, 2.15, 4.3, 6.45, 8.6, 10.75, 12.9].map((y) => (
+            <rect key={y} y={y} width="20" height="1.08" fill="#b22234" />
+          ))}
+          <rect width="8.5" height="7.55" fill="#3c3b6e" />
+          {[
+            [1.3, 1.15],
+            [3.2, 1.15],
+            [5.1, 1.15],
+            [7, 1.15],
+            [2.25, 2.65],
+            [4.15, 2.65],
+            [6.05, 2.65],
+            [1.3, 4.15],
+            [3.2, 4.15],
+            [5.1, 4.15],
+            [7, 4.15],
+            [2.25, 5.65],
+            [4.15, 5.65],
+            [6.05, 5.65],
+          ].map(([cx, cy], index) => (
+            <circle key={index} cx={cx} cy={cy} r="0.38" fill="#fff" />
+          ))}
+        </>
+      )}
+    </svg>
+  )
+}
 
 /** Order only — the visible label comes from the active dictionary. */
 const THEMES: ThemePreference[] = ['dark', 'light', 'system']
@@ -277,13 +330,6 @@ function Nav() {
         </ul>
 
         <div className={styles.utils}>
-          <a className={styles.about} href="#creator">
-            {t.nav.about}
-            <span className={styles.aboutArrow} aria-hidden="true">
-              ↗
-            </span>
-          </a>
-
           <div
             className={styles.menuWrap}
             ref={themeWrapRef}
@@ -384,7 +430,7 @@ function Nav() {
               tabIndex={-1}
               onKeyDown={handleMenuKeyDown('language')}
             >
-              {LANGUAGES.map(({ code, flag }) => (
+              {LANGUAGES.map(({ code }) => (
                 <button
                   key={code}
                   type="button"
@@ -393,12 +439,19 @@ function Nav() {
                   className={language === code ? styles.menuActive : undefined}
                   onClick={() => select('language', () => setLanguage(code))}
                 >
-                  <span aria-hidden="true">{flag}</span>
+                  <LanguageFlag language={code} />
                   {languageLabels[code]}
                 </button>
               ))}
             </div>
           </div>
+
+          <a className={styles.about} href="#creator">
+            {t.nav.about}
+            <span className={styles.aboutArrow} aria-hidden="true">
+              ↗
+            </span>
+          </a>
 
           {/* COMPACT-HEADER SECTIONS MENU — below 1024px only (see
               .sectionsTrigger in Nav.module.css). The centre link row used to

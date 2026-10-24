@@ -1,10 +1,8 @@
 /**
- * Three-zone navigation matched to the approved Hero reference:
- * mark + wordmark + violet dot / six muted section labels / About pill
- * + square theme utility. At the page top the bar has no background —
- * typography and spacing carry it, exactly as in the reference. Once the
- * page scrolls, a scrim fades in behind it (see .nav::before) so moving
- * content can never interleave with the bar's own labels.
+ * Three-zone navigation in a floating, restrained capsule: brand / section
+ * links / creator and preference controls. The capsule stays inset from the
+ * viewport and uses an opaque-enough token surface for readable text over
+ * every section; scroll only strengthens that surface slightly.
  */
 
 /* Below 1024 the bar is a COMPACT HEADER: identity left, utilities right
@@ -14,62 +12,50 @@
    instead. Every destination stays reachable; none is a permanent row. */
 .nav {
   position: fixed;
-  inset-block-start: 0;
-  inset-inline: 0;
+  inset-block-start: 0.875rem;
+  inset-inline: clamp(0.75rem, 3vw, 2.5rem);
   z-index: var(--z-nav);
   pointer-events: none;
 }
 
-/* SCROLLED-STATE SCRIM
-   The bar is transparent at the page top (approved identity), but during
-   scroll the sections pass straight beneath its labels — measured at 390px
-   in French, seven live text elements sat inside the 197px bar at once.
-   The scrim is a pseudo-element overlay so the fix costs zero layout: it
-   fades opacity only (no background-color transition, no height change),
-   sized by inset to whatever height the bar wraps to (1–3 rows).
-
-   Strength is measured, not eyeballed: at 94% base over the worst content
-   that can pass beneath (pure white in dark, near-black ink in light), the
-   64%-alpha section labels resolve to 7.1:1 dark and 5.2:1 light — AA with
-   margin even if backdrop-filter is unsupported, so the blur is a pure
-   enhancement. The fade only ever ADDS ground behind the labels, so no
-   transition frame dips below the settled contrast; reduced motion swaps
-   the fade for an instant state change via the global rule. */
-.nav::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-color: color-mix(in srgb, var(--color-bg-base) 94%, transparent);
-  border-block-end: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 7%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  opacity: 0;
-  transition: opacity var(--duration-base) var(--ease-out);
-}
-
-.nav[data-scrolled]::before {
-  opacity: 1;
-}
-
-/* The bar shares the Hero's ~1536px composition canvas: on viewports
-   wider than the canvas it stays centred with the content instead of
-   spreading to the window edges. */
+/* The pill remains capped on wide screens and fills the available inset
+   width on smaller screens. The subtle border and blur separate it from the
+   page without turning the whole header into a full-width band. */
 .bar {
   /* Positioned so the mobile dropdown can anchor to the WHOLE bar rather
      than to its trigger — see .menu. Nothing is positioned against it at
      desktop, where .menuWrap takes the containing block back. */
   position: relative;
-  max-width: 96rem;
+  width: 100%;
+  max-width: 76rem;
   margin-inline: auto;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   row-gap: var(--space-2);
   column-gap: var(--space-3);
-  padding: var(--space-3) var(--container-padding-inline);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  border-radius: 1rem;
+  background-color: var(--color-bg-base);
+  background-color: color-mix(in srgb, var(--color-bg-base) 92%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0.75rem 2rem
+    color-mix(in srgb, var(--color-bg-base) 18%, transparent);
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.nav[data-scrolled] .bar {
+  background-color: var(--color-bg-base);
+  background-color: color-mix(in srgb, var(--color-bg-base) 96%, transparent);
+  border-color: color-mix(in srgb, var(--color-text-primary) 13%, transparent);
+  box-shadow: 0 0.875rem 2.25rem
+    color-mix(in srgb, var(--color-bg-base) 26%, transparent);
 }
 
 .wordmark {
@@ -146,6 +132,16 @@
   font-size: 0.75rem;
   text-align: left;
   cursor: pointer;
+}
+
+.flag {
+  flex: 0 0 1.25rem;
+  width: 1.25rem;
+  height: 0.875rem;
+  overflow: hidden;
+  border-radius: 0.125rem;
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--color-text-primary) 16%, transparent);
 }
 
 .menu button:hover,
@@ -423,11 +419,8 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     column-gap: var(--space-4);
-    /* Percentages resolve against the viewport-wide nav, so cap them at
-       their 1536-canvas pixel values — beyond the canvas width the bar
-       must stop drifting outward. Top padding overlay-calibrated to the
-       reference's bar baseline. */
-    padding: 2.25rem min(3.6%, 3.25rem) 0 min(4.3%, 4.125rem);
+    /* Compact single-row capsule; its outside gutters come from .nav. */
+    padding: 0.625rem clamp(1rem, 2.5vw, 2rem);
   }
 
   .wordmark,
@@ -535,6 +528,17 @@
 
   .utils {
     gap: 0.75rem;
+  }
+}
+
+@media (max-width: 539px) {
+  .nav {
+    inset-block-start: 0.625rem;
+    inset-inline: 0.5rem;
+  }
+
+  .bar {
+    border-radius: 0.875rem;
   }
 }
 
