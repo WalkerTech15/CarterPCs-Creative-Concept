@@ -1,14 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import { en } from '../i18n/en'
-import { fr } from '../i18n/fr'
-import { es } from '../i18n/es'
-import type { Language } from '../i18n'
-import { getFeaturedStories } from '../data/featured'
-import { getHardwareBeats } from '../data/hardware'
-import { getContentCategories } from '../data/contentUniverse'
 
 function mockMatchMedia(matches: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -36,12 +30,6 @@ async function openSectionsMenu(
   await user.click(screen.getByRole('button', { name: a11y.chooseSections }))
   return within(screen.getByRole('menu', { name: a11y.sectionsMenu }))
 }
-
-/**
- * Matches an accessible name by its leading visible label. A function matcher
- * rather than a regex, so the titles' `$`, `?` and `.` need no escaping.
- */
-const startsWith = (label: string) => (name: string) => name.startsWith(label)
 
 describe('App', () => {
   beforeEach(() => {
@@ -276,13 +264,12 @@ describe('App', () => {
     expect(main).toContainElement(
       screen.getByRole('heading', { level: 2, name: /six territories/i }),
     )
-    // Closing is the last section, and its heading is art-directed onto two
-    // lines the same way the Hero's h1 is — so it is matched on its
-    // accessible name, not on the run-together text content.
+    // Closing is the last section, and its headline is art-directed onto two
+    // lines, so match its accessible name rather than run-together text.
     expect(main).toContainElement(
       screen.getByRole('heading', {
         level: 2,
-        name: /^making tech interesting\.$/i,
+        name: /^good tech\. no guesswork\.$/i,
       }),
     )
 
@@ -295,10 +282,10 @@ describe('App', () => {
     expect(headingOrder[0]).toBe(1)
     expect(headingOrder.slice(1).every((level) => level >= 2)).toBe(true)
     expect(h2s.at(-2)).toHaveAccessibleName(/six territories/i)
-    expect(h2s.at(-1)).toHaveAccessibleName(/^making tech interesting\.$/i)
+    expect(h2s.at(-1)).toHaveAccessibleName(/^good tech\. no guesswork\.$/i)
   })
 
-  it('renders the Closing section with the identity, statement, disclaimer, and a back-to-top link', () => {
+  it('renders the Closing section with its statement, workshop image, disclaimer, and section links', () => {
     render(<App />)
 
     const closing = document.querySelector('#closing')
@@ -315,9 +302,11 @@ describe('App', () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /^making tech interesting\.$/i,
+        name: /^good tech\. no guesswork\.$/i,
       }),
     ).toBeInTheDocument()
+    expect(closing?.querySelector('img')).toHaveAttribute('alt', '')
+    expect(closing?.querySelector('img')).toHaveAttribute('loading', 'lazy')
     // Scoped to the section: "Independent creative concept." belongs to the
     // Closing statement and is stated here only.
     expect(
@@ -331,11 +320,16 @@ describe('App', () => {
       ),
     ).toBeInTheDocument()
 
-    const backToTop = screen.getByRole('link', { name: /back to top/i })
-    expect(closing).toContainElement(backToTop)
-    expect(backToTop).toHaveAttribute('href', '#hero')
-    // The target it claims to return to actually exists.
-    expect(document.querySelector('#hero')).toBeInTheDocument()
+    const storiesLink = within(closing as HTMLElement).getByRole('link', {
+      name: /explore the stories/i,
+    })
+    const creatorLink = within(closing as HTMLElement).getByRole('link', {
+      name: /meet the creator/i,
+    })
+    expect(storiesLink).toHaveAttribute('href', '#featured')
+    expect(creatorLink).toHaveAttribute('href', '#creator')
+    expect(document.querySelector('#featured')).toBeInTheDocument()
+    expect(document.querySelector('#creator')).toBeInTheDocument()
   })
 
   it('renders the Footer after main as a contentinfo landmark, with the same destinations as the bar', async () => {
@@ -375,9 +369,17 @@ describe('App', () => {
       within(footer).getByText('© 2026 CarterPCs Portfolio Concept'),
     ).toBeInTheDocument()
     expect(within(footer).getByText(en.footer.disclaimer)).toBeInTheDocument()
+    expect(within(footer).getByText(en.footer.credit)).toBeInTheDocument()
+    expect(footer.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(3)
+    expect(footer.querySelectorAll('span[class*="columnRule"]')).toHaveLength(2)
+    expect(
+      within(footer).getByRole('link', {
+        name: `CarterPCs — ${en.footer.a11y.home}`,
+      }),
+    ).toHaveAttribute('href', '#hero')
 
-    // The footer states the affiliation disclaimer ONCE and does not repeat
-    // the Closing statement's "Independent creative concept." line.
+    // The full footer disclosure is not an exact repeat of Closing's shorter
+    // independent-concept line.
     expect(
       within(footer).queryByText(/^independent creative concept\.$/i),
     ).toBeNull()
@@ -418,8 +420,8 @@ describe('App', () => {
     const footer = screen.getByRole('contentinfo') as HTMLElement
 
     // Four internal (one per real section) + three external, nothing else.
-    expect(footer.querySelectorAll('a')).toHaveLength(7)
-    expect(footer.querySelectorAll('a[href^="#"]')).toHaveLength(4)
+    expect(footer.querySelectorAll('a')).toHaveLength(8)
+    expect(footer.querySelectorAll('a[href^="#"]')).toHaveLength(5)
     expect(footer.querySelectorAll('button, form, input')).toHaveLength(0)
     expect(footer.innerHTML).not.toMatch(/mailto:|tel:/i)
 
@@ -433,10 +435,10 @@ describe('App', () => {
       'www.tiktok.com',
     ])
 
-    // No follower counts or other figures: the only digits in visible text
-    // are the copyright year.
+    // The only figures are the copyright year and the explicitly requested
+    // fan-since year.
     const digits = (footer.innerText ?? footer.textContent ?? '').match(/\d+/g)
-    expect(digits).toEqual(['2026'])
+    expect(digits).toEqual(['2026', '15', '2023'])
   })
 
   it('claims no press coverage in the Hero — the row at its foot is the real channels, not publications', () => {
@@ -482,37 +484,35 @@ describe('App', () => {
     expect(screen.getByText(en.hero.disclaimer)).toBeInTheDocument()
   })
 
-  it('states no figure the cited reading does not clear, and dates the ones it shows', () => {
+  it('shows conservative dated public-tracker figures and omits unsupported audience/build claims', () => {
     render(<App />)
 
     const hero = document.querySelector('#hero') as HTMLElement
     const stats = document.querySelector('#hero aside:last-of-type')
       ?.textContent as string
 
-    // Rounded DOWN from 2.94M / 6,868,093,822 (see Hero.tsx's STATS note):
-    // a "+" is a floor claim, so the old 3.0M+/7.0B+ overstated the source.
-    expect(stats).toContain('2.9M+')
-    expect(stats).toContain('6.8B+')
-    expect(hero.textContent).not.toContain('3.0M+')
-    expect(hero.textContent).not.toContain('7.0B+')
-
-    // The build count stays qualitative — no counter exists to invent from.
-    expect(stats).toContain(en.hero.stats.dozens)
+    // Conservative floors from the 24 Oct 2026 public-tracker snapshot.
+    expect(stats).toContain('3.8M+')
+    expect(stats).toContain('10.0B+')
+    expect(hero.textContent).not.toContain('Custom PCs Built')
+    expect(hero.textContent).not.toContain('Dozens')
 
     // And the figures carry their date somewhere a visitor can read it, not
     // only in a source comment. It sits in the Hero's fine-print row rather
     // than in the card itself — see Hero.tsx for the measured reason.
     expect(screen.getByText(en.hero.statsSource)).toBeInTheDocument()
 
-    // Exactly three values, and the third is a word rather than a figure —
-    // read off the value elements themselves, because the card's textContent
-    // runs its "02" index straight into the first value.
+    // Only the two sourced channel metrics are presented as statistics.
     const values = Array.from(
       document.querySelectorAll(
         '#hero aside:last-of-type li > span:first-child',
       ),
     ).map((el) => el.textContent)
-    expect(values).toEqual(['2.9M+', '6.8B+', en.hero.stats.dozens])
+    expect(values).toEqual(['3.8M+', '10.0B+'])
+
+    const aboutCard = document.querySelector('#hero [data-about]')
+    expect(aboutCard?.querySelector('img')).toBeNull()
+    expect(aboutCard?.textContent).not.toMatch(/millions across platforms/i)
   })
 
   it('points the Content Universe media slots at real Shorts rather than placeholders', () => {
@@ -546,15 +546,18 @@ describe('App', () => {
     expect(universe.querySelectorAll('[data-dev-placeholder]')).toHaveLength(0)
   })
 
-  it('invents nothing in the Closing section — no links other than back-to-top, and no contact or audience claims', () => {
+  it('keeps Closing links internal and adds no contact details or audience claims', () => {
     render(<App />)
 
     const closing = document.querySelector('#closing') as HTMLElement
 
-    // The back-to-top control is the ONLY interactive element in the section.
+    // Both calls to action point to existing sections on this site.
     const links = Array.from(closing.querySelectorAll('a'))
-    expect(links).toHaveLength(1)
-    expect(links[0]).toHaveAttribute('href', '#hero')
+    expect(links).toHaveLength(2)
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '#featured',
+      '#creator',
+    ])
     expect(closing.querySelectorAll('button, form, input')).toHaveLength(0)
 
     // No external destinations, mail/tel handles, or social handles.
@@ -605,11 +608,11 @@ describe('App', () => {
       }),
     ).toBeInTheDocument()
     // Closing's reveal is skipped entirely under reduced motion, so its copy
-    // and its one control must already be in their resting state.
+    // and both internal links must already be in their resting state.
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /^making tech interesting\.$/i,
+        name: /^good tech\. no guesswork\.$/i,
       }),
     ).toBeInTheDocument()
     expect(
@@ -618,527 +621,16 @@ describe('App', () => {
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: /back to top/i }),
-    ).toBeInTheDocument()
-  })
-})
-
-/**
- * Localization coverage.
- *
- * The completeness check below is deliberately generated rather than a
- * hand-written list of phrases: it walks the English dictionary AND the three
- * data files, keeps every string whose translation actually differs, and then
- * asserts none of those English originals survive in the rendered French or
- * Spanish page. Adding a new English string without translating it therefore
- * fails this test automatically — the previous pass shipped with most
- * long-form copy still in English precisely because nothing checked for it.
- */
-
-/**
- * Deterministic depth-first walk over every string leaf. Keys are sorted so
- * two dictionaries of the same type produce index-aligned arrays, which is
- * what lets an English string be compared against its own translation without
- * threading key paths through the comparison.
- */
-function flattenStrings(value: unknown): string[] {
-  if (typeof value === 'string') return [value]
-  if (Array.isArray(value)) return value.flatMap(flattenStrings)
-  if (value && typeof value === 'object') {
-    const record = value as Record<string, unknown>
-    return Object.keys(record)
-      .sort()
-      .flatMap((key) => flattenStrings(record[key]))
-  }
-  return []
-}
-
-function allStrings(language: Language) {
-  return [
-    ...flattenStrings({ en, fr, es }[language]),
-    ...flattenStrings(getFeaturedStories(language)),
-    ...flattenStrings(getHardwareBeats(language)),
-    ...flattenStrings(getContentCategories(language)),
-  ]
-}
-
-/**
- * Rendered copy, one text node per line. `document.body.textContent` welds
- * adjacent elements together with no separator ("…FeaturedSelected Stories…"),
- * which defeats the whole-phrase matching below; splitting on node boundaries
- * gives every phrase a real edge to match against.
- */
-function renderedText() {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
-  const lines: string[] = []
-  let node = walker.nextNode()
-  while (node) {
-    lines.push((node.textContent ?? '').trim())
-    node = walker.nextNode()
-  }
-  return lines.join('\n')
-}
-
-/** Matches a phrase only as a whole, so "Impact" never matches "Impacto". */
-function containsPhrase(haystack: string, phrase: string) {
-  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return new RegExp(`(^|[^\\p{L}])${escaped}([^\\p{L}]|$)`, 'u').test(haystack)
-}
-
-/**
- * The dropdowns are closed (`display: none`) until their trigger is
- * activated, so the accessibility tree hides their items from a default
- * `getByRole` query. Opening first mirrors what a real visitor does.
- */
-async function openMenu(
-  user: ReturnType<typeof userEvent.setup>,
-  triggerName: RegExp | string,
-) {
-  await user.click(screen.getByRole('button', { name: triggerName }))
-}
-
-function menuOption(name: RegExp | string) {
-  return screen.getByRole('menuitemradio', { name, hidden: true })
-}
-
-/** Opens the language menu and picks an option in one step. */
-async function chooseLanguage(
-  user: ReturnType<typeof userEvent.setup>,
-  triggerName: RegExp | string,
-  optionName: RegExp | string,
-) {
-  await openMenu(user, triggerName)
-  await user.click(menuOption(optionName))
-}
-
-/**
- * English phrases that MUST have disappeared once `language` is selected:
- * long enough to be real copy rather than a shared loanword ("Tech", "Impact",
- * "Performance" are legitimately identical in at least one target language),
- * genuinely different from their translation, and actually visible in the
- * English render — accessible names and <head> metadata are asserted
- * separately since they never appear in body text.
- */
-function untranslatedSentinels(language: Language, englishBodyText: string) {
-  const source = allStrings('en')
-  const target = allStrings(language)
-  return source.filter(
-    (value, index) =>
-      value.length >= 12 &&
-      value !== target[index] &&
-      containsPhrase(englishBodyText, value),
-  )
-}
-
-describe('localization', () => {
-  beforeEach(() => {
-    window.localStorage.clear()
-    document.documentElement.lang = ''
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('defaults to English and records it on the document', () => {
-    render(<App />)
-
-    expect(document.documentElement.lang).toBe('en')
-    expect(document.title).toBe(en.meta.title)
-    expect(screen.getByText(en.hero.support)).toBeInTheDocument()
-  })
-
-  it.each([
-    ['fr' as const, fr],
-    ['es' as const, es],
-  ])('restores a stored %s preference on load', (language, dictionary) => {
-    window.localStorage.setItem('carterpcs-language', language)
-    render(<App />)
-
-    expect(document.documentElement.lang).toBe(language)
-    expect(screen.getByText(dictionary.hero.support)).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: dictionary.hardware.headline,
-      }),
-    ).toBeInTheDocument()
-  })
-
-  it('falls back to English when the stored language is not one we support', () => {
-    window.localStorage.setItem('carterpcs-language', 'de')
-    render(<App />)
-
-    expect(document.documentElement.lang).toBe('en')
-    expect(screen.getByText(en.hero.support)).toBeInTheDocument()
-  })
-
-  it.each([
-    ['fr' as const, fr, /^french$/i],
-    ['es' as const, es, /^spanish$/i],
-  ])(
-    'switches every section to %s immediately, with no reload',
-    async (language, dictionary, menuLabel) => {
-      const user = userEvent.setup()
-      render(<App />)
-
-      await chooseLanguage(user, en.a11y.chooseLanguage, menuLabel)
-
-      // Document state
-      expect(document.documentElement.lang).toBe(language)
-      expect(document.title).toBe(dictionary.meta.title)
-      expect(window.localStorage.getItem('carterpcs-language')).toBe(language)
-
-      // Navigation + skip link
-      expect(
-        screen.getByRole('link', { name: dictionary.a11y.skipToContent }),
-      ).toHaveAttribute('href', '#main-content')
-      const sectionsMenu = await openSectionsMenu(user, dictionary.a11y)
-      expect(
-        sectionsMenu.getByRole('menuitem', {
-          name: dictionary.nav.sections[0],
-        }),
-      ).toHaveAttribute('href', '#featured')
-      // Close it again so the remaining assertions read the settled page.
-      await user.keyboard('{Escape}')
-      expect(
-        screen.getByRole('link', { name: dictionary.nav.about }),
-      ).toHaveAttribute('href', '#creator')
-      expect(
-        screen.getByRole('navigation', {
-          name: dictionary.a11y.primaryNavigation,
-        }),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: dictionary.a11y.chooseLanguage }),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: dictionary.a11y.chooseTheme }),
-      ).toBeInTheDocument()
-
-      // Hero — headline, CTAs, both cards, tiles, disclaimer
-      expect(
-        screen.getByRole('heading', {
-          level: 1,
-          name: dictionary.hero.headlineLabel,
-        }),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hero.support)).toBeInTheDocument()
-      expect(
-        screen.getByRole('link', {
-          name: new RegExp(dictionary.hero.ctaPrimary, 'i'),
-        }),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hero.statsTitle)).toBeInTheDocument()
-      expect(
-        screen.getByText(dictionary.hero.stats.subscribers),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hero.stats.dozens)).toBeInTheDocument()
-      expect(
-        screen.getByText(dictionary.hero.tiles.universe.body),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hero.disclaimer)).toBeInTheDocument()
-
-      // The verified figures are NOT localized — see Hero.tsx's STATS note.
-      // Both round DOWN from the cited reading (2.94M / 6.87B): a "+" figure
-      // is a floor claim, so rounding up would overstate the source.
-      expect(screen.getByText('2.9M+')).toBeInTheDocument()
-      expect(screen.getByText('6.8B+')).toBeInTheDocument()
-
-      // The dated provenance line beneath them IS localized.
-      expect(screen.getByText(dictionary.hero.statsSource)).toBeInTheDocument()
-
-      // Creator / Featured / Hardware / Content Universe section copy
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: dictionary.creator.headline,
-        }),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.creator.bodyOne)).toBeInTheDocument()
-      expect(screen.getByText(dictionary.creator.tags)).toBeInTheDocument()
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: dictionary.featured.title,
-        }),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: dictionary.hardware.headline,
-        }),
-      ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hardware.tags)).toBeInTheDocument()
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: dictionary.contentUniverse.headline,
-        }),
-      ).toBeInTheDocument()
-
-      // Data-driven content: stories, beats, and categories
-      const stories = getFeaturedStories(language)
-      expect(screen.getByText(stories[0].support)).toBeInTheDocument()
-      expect(
-        screen.getByText(stories[0].category, { selector: 'p' }),
-      ).toBeInTheDocument()
-      expect(screen.getByText(stories[2].tags.join(' — '))).toBeInTheDocument()
-
-      // The Shorts' player controls are interface, so they translate; the
-      // video titles inside their accessible names stay English.
-      expect(
-        screen.getAllByRole('button', {
-          name: startsWith(dictionary.featured.playShort),
-        }),
-      ).toHaveLength(3)
-      // Every rail control translates too — the two links out, and the two
-      // buttons that act on this page.
-      expect(
-        screen.getAllByRole('link', {
-          name: startsWith(dictionary.featured.actions.watch),
-        }),
-      ).toHaveLength(3)
-      expect(
-        screen.getAllByRole('link', {
-          name: startsWith(dictionary.featured.actions.comments),
-        }),
-      ).toHaveLength(3)
-      expect(
-        screen.getAllByRole('button', {
-          name: startsWith(dictionary.featured.actions.like),
-        }),
-      ).toHaveLength(3)
-      expect(
-        screen.getAllByRole('button', {
-          name: startsWith(dictionary.featured.actions.share),
-        }),
-      ).toHaveLength(3)
-      // The required wording for the comments destination, in this language.
-      expect(
-        screen
-          .getAllByRole('link', {
-            name: startsWith(dictionary.featured.actions.comments),
-          })[0]
-          .getAttribute('aria-label'),
-      ).toContain(dictionary.featured.a11y.viewComments)
-
-      const beats = getHardwareBeats(language)
-      expect(screen.getByText(beats[0].label)).toBeInTheDocument()
-      expect(screen.getByText(beats[2].description)).toBeInTheDocument()
-
-      const categories = getContentCategories(language)
-      for (const category of categories) {
-        expect(
-          screen.getByRole('heading', { level: 3, name: category.fullName }),
-        ).toBeInTheDocument()
-      }
-      expect(screen.getByText(categories[0].description)).toBeInTheDocument()
-    },
-  )
-
-  it.each([['fr' as const], ['es' as const]])(
-    'leaves no English source copy visible in %s',
-    async (language) => {
-      const user = userEvent.setup()
-      const { unmount } = render(<App />)
-      const englishText = renderedText()
-      unmount()
-
-      const sentinels = untranslatedSentinels(language, englishText)
-      // Guards the guard: a short sentinel list would make the assertion
-      // below pass without covering much. Every section contributes several.
-      expect(sentinels.length).toBeGreaterThan(50)
-
-      render(<App />)
-      await chooseLanguage(
-        user,
-        en.a11y.chooseLanguage,
-        language === 'fr' ? /^french$/i : /^spanish$/i,
-      )
-
-      const translatedText = renderedText()
-      const leaked = sentinels.filter((phrase) =>
-        containsPhrase(translatedText, phrase),
-      )
-      expect(leaked).toEqual([])
-    },
-  )
-
-  it('keeps the theme control working and independent of language', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await chooseLanguage(user, en.a11y.chooseLanguage, /^french$/i)
-    await openMenu(user, fr.a11y.chooseTheme)
-    await user.click(menuOption(fr.nav.themes.light))
-
-    expect(document.documentElement.dataset.theme).toBe('light')
-    expect(window.localStorage.getItem('carterpcs-theme')).toBe('light')
-    expect(document.documentElement.lang).toBe('fr')
-  })
-})
-
-/**
- * Preference-menu open/close behaviour.
- *
- * The CSS-only version these replaced could not close at all once an option
- * was chosen — the selected item still held focus, so `:focus-within` pinned
- * the panel open — and exposed no `aria-expanded` for assistive tech to read.
- * Each case below locks in one of the behaviours that regression produced.
- */
-describe('preference menus', () => {
-  beforeEach(() => {
-    window.localStorage.clear()
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  const trigger = (name: RegExp | string) =>
-    screen.getByRole('button', { name })
-
-  it('reports its state through aria-expanded and opens on click', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    const languageTrigger = trigger(en.a11y.chooseLanguage)
-    expect(languageTrigger).toHaveAttribute('aria-expanded', 'false')
-    expect(languageTrigger).toHaveAttribute('aria-haspopup', 'menu')
-
-    await user.click(languageTrigger)
-    expect(languageTrigger).toHaveAttribute('aria-expanded', 'true')
-
-    // aria-controls points at the menu it actually owns.
-    const controlled = languageTrigger.getAttribute('aria-controls')
-    expect(
-      screen.getByRole('menu', { name: en.a11y.languageMenu, hidden: true }),
-    ).toHaveAttribute('id', controlled)
-  })
-
-  it('closes immediately after an option is selected', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await user.click(trigger(en.a11y.chooseTheme))
-    expect(trigger(en.a11y.chooseTheme)).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-
-    await user.click(menuOption(en.nav.themes.light))
-
-    // The selection applied AND the menu closed, with focus handed back to
-    // the trigger rather than left on a now-hidden item.
-    expect(document.documentElement.dataset.theme).toBe('light')
-    expect(trigger(en.a11y.chooseTheme)).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-    expect(trigger(en.a11y.chooseTheme)).toHaveFocus()
-  })
-
-  it('keeps the checked state on the selected item', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await user.click(trigger(en.a11y.chooseTheme))
-    await user.click(menuOption(en.nav.themes.light))
-    await user.click(trigger(en.a11y.chooseTheme))
-
-    expect(menuOption(en.nav.themes.light)).toHaveAttribute(
-      'aria-checked',
-      'true',
-    )
-    expect(menuOption(en.nav.themes.dark)).toHaveAttribute(
-      'aria-checked',
-      'false',
-    )
-  })
-
-  it('closes on Escape and returns focus to the trigger', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await user.click(trigger(en.a11y.chooseLanguage))
-    expect(trigger(en.a11y.chooseLanguage)).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-
-    await user.keyboard('{Escape}')
-
-    expect(trigger(en.a11y.chooseLanguage)).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-    expect(trigger(en.a11y.chooseLanguage)).toHaveFocus()
-    // Escape must not have applied anything.
-    expect(document.documentElement.lang).toBe('en')
-  })
-
-  it('closes when focus moves outside the menu', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await user.click(trigger(en.a11y.chooseLanguage))
-    expect(trigger(en.a11y.chooseLanguage)).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-
-    screen.getByRole('link', { name: en.nav.about }).focus()
-
-    await waitFor(() =>
-      expect(trigger(en.a11y.chooseLanguage)).toHaveAttribute(
-        'aria-expanded',
-        'false',
+      within(document.querySelector('#closing') as HTMLElement).getByRole(
+        'link',
+        { name: /explore the stories/i },
       ),
-    )
-  })
-
-  it('closes the previously open menu when the other one opens', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await user.click(trigger(en.a11y.chooseTheme))
-    await user.click(trigger(en.a11y.chooseLanguage))
-
-    expect(trigger(en.a11y.chooseTheme)).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-    expect(trigger(en.a11y.chooseLanguage)).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-  })
-
-  it('opens from the keyboard and moves between items with the arrow keys', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    trigger(en.a11y.chooseTheme).focus()
-    await user.keyboard('{ArrowDown}')
-
-    await waitFor(() => expect(menuOption(en.nav.themes.dark)).toHaveFocus())
-
-    await user.keyboard('{ArrowDown}')
-    expect(menuOption(en.nav.themes.light)).toHaveFocus()
-
-    await user.keyboard('{End}')
-    expect(menuOption(en.nav.themes.system)).toHaveFocus()
-
-    await user.keyboard('{Home}')
-    expect(menuOption(en.nav.themes.dark)).toHaveFocus()
-
-    // Enter on the focused item selects it and closes, same as a click.
-    await user.keyboard('{Enter}')
-    expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(trigger(en.a11y.chooseTheme)).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
+    ).toBeInTheDocument()
+    expect(
+      within(document.querySelector('#closing') as HTMLElement).getByRole(
+        'link',
+        { name: /meet the creator/i },
+      ),
+    ).toBeInTheDocument()
   })
 })

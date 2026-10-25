@@ -7,7 +7,6 @@ import { getFeaturedStories } from '../src/data/featured'
 import { getHardwareBeats } from '../src/data/hardware'
 import { primaryNav } from './helpers'
 
-
 test('Hero loads with heading, subhead, and navigation', async ({ page }) => {
   await page.goto('/')
 
@@ -21,105 +20,16 @@ test('Hero loads with heading, subhead, and navigation', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: /primary/i })).toBeVisible()
 })
 
-test('Editorial progress rail follows all six sections and hides on mobile', async ({
+test('editorial progress rail and section index are removed at every viewport', async ({
   page,
 }) => {
-  const rail = page.locator('[data-editorial-rail]')
-  const marker = page.locator('[data-editorial-marker]')
-  const index = page.locator('[data-editorial-index]')
-
-  await page.setViewportSize(DESKTOP)
-  await page.goto('/')
-  await expect(rail).toBeVisible()
-  await expect(rail).toHaveAttribute('aria-hidden', 'true')
-  await expect(index).toBeVisible()
-  await expect(index).toHaveText('01/06')
-  await page.waitForTimeout(500)
-  const railBox = await rail.boundingBox()
-  const indexBox = await index.boundingBox()
-  expect(railBox).not.toBeNull()
-  expect(indexBox).not.toBeNull()
-  const heroHeadline = await page.locator('#hero h1').boundingBox()
-  expect(heroHeadline).not.toBeNull()
-  expect(heroHeadline!.x - railBox!.x).toBeGreaterThan(80)
-  expect(Math.abs(railBox!.y - page.viewportSize()!.height * 0.087)).toBeLessThan(2)
-  expect(Math.abs(railBox!.height - page.viewportSize()!.height * 0.801)).toBeLessThan(2)
-  expect(Math.abs(indexBox!.x - railBox!.x)).toBeLessThan(2)
-  expect(
-    Math.abs(
-      indexBox!.y + indexBox!.height - page.viewportSize()!.height * 0.935,
-    ),
-  ).toBeLessThan(2)
-
-  // Check the supplied 2559×1269 reference viewport as well as the
-  // standard desktop viewport above.
-  await page.setViewportSize({ width: 2559, height: 1269 })
-  await page.waitForTimeout(500)
-  const referenceRailBox = await rail.boundingBox()
-  const referenceIndexBox = await index.boundingBox()
-  expect(referenceRailBox).not.toBeNull()
-  expect(referenceIndexBox).not.toBeNull()
-  const referenceHeadline = await page.locator('#hero h1').boundingBox()
-  expect(referenceHeadline).not.toBeNull()
-  expect(referenceHeadline!.x - referenceRailBox!.x).toBeGreaterThan(80)
-  expect(Math.abs(referenceRailBox!.x - referenceIndexBox!.x)).toBeLessThan(2)
-  expect(Math.abs(referenceRailBox!.y - 1269 * 0.087)).toBeLessThan(2)
-  expect(Math.abs(referenceIndexBox!.y + referenceIndexBox!.height - 1269 * 0.935)).toBeLessThan(2)
-
-  await page.setViewportSize(DESKTOP)
-  const markerTop = async () => {
-    const railBox = await rail.boundingBox()
-    const markerBox = await marker.boundingBox()
-    return markerBox!.y + markerBox!.height / 2 - railBox!.y
+  for (const viewport of [DESKTOP, MOBILE]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await expect(page.locator('[data-editorial-rail]')).toHaveCount(0)
+    await expect(page.locator('[data-editorial-marker]')).toHaveCount(0)
+    await expect(page.locator('[data-editorial-index]')).toHaveCount(0)
   }
-  const sectionIds = [
-    'hero',
-    'creator',
-    'featured',
-    'hardware',
-    'content-universe',
-    'closing',
-  ]
-
-  for (const position of sectionIds.keys()) {
-    const expectedIndex = position + 1
-    for (let step = 0; step < 60; step += 1) {
-      const currentIndex = Number((await index.innerText()).slice(0, 2))
-      if (currentIndex >= expectedIndex) break
-      await page.evaluate(() => window.scrollBy({ top: 250, behavior: 'instant' }))
-      await page.waitForTimeout(30)
-    }
-    await expect(index).toHaveText(`${String(expectedIndex).padStart(2, '0')}/06`)
-    if (position > 0) {
-      await expect
-        .poll(() =>
-          page.evaluate((id) => {
-            const heading = document
-              .getElementById(id)!
-              .querySelector('h1, h2')!
-              .getBoundingClientRect()
-            const rail = document
-              .querySelector('[data-editorial-rail]')!
-              .getBoundingClientRect()
-            return heading.left - rail.left
-          }, sectionIds[position]),
-        )
-        .toBeGreaterThanOrEqual(23)
-    }
-    await expect
-      .poll(markerTop)
-      .toBeGreaterThanOrEqual((railBox!.height * position) / 5 - 2)
-  }
-
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
-  await page.locator('#creator').scrollIntoViewIfNeeded()
-  await expect(index).toHaveText('02/06')
-
-  await page.setViewportSize(MOBILE)
-  await page.goto('/')
-  await expect(rail).toBeHidden()
-  await expect(index).toBeHidden()
 })
 
 test('skip link is keyboard-reachable and targets main content', async ({
@@ -142,6 +52,81 @@ test('scrolling from Hero reveals the Creator section', async ({ page }) => {
 
   await creatorHeading.scrollIntoViewIfNeeded()
   await expect(creatorHeading).toBeVisible()
+})
+
+test('Creator uses an inset image and balanced text on wide screens, then stacks cleanly', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 1280, height: 800 },
+    { width: 1024, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await page.locator('#creator').scrollIntoViewIfNeeded()
+    const creatorImage = page.locator('#creator img')
+    await creatorImage.scrollIntoViewIfNeeded()
+    await expect
+      .poll(() =>
+        creatorImage.evaluate(
+          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+        ),
+      )
+      .toBe(true)
+
+    const layout = await page.evaluate(() => {
+      const section = document.querySelector<HTMLElement>('#creator')!
+      const media = section
+        .querySelector<HTMLElement>('[data-reveal-stage]')!
+        .getBoundingClientRect()
+      const image = section.querySelector('img')!
+      const imageRect = image.getBoundingClientRect()
+      const heading = section.querySelector('h2')!.getBoundingClientRect()
+      const footer = section
+        .querySelector<HTMLElement>('[class*="footer"]')!
+        .getBoundingClientRect()
+      return {
+        media: {
+          left: media.left,
+          right: media.right,
+          top: media.top,
+          bottom: media.bottom,
+          height: media.height,
+        },
+        image: {
+          height: imageRect.height,
+          loaded: image.complete && image.naturalWidth > 0,
+        },
+        heading: {
+          left: heading.left,
+          right: heading.right,
+          top: heading.top,
+          bottom: heading.bottom,
+        },
+        footer: { top: footer.top, bottom: footer.bottom },
+        viewportWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }
+    })
+
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.viewportWidth)
+    expect(layout.image.loaded).toBe(true)
+    expect(Math.abs(layout.media.height - layout.image.height)).toBeLessThan(4)
+    if (viewport.width >= 1200) {
+      expect(layout.media.left).toBeGreaterThan(24)
+      expect(layout.media.right).toBeLessThan(layout.heading.left)
+      expect(layout.media.bottom - layout.media.top).toBeGreaterThan(
+        viewport.height * 0.55,
+      )
+    } else {
+      expect(layout.media.top).toBeGreaterThan(layout.footer.bottom)
+      expect(layout.media.left).toBeGreaterThanOrEqual(0)
+    }
+  }
 })
 
 test('Creator nav link scrolls to the Creator section', async ({ page }) => {
@@ -242,7 +227,9 @@ test('the #hardware anchor lands below the fixed bar at every width, in every la
       await jumpToHardware(page)
 
       const clearance = await page.evaluate(() => {
-        const section = document.querySelector('#hardware')!.getBoundingClientRect()
+        const section = document
+          .querySelector('#hardware')!
+          .getBoundingClientRect()
         const bar = document.querySelector('nav')!.getBoundingClientRect()
         return section.top - bar.bottom
       })
@@ -290,7 +277,11 @@ test('Hardware: the object never crosses the copy, and the pin never strands the
           Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
           Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
         let overStage = 0
-        for (const selector of ['h2', '[class*="kicker"]', '[class*="support"]']) {
+        for (const selector of [
+          'h2',
+          '[class*="kicker"]',
+          '[class*="support"]',
+        ]) {
           for (const rect of inkOf(selector)) {
             overStage += cross(rect, stage)
           }
@@ -399,7 +390,7 @@ test('Universe nav link scrolls to the Content Universe section', async ({
   await expect(page).toHaveURL(/#content-universe$/)
 })
 
-test('desktop: Content Universe choreography progresses and resolves with all six categories reachable', async ({
+test('desktop: Content Universe stays static and all six categories remain reachable', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -423,11 +414,15 @@ test('desktop: Content Universe choreography progresses and resolves with all si
   await expect(hardwareCategory).toBeAttached()
   await expect(communityCategory).toBeAttached()
 
-  // Scroll well past the pin's distance so it releases and normal vertical
-  // flow resumes, reaching the section's resolved end (the closing index
-  // line lists all six categories as one connected list).
-  await page.evaluate(() => window.scrollBy(0, 1400))
-  await page.waitForTimeout(500)
+  const categories = page.locator('#content-universe [data-cat]')
+  const initialTransforms = await categories.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).transform),
+  )
+  await page.evaluate(() => window.scrollBy(0, 500))
+  const scrolledTransforms = await categories.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).transform),
+  )
+  expect(scrolledTransforms).toEqual(initialTransforms)
 
   await communityCategory.scrollIntoViewIfNeeded()
   await expect(communityCategory).toBeVisible()
@@ -437,6 +432,11 @@ test('desktop: Content Universe choreography progresses and resolves with all si
   )
   await index.scrollIntoViewIfNeeded()
   await expect(index).toBeVisible()
+
+  const pinSpacerCount = await page
+    .locator('#content-universe')
+    .evaluate((section) => section.querySelectorAll('.pin-spacer').length)
+  expect(pinSpacerCount).toBe(0)
 
   const overflow = await page.evaluate(
     () =>
@@ -523,7 +523,26 @@ test('language menu opens on click and switches the page without a reload', asyn
     ;(window as unknown as { __noReload: boolean }).__noReload = true
   })
 
-  await selectLanguage(page, en.a11y.chooseLanguage, en.nav.languages.fr)
+  await page.getByRole('button', { name: en.a11y.chooseLanguage }).click()
+  const languageMenu = page.getByRole('menu', {
+    name: en.a11y.languageMenu,
+  })
+  await expect(
+    languageMenu.locator('svg[data-language-flag="en"]'),
+  ).toBeVisible()
+  await expect(
+    languageMenu.locator('svg[data-language-flag="fr"]'),
+  ).toBeVisible()
+  await expect(
+    languageMenu.locator('svg[data-language-flag="es"]'),
+  ).toBeVisible()
+  await expect(
+    languageMenu.getByRole('menuitemradio', { name: en.nav.languages.en }),
+  ).toBeVisible()
+
+  await languageMenu
+    .getByRole('menuitemradio', { name: en.nav.languages.fr, exact: true })
+    .click()
 
   expect(
     await page.evaluate(
@@ -640,7 +659,7 @@ for (const [language, dictionary] of [
   }
 }
 
-test('desktop: the Featured horizontal sequence still completes in French', async ({
+test('desktop: the Featured editorial story layout stays complete in French', async ({
   page,
 }) => {
   await page.setViewportSize(DESKTOP)
@@ -650,23 +669,20 @@ test('desktop: the Featured horizontal sequence still completes in French', asyn
   await page.goto('/')
 
   const stories = getFeaturedStories('fr')
-  const firstStory = page.getByRole('heading', {
-    level: 3,
-    name: stories[0].headlineLines.join(' '),
-  })
-  const lastStory = page.getByRole('heading', {
-    level: 3,
-    name: stories[2].headlineLines.join(' '),
-  })
-
-  await firstStory.scrollIntoViewIfNeeded()
-  await expect(firstStory).toBeVisible()
-  await expect(lastStory).not.toBeInViewport()
-
-  await page.evaluate(() => window.scrollBy(0, 2200))
-  await page.waitForTimeout(500)
-
-  await expect(lastStory).toBeInViewport()
+  const storyPanels = page.locator('#featured [data-panel]')
+  await expect(storyPanels).toHaveCount(3)
+  for (const [index, story] of stories.entries()) {
+    await expect(
+      storyPanels.nth(index).getByRole('heading', {
+        level: 3,
+        name: story.headlineLines.join(' '),
+      }),
+    ).toBeVisible()
+  }
+  await expect(storyPanels.nth(0).locator('p').first()).toContainText(
+    'Matériel',
+  )
+  await expect(storyPanels.nth(2).locator('p').first()).toContainText('Analyse')
   expect(await hasHorizontalOverflow(page)).toBe(false)
 })
 
@@ -760,7 +776,7 @@ test('mobile: an open menu stays a compact dropdown that covers none of the bar�
       ...document.querySelectorAll(
         'nav a[href="#hero"], nav a[href="#creator"], nav button[aria-haspopup]',
       ),
-    ].filter((el) => !el.closest('footer'))
+    ].filter((el) => !el.closest('footer') && !el.closest('[role="menu"]'))
     for (const control of controls) {
       const l = control.getBoundingClientRect()
       if (
@@ -804,7 +820,7 @@ test('mobile: an open menu stays a compact dropdown that covers none of the bar�
 
 for (const width of [320, 390]) {
   for (const language of ['en', 'fr', 'es'] as const) {
-    test(`${language} @ ${width}px: section headings wrap without clipped glyphs`, async ({
+    test(`${language} @ ${width}px: section headings stay visible without clipped glyphs`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 844 })
@@ -843,8 +859,9 @@ for (const width of [320, 390]) {
           m.residualClip,
           `${selector} kept a clip-path after revealing`,
         ).toBe('')
-        // It wraps rather than running past its box.
-        expect(m.lines, `${selector} did not wrap`).toBeGreaterThan(1)
+        // A short heading may fit on one line; longer ones can wrap. Either
+        // way, its text must remain inside the heading box.
+        expect(m.lines, `${selector} has no visible text`).toBeGreaterThan(0)
         expect(m.cutRight, `${selector} overflows horizontally`).toBeLessThan(1)
       }
 
@@ -1133,9 +1150,7 @@ test('mobile: the sections menu opens, navigates, closes, and restores focus', a
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
   await expect(menu).toBeVisible()
   const labels = await menu.getByRole('menuitem').allTextContents()
-  expect(labels.map((label) => label.trim())).toEqual([
-    ...en.nav.sections,
-  ])
+  expect(labels.map((label) => label.trim())).toEqual([...en.nav.sections])
 
   // 2. Escape closes and hands focus back to the trigger.
   await page.keyboard.press('Escape')
@@ -1216,7 +1231,7 @@ test('mobile, reduced motion: the sections menu still opens and its items are fu
 const DICTIONARIES = { en, fr, es } as const
 
 for (const language of ['en', 'fr', 'es'] as const) {
-  test(`${language}: the Closing section renders its statement and returns to the Hero`, async ({
+  test(`${language}: the Closing section renders its statement, image, and internal links`, async ({
     page,
   }) => {
     const dictionary = DICTIONARIES[language]
@@ -1268,21 +1283,18 @@ for (const language of ['en', 'fr', 'es'] as const) {
         clip: (el as HTMLElement).style.clipPath || '',
       })),
     )
-    expect(resting).toHaveLength(5)
+    expect(resting).toHaveLength(6)
     for (const item of resting) {
       expect(item.opacity, `"${item.text}" never became visible`).toBe('1')
       expect(item.clip, `"${item.text}" kept a clip-path`).toBe('')
     }
 
-    // Back to top actually goes back to the top.
-    const backToTop = closing.getByRole('link', {
-      name: dictionary.closing.backToTop,
-    })
-    await expect(backToTop).toHaveAttribute('href', '#hero')
-    await backToTop.click()
-    await page.waitForTimeout(1500)
-    expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(0)
-    await expect(page).toHaveURL(/#hero$/)
+    await expect(
+      closing.getByRole('link', { name: dictionary.closing.exploreStories }),
+    ).toHaveAttribute('href', '#featured')
+    await expect(
+      closing.getByRole('link', { name: dictionary.closing.meetCreator }),
+    ).toHaveAttribute('href', '#creator')
   })
 }
 
@@ -1362,12 +1374,18 @@ test('light theme: the Closing copy meets AA contrast on its own ground', async 
       ...document.querySelectorAll('#closing h2, #closing p, #closing a'),
     ].map((el) => {
       const style = getComputedStyle(el)
+      const elementBackground = style.backgroundColor
+      const background =
+        elementBackground === 'rgba(0, 0, 0, 0)' ||
+        elementBackground === 'transparent'
+          ? body
+          : parse(elementBackground)
       return {
         text: (el.textContent ?? '').trim().slice(0, 24),
         size: parseFloat(style.fontSize),
         weight: parseInt(style.fontWeight, 10) || 400,
         color: parse(style.color),
-        background: body,
+        background,
       }
     })
   })
@@ -1406,19 +1424,22 @@ test('reduced motion: the Closing section is fully present with no animation lef
             !!(el as HTMLElement).style.clipPath
           )
         }).length,
-      backToTop: !!section.querySelector('a[href="#hero"]'),
+      links: [...section.querySelectorAll('a')].map((link) =>
+        link.getAttribute('href'),
+      ),
     }
   })
 
   expect(state.stranded).toBe(0)
-  expect(state.backToTop).toBe(true)
+  expect(state.links).toEqual(['#featured', '#creator'])
 })
 
 /* ------------------------------------------------------------------ *
  * Footer
  *
  * The site's last row, after the Closing statement. Exactly nine links: the
- * bar's six destinations and the three supplied social profiles.
+ * four section destinations, the home wordmark, and three supplied social
+ * profiles.
  * ------------------------------------------------------------------ */
 
 const SOCIAL = [
@@ -1470,6 +1491,12 @@ for (const language of ['en', 'fr', 'es'] as const) {
       footer.getByText(`© 2026 ${dictionary.footer.copyright}`),
     ).toBeVisible()
     await expect(footer.getByText(dictionary.footer.disclaimer)).toBeVisible()
+    await expect(footer.getByText(dictionary.footer.credit)).toBeVisible()
+    await expect(
+      footer.getByRole('link', {
+        name: `CarterPCs — ${dictionary.footer.a11y.home}`,
+      }),
+    ).toHaveAttribute('href', '#hero')
 
     // Stated once: the footer does not repeat the Closing statement's
     // "Independent creative concept." line above it.
@@ -1488,6 +1515,7 @@ for (const language of ['en', 'fr', 'es'] as const) {
       await expect(link).toHaveAttribute('target', '_blank')
       await expect(link).toHaveAttribute('rel', 'noreferrer')
       await expect(link).toContainText(name)
+      await expect(link.locator('svg[aria-hidden="true"]')).toHaveCount(1)
     }
   })
 }
@@ -1522,14 +1550,14 @@ test('the Footer links nowhere it was not told to, and claims nothing', async ({
   })
 
   expect(audit).toEqual({
-    total: 7,
-    internal: 4,
+    total: 8,
+    internal: 5,
     hosts: ['www.youtube.com', 'www.instagram.com', 'www.tiktok.com'],
     unsafe: 0,
     controls: 0,
     contact: false,
-    // The copyright year is the only figure the footer states.
-    digits: '2026',
+    // Copyright and the explicit fan-since credit are the only figures.
+    digits: '2026,15,2023',
   })
 })
 
@@ -1615,6 +1643,102 @@ for (const width of [320, 390]) {
   })
 }
 
+test('tablet and desktop: the footer groups stay in their intended rows in every language', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+
+  for (const width of [768, 1024, 1440]) {
+    for (const language of ['en', 'fr', 'es'] as const) {
+      await page.setViewportSize({ width, height: 900 })
+      await page.addInitScript((lang) => {
+        window.localStorage.setItem('carterpcs-language', lang)
+      }, language)
+      await page.goto('/')
+      await page.getByRole('contentinfo').scrollIntoViewIfNeeded()
+
+      const layout = await page.evaluate(() => {
+        const footer = document.querySelector('footer')!
+        const box = (selector: string) => {
+          const rect = footer.querySelector(selector)!.getBoundingClientRect()
+          return {
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            height: rect.height,
+            width: rect.width,
+          }
+        }
+        return {
+          canvas: box('[class*="canvas"]'),
+          footerHeight: footer.getBoundingClientRect().height,
+          brand: box('[class*="brand"]'),
+          brandFontSize: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="brand"]')!)
+              .fontSize,
+          ),
+          columnRules: [
+            ...footer.querySelectorAll(
+              '[class*="topRow"] > [class*="columnRule"]',
+            ),
+          ].map((rule) => rule.getBoundingClientRect().left),
+          nav: box('nav'),
+          social: box('ul[aria-label]'),
+          socialContent: (() => {
+            const items = [
+              ...footer.querySelectorAll('ul[aria-label] > li'),
+            ].map((item) => item.getBoundingClientRect())
+            return {
+              left: Math.min(...items.map((item) => item.left)),
+              right: Math.max(...items.map((item) => item.right)),
+            }
+          })(),
+          overflow:
+            document.documentElement.scrollWidth >
+            document.documentElement.clientWidth,
+        }
+      })
+
+      expect(layout.overflow, `${language} @ ${width}px`).toBe(false)
+      const centerY = ({ top, height }: { top: number; height: number }) =>
+        top + height / 2
+      expect(
+        Math.abs(centerY(layout.social) - centerY(layout.brand)),
+      ).toBeLessThan(4)
+      const socialCenter =
+        (layout.socialContent.left + layout.socialContent.right) / 2
+      const socialSectionCenter = (layout.social.left + layout.social.right) / 2
+      expect(Math.abs(socialCenter - socialSectionCenter)).toBeLessThan(4)
+      if (width > 1150) {
+        const brandInset = layout.brand.left - layout.canvas.left
+        expect(brandInset).toBeGreaterThan(36)
+        expect(brandInset).toBeLessThan(52)
+        if (width === 1440) {
+          expect(layout.footerHeight).toBeGreaterThan(160)
+          expect(layout.footerHeight).toBeLessThan(176)
+          expect(layout.brandFontSize).toBeGreaterThan(31)
+          expect(layout.brandFontSize).toBeLessThan(34)
+          const firstRuleRatio =
+            (layout.columnRules[0] - layout.canvas.left) / layout.canvas.width
+          const secondRuleRatio =
+            (layout.columnRules[1] - layout.canvas.left) / layout.canvas.width
+          expect(firstRuleRatio).toBeGreaterThan(0.26)
+          expect(firstRuleRatio).toBeLessThan(0.28)
+          expect(secondRuleRatio).toBeGreaterThan(0.65)
+          expect(secondRuleRatio).toBeLessThan(0.67)
+        }
+        expect(
+          Math.abs(centerY(layout.nav) - centerY(layout.brand)),
+        ).toBeLessThan(4)
+        expect(layout.nav.left).toBeGreaterThan(layout.brand.right)
+        expect(layout.nav.right).toBeLessThan(layout.social.left)
+      } else {
+        expect(layout.nav.top).toBeGreaterThan(layout.brand.top + 20)
+      }
+    }
+  }
+})
+
 test('light theme: the Footer copy meets AA contrast on every frame from first paint', async ({
   page,
 }) => {
@@ -1651,7 +1775,10 @@ test('light theme: the Footer copy meets AA contrast on every frame from first p
   expect(frames.length).toBe(20)
   expect(frames[0].length).toBeGreaterThan(0)
   const parse = (value: string) =>
-    value.match(/\d+(\.\d+)?/g)!.slice(0, 3).map(Number) as unknown as Rgb
+    value
+      .match(/\d+(\.\d+)?/g)!
+      .slice(0, 3)
+      .map(Number) as unknown as Rgb
   frames.forEach((samples, frame) => {
     for (const sample of samples) {
       expect(
@@ -1680,7 +1807,9 @@ test('switching theme through the menu never renders the Footer mid-swap', async
     const w = window as typeof window & { __swap?: string[]; __raf?: number }
     w.__swap = []
     const tick = () => {
-      w.__swap!.push(getComputedStyle(document.querySelector('footer a')!).color)
+      w.__swap!.push(
+        getComputedStyle(document.querySelector('footer nav a')!).color,
+      )
       w.__raf = requestAnimationFrame(tick)
     }
     tick()
@@ -1730,67 +1859,161 @@ test('reduced motion: the Footer carries no animation at all', async ({
 })
 
 /* ============================================================
- * Navigation scrolled-state scrim (fix-v16)
+ * Floating navigation capsule
  * ============================================================
- * The bar is transparent at the page top by design, and during scroll a
- * theme-aware scrim fades in behind it so page content can never
- * interleave with the bar's own labels. The scrim is a pseudo-element
- * overlay: it must add zero layout (the bar's height is identical in
- * both states) and must release again at the top.
+ * The inset capsule has a readable surface at the top and strengthens it
+ * slightly while scrolling. The visual state must not change its geometry.
  */
 
-const scrimState = (page: Page, label = en.a11y.primaryNavigation) =>
+const navSurfaceState = (page: Page, label = en.a11y.primaryNavigation) =>
   page.evaluate((navLabel) => {
     const nav = document.querySelector(`nav[aria-label="${navLabel}"]`)!
-    const cs = getComputedStyle(nav, '::before')
+    const bar = nav.firstElementChild as HTMLElement
+    const cs = getComputedStyle(bar)
+    const rect = nav.getBoundingClientRect()
+    const barRect = bar.getBoundingClientRect()
+    const controls = [
+      ...nav.querySelectorAll<HTMLElement>('a[href], button[aria-haspopup]'),
+    ].filter(
+      (control) =>
+        control.getBoundingClientRect().width > 0 &&
+        !control.closest('[role="menu"]'),
+    )
     return {
       scrolledAttr: nav.hasAttribute('data-scrolled'),
-      opacity: parseFloat(cs.opacity),
-      barHeight: nav.getBoundingClientRect().height,
+      background: cs.backgroundColor,
+      borderRadius: cs.borderRadius,
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      viewportWidth: document.documentElement.clientWidth,
+      barHeight: rect.height,
+      controlsInsideBar: controls.every((control) => {
+        const controlRect = control.getBoundingClientRect()
+        return (
+          controlRect.left >= barRect.left &&
+          controlRect.right <= barRect.right &&
+          controlRect.top >= barRect.top &&
+          controlRect.bottom <= barRect.bottom
+        )
+      }),
+      transitionDuration: cs.transitionDuration,
     }
   }, label)
 
-test('the bar is transparent at the top and carries its scrim once scrolled, with no layout shift', async ({
+test('theme and language controls sit to the left of About Carter', async ({
   page,
 }) => {
-  for (const viewport of [DESKTOP, MOBILE]) {
+  for (const viewport of [DESKTOP, MOBILE, { width: 320, height: 568 }]) {
     await page.setViewportSize(viewport)
     await page.goto('/')
 
-    const atTop = await scrimState(page)
+    const theme = await page
+      .getByRole('button', { name: en.a11y.chooseTheme })
+      .boundingBox()
+    const language = await page
+      .getByRole('button', { name: en.a11y.chooseLanguage })
+      .boundingBox()
+    const about = await page
+      .getByRole('link', { name: en.nav.about })
+      .boundingBox()
+
+    expect(theme).not.toBeNull()
+    expect(language).not.toBeNull()
+    expect(about).not.toBeNull()
+    expect(theme!.x + theme!.width).toBeLessThan(about!.x)
+    expect(language!.x + language!.width).toBeLessThan(about!.x)
+  }
+})
+
+test('links and buttons get press feedback without overriding reduced motion', async ({
+  page,
+}) => {
+  await page.setViewportSize(DESKTOP)
+  await page.goto('/')
+
+  const button = page.getByRole('button', { name: en.a11y.chooseTheme })
+  await button.hover()
+  await page.mouse.down()
+  await expect
+    .poll(() => button.evaluate((el) => getComputedStyle(el).animationName))
+    .toBe('control-press')
+  await page.mouse.up()
+
+  const link = page.getByRole('link', { name: en.nav.about })
+  await link.hover()
+  await page.mouse.down()
+  await expect
+    .poll(() => link.evaluate((el) => getComputedStyle(el).animationName))
+    .toBe('control-press')
+  await page.mouse.up()
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await button.hover()
+  await page.mouse.down()
+  await expect
+    .poll(() => button.evaluate((el) => getComputedStyle(el).animationName))
+    .toBe('control-press')
+  const reducedDuration = await button.evaluate((el) =>
+    parseFloat(getComputedStyle(el).animationDuration),
+  )
+  expect(reducedDuration).toBeLessThanOrEqual(0.001)
+  await page.mouse.up()
+})
+
+test('the navigation is a floating capsule and strengthens on scroll without shifting', async ({
+  page,
+}) => {
+  for (const viewport of [DESKTOP, MOBILE, { width: 320, height: 568 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+
+    const atTop = await navSurfaceState(page)
     expect(atTop.scrolledAttr).toBe(false)
-    expect(atTop.opacity).toBe(0)
+    expect(atTop.background).not.toBe('rgba(0, 0, 0, 0)')
+    expect(parseFloat(atTop.borderRadius)).toBeGreaterThan(0)
+    expect(atTop.left).toBeGreaterThan(0)
+    expect(atTop.right).toBeLessThan(atTop.viewportWidth)
+    expect(atTop.top).toBeGreaterThan(0)
+    expect(atTop.controlsInsideBar).toBe(true)
 
     await page.evaluate(() => window.scrollTo(0, 600))
     await expect
-      .poll(async () => (await scrimState(page)).opacity, { timeout: 5000 })
-      .toBe(1)
-    const scrolled = await scrimState(page)
+      .poll(async () => (await navSurfaceState(page)).background, {
+        timeout: 5000,
+      })
+      .not.toBe(atTop.background)
+    const scrolled = await navSurfaceState(page)
     expect(scrolled.scrolledAttr).toBe(true)
-    // A pseudo-element overlay adds no layout: same bar height in both
-    // states, at the single-row desktop bar and the wrapped mobile one.
+    // Strengthening the pill adds no layout at desktop or mobile.
     expect(scrolled.barHeight).toBe(atTop.barHeight)
 
     await page.evaluate(() => window.scrollTo(0, 0))
     await expect
-      .poll(async () => (await scrimState(page)).opacity, { timeout: 5000 })
-      .toBe(0)
+      .poll(async () => (await navSurfaceState(page)).background, {
+        timeout: 5000,
+      })
+      .toBe(atTop.background)
   }
 })
 
-test('reduced motion: the scrim state still switches, as an instant change', async ({
+test('reduced motion: the capsule state changes without a visible transition', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize(DESKTOP)
   await page.goto('/')
 
-  expect((await scrimState(page)).opacity).toBe(0)
+  const atTop = await navSurfaceState(page)
+  expect(atTop.scrolledAttr).toBe(false)
 
   await page.evaluate(() => window.scrollTo(0, 600))
-  // The global reduced-motion rule zeroes the fade, so the scrim must be
-  // fully present as soon as the scroll listener's next frame lands.
   await expect
-    .poll(async () => (await scrimState(page)).opacity, { timeout: 2000 })
-    .toBe(1)
+    .poll(async () => (await navSurfaceState(page)).scrolledAttr, {
+      timeout: 2000,
+    })
+    .toBe(true)
+  const scrolled = await navSurfaceState(page)
+  expect(scrolled.background).not.toBe(atTop.background)
+  expect(parseFloat(scrolled.transitionDuration)).toBeLessThanOrEqual(0.001)
 })
