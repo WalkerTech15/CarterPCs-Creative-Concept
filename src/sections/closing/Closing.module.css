@@ -12,10 +12,15 @@
 .closing {
   position: relative;
   overflow: clip;
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  align-items: center;
+  column-gap: clamp(2rem, 5vw, 5rem);
+  width: 100%;
+  max-width: 104rem;
+  min-height: 68vh;
+  margin-inline: auto;
+  padding-inline: var(--container-padding-inline);
   /* The bar is fixed and ~197px tall at its tallest wrap — an anchor jump to
      this section must not land under it. Matches Content Universe. */
   scroll-margin-block-start: 6rem;
@@ -71,10 +76,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
-  width: 100%;
-  max-width: 96rem;
-  margin-inline: auto;
-  padding: var(--space-7) var(--container-padding-inline);
+  min-width: 0;
+  padding-block: var(--space-7);
 }
 
 /* Micro-label register, matching Hero's eyebrow rhythm — but NOT
@@ -104,11 +107,8 @@
   flex-direction: column;
   margin-block-start: var(--space-1);
   font-family: var(--font-family-display);
-  /* Below the Hero's display size and above the section headings: this is the
-     final statement, not a competing hero. The 4.2vw slope keeps it inside
-     the canvas at 320px in all three languages (the widest line is Spanish's
-     "que engancha."). */
-  font-size: clamp(2.5rem, 1.5rem + 4.2vw, 5.5rem);
+  /* A compact closing statement, not a competing hero. */
+  font-size: clamp(2.75rem, 3.8vw, 4.5rem);
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.032em;
@@ -119,77 +119,146 @@
   display: block;
 }
 
+.description {
+  max-width: 48ch;
+  margin-block-start: var(--space-3);
+  font-size: var(--font-size-body);
+  line-height: 1.65;
+  color: color-mix(
+    in srgb,
+    var(--color-text-primary) 30%,
+    var(--color-text-muted)
+  );
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.primaryAction {
+  color: var(--color-bg-base);
+  background: var(--color-text-primary);
+}
+
+.secondaryAction {
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+.primaryAction:hover,
+.secondaryAction:hover {
+  transform: translateY(-1px);
+}
+
+.primaryAction:hover {
+  background: color-mix(
+    in srgb,
+    var(--color-text-primary) 84%,
+    var(--color-accent-secondary)
+  );
+}
+
+.secondaryAction:hover {
+  border-color: color-mix(in srgb, var(--color-text-primary) 42%, transparent);
+  background: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+}
+
+.primaryAction:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 2px solid var(--color-accent-secondary);
+  outline-offset: 3px;
+}
+
 .disclaimer {
   display: flex;
   flex-direction: column;
-  margin-block-start: var(--space-2);
+  margin-block-start: var(--space-4);
   max-width: 34ch;
   font-size: var(--font-size-body);
   line-height: 1.6;
   color: var(--color-text-muted);
 }
 
-/* Quiet text link in Hero's `.aboutLink` register. Sized by min-height rather
-   than by an overlay: there is no ink-calibrated geometry to preserve here, so
-   the target can simply BE 44px — comfortably past WCAG 2.2 AA's 24px floor
-   and at the touch guidance figure.
-   Hover dims the COLOUR, not the opacity, and transitions colour only. The
-   entrance reveal tweens this element's opacity, and a CSS transition on the
-   same property fights it — it left the link permanently invisible until the
-   tween was made explicit. Transitioning colour keeps the two off each
-   other's property, and matches the nav links' own hover treatment. */
-.backToTop {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2.75rem;
-  margin-block-start: var(--space-2);
-  padding-inline: 0.125rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  text-decoration: none;
-  transition: color var(--duration-fast) var(--ease-out);
+.media {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  border-radius: 1rem;
+  background: color-mix(
+    in srgb,
+    var(--color-text-primary) 4%,
+    var(--color-background)
+  );
 }
 
-.backToTop:hover {
-  color: color-mix(in srgb, var(--color-text-primary) 68%, transparent);
+.mediaImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
 }
 
-.backToTopArrow {
-  font-size: 0.8125rem;
-  transition: transform var(--duration-base) var(--ease-out);
-}
-
-.backToTop:hover .backToTopArrow {
-  transform: translateY(-0.125rem);
-}
-
-/* The arrow's nudge is decoration, not information — reduced motion drops it
-   along with everything else. The global rule already collapses transition
-   durations; this removes the movement itself. */
-@media (prefers-reduced-motion: reduce) {
-  .backToTop:hover .backToTopArrow {
-    transform: none;
-  }
-}
-
-/* ===== Desktop =====
-   From the width at which the Hero's reference frame engages, the closing
-   block gets the same generous vertical air the other sections carry. */
-
-@media (min-width: 1024px) {
+@media (max-width: 1023px) {
   .closing {
-    min-height: 68vh;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-3);
+    min-height: 0;
+    padding-block: var(--space-5);
   }
 
   .canvas {
-    gap: var(--space-4);
-    padding-block: calc(var(--space-7) + var(--space-2));
+    padding-block: var(--space-3) 0;
   }
 
-  .disclaimer {
-    font-size: 1.0625rem;
+  .media {
+    grid-row: 2;
+    aspect-ratio: 4 / 3;
+  }
+
+  .backdropNumeral {
+    font-size: clamp(8rem, 36vw, 14rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .closing {
+    min-height: 68vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryAction:hover,
+  .secondaryAction:hover {
+    transform: none;
   }
 }

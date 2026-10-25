@@ -6,6 +6,7 @@ import {
 } from '../../animations/gsap'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
+import workshop from '../../assets/creator/creator-build-session.webp'
 import styles from './Closing.module.css'
 
 /**
@@ -13,12 +14,9 @@ import styles from './Closing.module.css'
  * is a separate task and nothing here anticipates it.
  *
  * COMPOSITION
- * The site's five content sections all open the same way: a small label, then
- * display type, then supporting copy, all left-aligned on the shared 96rem
- * canvas. This closes on the same rail rather than centring, so the page ends
- * on the axis it has held throughout — and it deliberately runs SHORTER than
- * the sections above it (60vh rather than 100vh), because a closing beat that
- * demands a full viewport reads as another section rather than as an ending.
+ * The closing beat pairs a compact editorial statement and two internal
+ * destinations with the existing workshop photograph. It keeps the site's
+ * dark editorial register while giving the page a clear, useful ending.
  *
  * The "06" is the same environmental-numeral device Hardware (04) and Content
  * Universe (05) already use: a large, low-contrast glyph in its own layer
@@ -27,15 +25,13 @@ import styles from './Closing.module.css'
  * information — the numeral is visual language, not a new claim.
  *
  * COPY
- * Everything visible comes from the dictionary except the identity, which is
- * the proper noun "CarterPCs" and is written as a literal in every language,
- * exactly as the nav bar already does. There are no links, handles, counts or
- * contact details of any kind — the only interactive element is the
- * back-to-top control, which targets #hero.
+ * Copy comes from the dictionary except the identity, the proper noun
+ * "CarterPCs", which remains consistent with the nav. Both calls to action
+ * lead to existing sections; no social handles, contact details, counts, or
+ * new claims are introduced.
  *
- * The headline is one sentence broken across two display lines, and each
- * language chooses its own break point (see the dictionary comment) rather
- * than inheriting English's.
+ * The headline is broken across two display lines, with natural localized
+ * wording in each dictionary.
  *
  * MOTION
  * The same one-shot reveal the other sections use: the two headline lines wipe
@@ -122,29 +118,54 @@ function Closing() {
           <span className={styles.wordmarkDot} aria-hidden="true" />
         </p>
 
-        <h2
-          className={styles.headline}
-          aria-label={`${t.closing.headlineLineOne} ${t.closing.headlineLineTwo}`}
-        >
-          <span className={styles.line} aria-hidden="true" data-headline-line>
-            {t.closing.headlineLineOne}
-          </span>
-          <span className={styles.line} aria-hidden="true" data-headline-line>
-            {t.closing.headlineLineTwo}
-          </span>
-        </h2>
+        <div className={styles.copy}>
+          <h2
+            className={styles.headline}
+            aria-label={`${t.closing.headlineLineOne} ${t.closing.headlineLineTwo}`}
+          >
+            <span className={styles.line} aria-hidden="true" data-headline-line>
+              {t.closing.headlineLineOne}
+            </span>
+            <span className={styles.line} aria-hidden="true" data-headline-line>
+              {t.closing.headlineLineTwo}
+            </span>
+          </h2>
+
+          <p className={styles.description} data-reveal>
+            {t.closing.description}
+          </p>
+
+          <div className={styles.actions} data-reveal>
+            <a className={styles.primaryAction} href="#featured">
+              {t.closing.exploreStories}
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a className={styles.secondaryAction} href="#creator">
+              {t.closing.meetCreator}
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
 
         <p className={styles.disclaimer} data-reveal>
           <span>{t.closing.disclaimerLineOne}</span>
           <span>{t.closing.disclaimerLineTwo}</span>
         </p>
+      </div>
 
-        <a className={styles.backToTop} href="#hero" data-reveal>
-          {t.closing.backToTop}
-          <span className={styles.backToTopArrow} aria-hidden="true">
-            ↑
-          </span>
-        </a>
+      {/* Reuse the already-approved workshop image as illustrative atmosphere,
+          not as evidence of Carter or a specific build. This same asset has
+          an explicit decorative-image rationale in Creator.tsx. */}
+      <div className={styles.media} aria-hidden="true" data-reveal-stage>
+        <img
+          className={styles.mediaImage}
+          src={workshop}
+          alt=""
+          width={1448}
+          height={1086}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     </section>
   )
