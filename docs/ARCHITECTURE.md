@@ -14,7 +14,7 @@ A single-route, single-scroll React page. There is no router. Everything below i
 | :--- | :--- | :--- | :--- | :--- |
 | — | `sections/intro/Intro` | — | — | ~1.4s branding overlay rendered **on top of** Hero (not a loader). Skipped entirely under reduced motion. |
 | — | `components/navigation/Nav` | — | — | Fixed top bar (see Global shell). |
-| 1 | `sections/hero/Hero` | `#hero` | — | Reference-composition hero: headline, CTAs, portrait, About card, By The Numbers card (user-verified, dated figures), three content tiles, real channel row. |
+| 1 | `sections/hero/Hero` | `#hero` | — | Reference-composition hero: headline, CTAs, portrait, About card, By The Numbers card (dated public-tracker estimates, not private analytics), three content tiles, real channel row. |
 | 2 | `sections/creator/Creator` | `#creator` | 02 | Short editorial bridge with the supplied workshop photograph. |
 | 3 | `sections/featured/Featured` | `#featured` | 03 | Three real CarterPCs Shorts as editorial stories: click-to-play, action rail, desktop horizontal pin. |
 | 4 | `sections/hardware/Hardware` | `#hardware` | 04 | One layered hardware stage with workshop photography and three beats; entrance reveal only (no pin). |
@@ -50,7 +50,7 @@ A single-route, single-scroll React page. There is no router. Everything below i
   - `hardware.ts` — Hardware's three beats.
   - `contentUniverse.ts` — the six territories, each with a `tier` and an optional `shortIndex` link to a Featured story.
   - `channels.ts` — the three supplied channel URLs, shared by Hero and Footer.
-  - Hero's statistics and tiles are still declared in `Hero.tsx`, next to their provenance notes.
+  - `hero.ts` — Hero's lower content tiles and By The Numbers statistics: structure and the dated public-tracker source note only, not localized (labels resolve from the dictionary).
 - Media is local and imported through Vite. **No YouTube iframe exists until a visitor presses Play**, and at most one player exists at a time.
 - Provenance, licensing and watermark rules are in `AI_WORKFLOW.md` (Media and attribution policy). There is no asset manifest file yet.
 
@@ -78,7 +78,9 @@ A CSS Modules class name is scoped to the file it is defined in. A descendant se
 ### Tests
 
 - **Vitest + Testing Library** (jsdom):
-  - `app/App.test.tsx` — page landmarks, heading order, navigation targets, content-honesty checks, localization, preference menus.
+  - `app/App.test.tsx` — page landmarks, heading order, navigation targets, content-honesty checks.
+  - `app/App.localization.test.tsx` — the full app re-rendered per language: string-completeness sweep, data-driven content, theme/language independence.
+  - `components/navigation/Nav.test.tsx` — the theme/language menus: open/close, `aria-expanded`/`aria-checked`, Escape, outside focus, keyboard navigation.
   - `sections/featured/Featured.test.tsx` — click-to-play, one player, keyboard close and focus, the action rail.
   - `sections/featured/featured.utils.test.ts` — the pure helpers, including the copy-fade regression.
   - `data/data.test.ts` — content integrity: every language complete, embed and watch URLs match, structure is language-independent.
