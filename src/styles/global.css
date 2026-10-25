@@ -101,6 +101,19 @@ body {
   outline-offset: 2px;
 }
 
+/* Shared tactile feedback for every real link and enabled button. The
+   individual `scale` property composes with component transforms (for
+   example, arrows and card hover treatments) instead of replacing them. */
+@keyframes control-press {
+  to {
+    scale: 0.97;
+  }
+}
+
+:where(a[href], button:not(:disabled), [role='button']):active {
+  animation: control-press var(--duration-fast) var(--ease-out) both;
+}
+
 /* Skip-to-content link: visually hidden until focused */
 .skip-link {
   position: fixed;

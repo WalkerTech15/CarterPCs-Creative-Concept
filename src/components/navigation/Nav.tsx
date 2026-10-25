@@ -231,8 +231,8 @@ function Nav() {
   /** Opens the menu and lands on an item in the same tick as the keypress. */
   const openAt = (id: MenuId, edge: 'first' | 'last') => {
     setOpenMenu(id)
-    // The menu is display:none until the state lands, so focus has to wait
-    // for the committed DOM rather than run against the closed markup.
+    // The closed menu is visibility:hidden until the state lands, so focus
+    // has to wait for the committed DOM rather than target hidden markup.
     window.requestAnimationFrame(() =>
       focusItem(id, edge === 'first' ? 0 : items(id).length - 1),
     )
@@ -373,6 +373,7 @@ function Nav() {
               id={menuId('theme')}
               role="menu"
               aria-label={t.a11y.themeMenu}
+              inert={openMenu !== 'theme'}
               // Programmatically focusable only: the arrow-key handler lives
               // on the container (keydown bubbles up from the items), and an
               // element carrying an interactive role must be able to hold
@@ -426,6 +427,7 @@ function Nav() {
               id={menuId('language')}
               role="menu"
               aria-label={t.a11y.languageMenu}
+              inert={openMenu !== 'language'}
               // See the theme menu above — programmatically focusable only.
               tabIndex={-1}
               onKeyDown={handleMenuKeyDown('language')}
@@ -502,6 +504,7 @@ function Nav() {
               id={menuId('sections')}
               role="menu"
               aria-label={t.a11y.sectionsMenu}
+              inert={openMenu !== 'sections'}
               // See the theme menu above — programmatically focusable only.
               tabIndex={-1}
               onKeyDown={handleMenuKeyDown('sections')}
