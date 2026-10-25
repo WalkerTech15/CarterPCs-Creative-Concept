@@ -76,7 +76,7 @@
 .stage {
   position: relative;
   order: 2;
-  margin-block-start: calc(var(--space-3) * -1);
+  margin: var(--space-3) var(--container-padding-inline) 0;
   aspect-ratio: 1536 / 1024;
 }
 
@@ -84,6 +84,12 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--color-text-primary) 12%,
+    transparent
+  );
+  border-radius: 0.75rem;
 }
 
 .stageImage {
@@ -187,85 +193,57 @@
   opacity: 0.85;
 }
 
-/* ===== Desktop: media resumes the left side, mirroring Hero's right ===== */
+/* ===== Wide desktop: a framed image and a calm, balanced copy column ===== */
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .creator {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: center;
   }
 
-  /* The photograph takes the left half and the type sits beside it, which is
-     the composition the photograph itself was shot for.
-
-     The box is 1229:1024 — the subject region of the file, i.e. its left 80%.
-     With object-position: left, `cover` on a 1.20 box fed a 1.50 image scales
-     to the box HEIGHT, so the visible slice is 1.20/1.50 = exactly the left
-     80% of the frame: the whole subject, and nothing of it lost vertically.
-     The only thing ever cropped is the right-hand negative space. */
+  /* Inset the workshop image from the viewport edge and keep the source's
+     full subject area visible. The crop removes only its right-hand negative
+     space, preserving the case, hands, phone rig, and camera. */
   .stage {
     position: absolute;
     inset-block-start: 50%;
-    inset-inline: 0 50%;
+    inset-inline: 6% 42%;
     translate: 0 -50%;
     aspect-ratio: 1229 / 1024;
     order: initial;
-    margin-block-start: 0;
+    margin: 0;
   }
 
   .stageSurface {
-    /* Dissolves only the trailing edge, so the plate melts into the section
-       instead of butting a hard rectangle against the type column. The leading
-       edge stays crisp against the viewport, which is how the file already
-       ends — the case is cut off at its own left edge. */
-    mask-image: linear-gradient(
-      to right,
-      rgb(0 0 0) 0 84%,
-      rgb(0 0 0 / 55%) 93%,
-      transparent 100%
-    );
+    /* A clear edge separates real workshop media from the dark canvas; avoid
+       the previous fade, which made the image feel like background texture. */
+    mask-image: none;
   }
 
   .canvas {
     order: initial;
-    /* Back to columns 7..12, beside the photograph rather than overlapping it.
-       fix-v12 had moved this one column left to close a 438px void on the left
-       — a void that existed because the stage was an empty gradient. The
-       photograph now fills that half, so the block returns to the column edge
-       the media ends on, leaving exactly one page margin as the gutter. Same
-       six-column measure either way, so no line break in the headline or body
-       changes. */
-    grid-column: 7 / 13;
-    /* Anchored to the top of the row rather than centred in it. Centring split
-       the section's leftover height evenly, so the band above the metadata line
-       was a function of how tall the copy happened to be — 122px in English at
-       1440x900 but 227px in French at 1920x1080, for the same design. Anchoring
-       makes that band one value in every language, and moves the slack below the
-       type where the stage's glow already occupies it.
-
-       The offset is near-constant on purpose: the floor is set by the fixed bar
-       (80px tall, 89px at 1920 where the root font grows), so the band cannot
-       usefully shrink below it, and above that there is nothing to gain by
-       letting it grow with the viewport. Measured gap from the bar to the
-       metadata line, before -> after: -29.2 -> 28.5 at 1024x768 and -9.7 -> 33
-       at 1280x800 (both negative before, i.e. the copy was inside the bar),
-       42.4 -> 37 at 1440x900, 97.5 -> 37 at 1536x1024, 61.8 -> 41.6 at
-       1920x1080, and the French worst case 138 -> 41.6. The vh term only pulls
-       the offset back in on short viewports, where the section has no height to
-       spare. */
-    align-self: start;
-    padding-block: min(7.25rem, 14vh) var(--space-4);
+    grid-column: 8 / 13;
+    min-inline-size: 0;
+    align-self: center;
+    padding-block: var(--space-4);
   }
 
   .body {
-    /* Matches Hero's support paragraph (1.7). At 1.5 this was the tightest
-       body measure on the site, under the largest headline. Desktop only:
-       the approved mobile block keeps its own rhythm. */
     line-height: 1.7;
   }
 
   .headline {
-    font-size: clamp(2.75rem, 1.25rem + 3.5vw, 5.5rem);
+    font-size: clamp(3rem, 4vw, 4.5rem);
+  }
+
+  .footer {
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: 1px solid color-mix(
+      in srgb,
+      var(--color-text-primary) 14%,
+      transparent
+    );
   }
 }

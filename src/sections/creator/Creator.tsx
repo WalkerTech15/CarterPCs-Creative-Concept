@@ -6,8 +6,7 @@ import {
 } from '../../animations/gsap'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
-import workshop from '../../assets/creator/creator-workshop-filming-setup.png'
-import workshopWebp from '../../assets/creator/creator-workshop-filming-setup.webp'
+import workshop from '../../assets/creator/creator-build-session.webp'
 import styles from './Creator.module.css'
 
 /**
@@ -47,13 +46,11 @@ import styles from './Creator.module.css'
  * timeless creator-positioning content.
  *
  * SECTION MEDIA
- * `src/assets/creator/creator-workshop-filming-setup.png` is the supplied
- * asset, copied in byte for byte (SHA-256
- * 173F6E94…B67A94505, 1 536 x 1 024, 1 818 691 bytes). It is not cropped,
- * resized, re-encoded or retouched anywhere in this codebase — every framing
- * decision below is CSS around the file, never a change to it. This replaces
- * the gradient placeholder that `.stageSurface` was always documented as the
- * drop-in target for, so the surrounding structure is unchanged.
+ * `src/assets/creator/creator-build-session.webp` is an illustrative image
+ * generated from the user's approved Creator mockup (1448 × 1086, 142 560
+ * bytes). It depicts a fictional creator and is not documentary evidence of
+ * Carter or a specific build. It is used as atmosphere only, so alt="" avoids
+ * implying facts the accompanying copy does not establish.
  *
  * The photograph's own composition decides the layout: its subject (the open
  * case, the hands, the phone rig, the camera, the tool mat) occupies the left
@@ -64,11 +61,8 @@ import styles from './Creator.module.css'
  * subject is never cut. See `.stage` in Creator.module.css for the arithmetic.
  *
  * ACCESSIBILITY
- * The photograph is editorial media illustrating copy that already names it —
- * the body paragraph describes PC builds "filmed fast, tested by hand" — so it
- * carries alt="" rather than restating that for screen readers, matching the
- * convention Hero documents for its portrait. It is not a functional image and
- * conveys no information the section's text does not.
+ * The image is decorative editorial imagery, not evidence of a specific
+ * build, test, or creator biography. It remains alt="" for that reason.
  */
 function Creator() {
   const reducedMotion = useReducedMotion()
@@ -167,23 +161,16 @@ function Creator() {
           it out of flow with position: absolute (see Creator.module.css). */}
       <div className={styles.stage} aria-hidden="true" data-reveal-stage>
         <div className={styles.stageSurface}>
-          {/* Deliberately NOT lazy. This is section 02, one scroll below the
-              Hero, so it is on the first scroll path rather than deep in the
-              page, and at 1.8 MB the fetch is far from instant — deferring the
-              request is how you get an empty plate under someone already
-              looking at it. Intrinsic width/height are declared so the box is
-              reserved before the bytes land and nothing below it shifts. */}
-          <picture>
-            <source srcSet={workshopWebp} type="image/webp" />
-            <img
-              className={styles.stageImage}
-              src={workshop}
-              alt=""
-              width={1536}
-              height={1024}
-              decoding="async"
-            />
-          </picture>
+          {/* This section is one scroll below the Hero, so load its compact
+              WebP early and reserve its 4:3 intrinsic dimensions. */}
+          <img
+            className={styles.stageImage}
+            src={workshop}
+            alt=""
+            width={1448}
+            height={1086}
+            decoding="async"
+          />
         </div>
       </div>
 
