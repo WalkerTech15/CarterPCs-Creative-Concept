@@ -56,27 +56,15 @@ export const fr: Dictionary = {
     ctaSecondary: 'Voir les Shorts',
     aboutTitle: 'À propos de Carter',
     aboutText:
-      'Carter crée des contenus tech rapides et accessibles : matériel, mobile, montages et tout l’univers de la tech.',
+      'Créateur de vidéos courtes sur les PC, les téléphones et la tech du quotidien.',
     aboutLink: 'En savoir plus',
-    // The audience line and the three stat labels sit in `white-space: nowrap`
-    // slots sized against the approved English composition (see
-    // Hero.module.css's .aboutAudience and the ≥1240px .statLabel rule), so
-    // these are deliberately terse: a faithful-but-longer phrasing
-    // ("Des millions sur toutes les plateformes") measured 87px past its slot
-    // and ran off the About card.
-    audience: 'Millions, tous réseaux',
     statsTitle: 'En chiffres',
     stats: {
       subscribers: 'Abonnés YouTube',
       views: 'Vues YouTube totales',
-      builds: 'PC sur mesure',
-      // Single word: "Des dizaines" wrapped onto a second line and pushed the
-      // stats card taller than the reference geometry allows.
-      dozens: 'Dizaines',
     },
-    // Keep the date and the figures in Hero.tsx's STATS in sync.
     statsSource:
-      'Chiffres YouTube relevés sur un compteur public le 28 juillet 2026, arrondis à la baisse. Les montages ne sont pas comptabilisés publiquement.',
+      'Relevé public de la chaîne YouTube par TubeLeader, le 24 octobre 2026 ; pas les données privées de YouTube Analytics.',
     tiles: {
       builds: {
         title: 'PC sur mesure',
@@ -84,11 +72,11 @@ export const fr: Dictionary = {
       },
       content: {
         title: 'Création de contenu',
-        body: 'Du contenu tech cinématographique qui informe, divertit et inspire.',
+        body: 'Des histoires courtes sur les PC, les téléphones et la tech du quotidien.',
       },
       universe: {
         title: 'L’univers',
-        body: 'Découvrez les systèmes, la philosophie et le processus derrière tout cela.',
+        body: 'Découvrez les sujets récurrents des vidéos de CarterPCs.',
       },
     },
     // Labels the real channel row. Replaced `featuredIn` ("Vu dans"), which
@@ -104,15 +92,15 @@ export const fr: Dictionary = {
     kicker: 'Le créateur',
     headline: 'Le matériel expliqué, sans le superflu.',
     bodyOne:
-      'Un journal quotidien au format court sur les montages PC, les smartphones et les décisions tech de tous les jours — filmé vite, testé à la main, et pensé pour ceux qui veulent l’essentiel sans perdre le contexte.',
+      'Ses vidéos courtes parlent de matériel PC, de smartphones, d’appareils grand public et de questions tech du quotidien.',
     bodyTwo:
-      'Le ton reste direct par choix : des explications en langage clair, la volonté de dénoncer le mauvais matériel et le marketing pire encore, et un humour qui ne s’éloigne jamais de l’internet où il a grandi.',
+      'Les sujets vont des comparatifs et conseils pratiques au matériel PC, aux commentaires de créateur et parfois aux jeux vidéo.',
     tags: 'Matériel PC — Tech mobile — Tech grand public — Anti-arnaques',
     platforms: 'TikTok · YouTube Shorts · Instagram Reels',
   },
 
-  /* Interface only : les titres des Shorts restent en anglais, ce sont les
-     titres réellement publiés (voir data/featured.ts). */
+  /* Interface only : les titres éditoriaux restent en anglais ; deux titres
+     ne sont pas confirmés comme les titres publiés des vidéos. */
   featured: {
     metaLabel: '03 / Sélection',
     metaNote: 'Histoires éditoriales choisies',
@@ -153,25 +141,29 @@ export const fr: Dictionary = {
       'Le terrain récurrent auquel chaque vidéo revient — des PC sur mesure aux histoires qui n’ont rien à voir avec le matériel.',
   },
 
-  /* The headline reuses this file's own opening of `hero.support` ("La tech
-     rendue intéressante"), broken where French breaks naturally: the article
-     stays with its noun on line one. */
+  /* Closing statement, section links, and independent-concept disclaimer. */
   closing: {
     disclaimerLineOne: 'Concept créatif indépendant.',
     disclaimerLineTwo: 'Sans affiliation avec CarterPCs.',
-    headlineLineOne: 'La tech rendue',
-    headlineLineTwo: 'intéressante.',
-    backToTop: 'Haut de page',
+    headlineLineOne: 'La tech,',
+    headlineLineTwo: 'sans deviner.',
+    description:
+      'Des PC sur mesure aux appareils du quotidien, découvrez les détails, les compromis et les conseils pratiques derrière la technologie.',
+    exploreStories: 'Explorer les histoires',
+    meetCreator: 'Rencontrer le créateur',
   },
 
   /* `copyright` is the name only — the "©" and the year are composed in
      Footer.tsx. It follows this file's own `meta.title` wording. */
   footer: {
     copyright: 'CarterPCs — Concept de portfolio',
-    disclaimer: 'Aucune affiliation ni approbation impliquée.',
+    disclaimer:
+      'Concept indépendant créé par un fan. Ni affilié à CarterPCs ni approuvé par CarterPCs.',
+    credit: 'Créé par WalkerTech15 — fan de CarterPCs depuis 2023.',
     a11y: {
       footerNavigation: 'Pied de page',
       socialLinks: 'Réseaux sociaux',
+      home: 'accueil',
       opensInNewTab: 'ouvre dans un nouvel onglet',
     },
   },

@@ -20,10 +20,9 @@
  * - Platform names (TikTok / YouTube Shorts / Instagram Reels) are proper
  *   nouns; they carry a per-language entry only so the separator/order stays
  *   editable per locale.
- * - Hero's numeric statistics ("2.9M+", "6.8B+") are user-verified figures and
- *   are rendered from `Hero.tsx`'s STATS unchanged. Only their LABELS, the
- *   qualitative "Dozens" value and the dated `statsSource` line are localized
- *   (see hero.stats below).
+ * - Hero's public tracker statistics ("3.8M+", "10.0B+") are rendered from
+ *   `data/hero.ts`'s `HERO_STATS` unchanged. Only their LABELS and dated
+ *   `statsSource` are localized (see hero.stats below).
  * - Section numerals ("02 / …") stay Arabic numerals in every language; only
  *   the word after the slash is translated.
  */
@@ -83,25 +82,19 @@ export const en = {
     ctaSecondary: 'Watch the Shorts',
     aboutTitle: 'About Carter',
     aboutText:
-      'Carter creates fast, accessible technology content across hardware, mobile tech, builds and the wider tech world.',
+      'Short-form tech videos spanning PCs, phones, and everyday devices.',
     aboutLink: 'Learn more',
-    audience: 'Millions across platforms',
     statsTitle: 'By The Numbers',
     stats: {
       subscribers: 'YouTube Subscribers',
       views: 'Total YouTube Views',
-      builds: 'Custom PCs Built',
-      /** Qualitative value — no verified lifetime build counter exists. */
-      dozens: 'Dozens',
     },
     /**
-     * Dates the two YouTube figures on screen. The date is the one the
-     * reading was actually taken on (see Hero.tsx's STATS note) — update
-     * this string and the values in that file together, never separately.
-     * "Rounded down" is stated because both figures carry a "+".
+     * Dates the public tracker snapshot; figures are estimates, not private
+     * YouTube Analytics data.
      */
     statsSource:
-      'YouTube figures from a public tracker reading, 28 July 2026, rounded down. Builds are not counted publicly.',
+      'Public YouTube tracker snapshot from TubeLeader, 24 October 2026; not private YouTube Analytics.',
     tiles: {
       builds: {
         title: 'Custom Builds',
@@ -109,11 +102,11 @@ export const en = {
       },
       content: {
         title: 'Content Creation',
-        body: 'Cinematic tech content that educates, entertains, and inspires.',
+        body: 'Short-form stories about PCs, phones, and everyday technology.',
       },
       universe: {
         title: 'The Universe',
-        body: 'Explore the systems, philosophy, and process behind everything.',
+        body: 'Explore the recurring subjects across CarterPCs videos.',
       },
     },
     /**
@@ -131,9 +124,9 @@ export const en = {
     kicker: 'The Creator',
     headline: 'Hardware knowledge, delivered without the fluff.',
     bodyOne:
-      'A daily short-form record of PC builds, smartphones, and everyday tech decisions — filmed fast, tested by hand, and built for viewers who want the point without losing the context.',
+      'Short-form videos cover PC hardware, smartphones, consumer devices and everyday technology questions.',
     bodyTwo:
-      'The tone stays direct on purpose: plain-English breakdowns, a willingness to call out bad hardware and worse marketing, and a sense of humor that never strays far from the internet it grew up on.',
+      'Topics range from product comparisons and practical tech advice to PC hardware, creator commentary and occasional gaming stories.',
     tags: 'PC Hardware — Mobile Tech — Consumer Tech — Scam-Busting',
     /** Proper nouns — identical in every language, kept per-locale only so the separator can move. */
     platforms: 'TikTok · YouTube Shorts · Instagram Reels',
@@ -141,12 +134,11 @@ export const en = {
 
   /**
    * The three Shorts are click-to-play: nothing is fetched from YouTube until
-   * a visitor asks for it. Only the INTERFACE is translated here. The video
-   * titles themselves stay in English in every language — they are the real,
-   * published titles of the Shorts (see data/featured.ts, where all three
-   * `headlineLines` carry the same English text in all three locales), and
-   * translating a published title would misstate what the visitor is about to
-   * open.
+   * a visitor asks for it. Only the INTERFACE is translated here. The
+   * editorial headlines stay in English in every language (see
+   * data/featured.ts). They are not represented as verified published titles;
+   * two title/video pairs remain unconfirmed. Translating the editorial
+   * headlines would change the selected English concept copy.
    *
    * Each accessible name is composed as `${visible label} — ${title}`, so the
    * visible label always STARTS the accessible name (WCAG 2.5.3 Label in Name)
@@ -209,27 +201,16 @@ export const en = {
       'The recurring ground every video comes back to — from custom builds to the stories that have nothing to do with hardware at all.',
   },
 
-  /**
-   * Closing statement — the site's last beat before the footer (a separate
-   * task; nothing here belongs to it).
-   *
-   * `wordmark` is absent on purpose: the identity is the proper noun
-   * "CarterPCs" and is rendered as a literal in Closing.tsx, exactly as the
-   * nav bar and Hero's Featured-In strip already do.
-   *
-   * `headlineLineOne`/`headlineLineTwo` are one sentence broken across two
-   * display lines, so each language keeps its own natural break point rather
-   * than inheriting English's. The sentence deliberately restates
-   * `hero.support`'s opening claim — it is the bookend to it — so each
-   * language reuses its own existing phrasing rather than inventing a second
-   * translation of the same line.
-   */
+  /** Closing statement, section links, and independent-concept disclaimer. */
   closing: {
     disclaimerLineOne: 'Independent creative concept.',
     disclaimerLineTwo: 'Not affiliated with CarterPCs.',
-    headlineLineOne: 'Making tech',
-    headlineLineTwo: 'interesting.',
-    backToTop: 'Back to top',
+    headlineLineOne: 'Good tech.',
+    headlineLineTwo: 'No guesswork.',
+    description:
+      'From custom PC builds to everyday devices, explore the details, trade-offs, and practical advice behind the tech.',
+    exploreStories: 'Explore the stories',
+    meetCreator: 'Meet the creator',
   },
 
   /**
@@ -244,15 +225,18 @@ export const en = {
    * name in the right language. Those are the only three destinations that
    * exist — see Footer.tsx.
    *
-   * `disclaimer` is a SINGLE line. The Closing statement above already says
-   * "Independent creative concept.", so the footer does not repeat it.
+   * The footer reference uses a complete fan-made/non-affiliation statement;
+   * keep this wording distinct from Closing's shorter disclaimer.
    */
   footer: {
     copyright: 'CarterPCs Portfolio Concept',
-    disclaimer: 'No affiliation or endorsement implied.',
+    disclaimer:
+      'Independent fan-made concept. Not affiliated with or endorsed by CarterPCs.',
+    credit: 'Made by WalkerTech15 — a CarterPCs fan since 2023.',
     a11y: {
       footerNavigation: 'Footer',
       socialLinks: 'Social',
+      home: 'home',
       /** Appended after the platform name, so the visible label is preserved. */
       opensInNewTab: 'opens in a new tab',
     },
