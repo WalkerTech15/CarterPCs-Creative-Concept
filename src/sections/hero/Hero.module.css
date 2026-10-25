@@ -15,8 +15,7 @@
  * right cards inset 3.4% from the right edge, About card top at 24.5%
  * and stats card at 53% of section height.
  *
- * The reference's left progress rail is a restrained, decorative scroll cue
- * (no misleading section count); it appears only in the desktop composition.
+ * The reference's decorative left progress rail is intentionally omitted.
  */
 
 .hero {
@@ -272,7 +271,8 @@
   font-weight: 600;
 }
 
-.ctaPrimary:hover {
+.ctaPrimary:hover,
+.ctaPrimary:focus-visible {
   background-color: #fff;
   border-color: #fff;
 }
@@ -293,7 +293,8 @@
   transition: transform var(--duration-base) var(--ease-out);
 }
 
-.cta:hover .ctaBadge {
+.cta:hover .ctaBadge,
+.cta:focus-visible .ctaBadge {
   transform: translateX(0.1875rem);
 }
 
@@ -313,7 +314,8 @@
   font-weight: 500;
 }
 
-.ctaSecondary:hover {
+.ctaSecondary:hover,
+.ctaSecondary:focus-visible {
   background-color: color-mix(
     in srgb,
     var(--color-text-primary) 11%,
@@ -443,7 +445,8 @@
   inset-inline: 0;
 }
 
-.aboutLink:hover {
+.aboutLink:hover,
+.aboutLink:focus-visible {
   opacity: 0.72;
 }
 
@@ -451,33 +454,12 @@
   transition: transform var(--duration-base) var(--ease-out);
 }
 
-.aboutLink:hover .aboutArrow {
+.aboutLink:hover .aboutArrow,
+.aboutLink:focus-visible .aboutArrow {
   transform: translate(0.125rem, -0.125rem);
 }
 
-/* Audience row — the reference card's avatar row (finished circular
-   crops from the approved reference render) + the supported qualitative
-   claim; never a numeric audience figure. */
-.aboutAudience {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  margin-block-start: 0.625rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
-}
-
-.audienceAvatars {
-  display: block;
-  /* Reference avatar row ink is 30px tall. */
-  height: 1.875rem;
-  width: auto;
-}
-
-/* By The Numbers — reference geometry, development values ("—") until
-   verified statistics are approved. */
+/* By The Numbers — reference geometry for the sourced public-channel metrics. */
 .stats {
   order: 4;
   gap: 1.125rem;
@@ -487,10 +469,7 @@
 
 .statsList {
   display: grid;
-  /* Reference column starts: 1149 / 1264 / 1375 — the first column
-     runs ~10px wider than the other two. minmax(0, …) keeps the rhythm
-     even though "DOZENS" is wider than the numerals. */
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.875rem;
   margin: 0;
   padding: 0;
@@ -504,10 +483,7 @@
   gap: 0.75rem;
 }
 
-/* Uppercase keeps the qualitative "Dozens" at the same visual register
-   as the numeric values (digits are cap-height glyphs); the slight
-   negative tracking keeps the six-letter word inside its equal column
-   without shrinking it. */
+/* Keep abbreviated channel metrics in the same visual register. */
 .statValue {
   font-size: 1.5rem;
   font-weight: 700;
@@ -562,7 +538,8 @@
     background-color var(--duration-base) var(--ease-out);
 }
 
-.tile:hover {
+.tile:hover,
+.tile:focus-visible {
   border-color: color-mix(in srgb, var(--color-text-primary) 17%, transparent);
   background-color: color-mix(
     in srgb,
@@ -647,15 +624,18 @@
   color: color-mix(in srgb, var(--color-text-primary) 82%, transparent);
   transition:
     background-color var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
 }
 
-.tile:hover .tileArrow {
+.tile:hover .tileArrow,
+.tile:focus-visible .tileArrow {
   background-color: color-mix(
     in srgb,
     var(--color-text-primary) 9%,
     transparent
   );
+  border-color: color-mix(in srgb, var(--color-text-primary) 34%, transparent);
   transform: translateX(0.125rem);
 }
 
@@ -733,25 +713,26 @@
 
 .disclaimer {
   margin-block-start: var(--space-2);
-  font-size: 0.625rem;
-  letter-spacing: 0.02em;
-  text-align: center;
-  color: color-mix(in srgb, var(--color-text-primary) 32%, transparent);
-}
-
-/* The provenance line for the By The Numbers figures — see Hero.tsx for why
-   it is down here rather than in that card. One step quieter again than the
-   disclaimer above it: it is a citation, not a statement. */
-.statsSource {
-  margin-block-start: 0.25rem;
-  max-width: 48rem;
-  margin-inline: auto;
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   line-height: 1.5;
   letter-spacing: 0.02em;
   text-align: center;
-  text-wrap: balance;
-  color: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
+  color: var(--color-text-muted);
+}
+
+/* The provenance line sits directly below the By The Numbers figures.
+   It stays visually secondary while remaining readable and easy to locate. */
+.statsSource {
+  margin-block-start: -1.375rem;
+  padding-block-start: 0.5rem;
+  border-block-start: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  max-width: 100%;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  text-align: start;
+  color: var(--color-text-muted);
 }
 
 /* Hero → Creator transition: unchanged hairline motif, picked up by
@@ -784,6 +765,48 @@
   .about,
   .stats {
     width: min(26rem, 100%);
+  }
+
+  .statsSource {
+    margin-block-start: -0.5rem;
+  }
+}
+
+/* Keep the opening mobile frame from becoming a long stack of oversized
+   gaps. Content and tap targets stay intact; only the editorial whitespace
+   tightens at phone widths. */
+@media (max-width: 767px) {
+  .inner {
+    padding-block-start: clamp(9rem, 21vh, 10.5rem);
+  }
+
+  .stage {
+    margin-block-start: var(--space-1);
+  }
+
+  .about {
+    margin-block-start: 1.5rem;
+  }
+
+  .stats {
+    margin-block-start: 1.25rem;
+    padding-block-end: 1rem;
+  }
+
+  .statsSource {
+    margin-block-start: -0.625rem;
+  }
+
+  .lower {
+    padding-block: 2rem 1rem;
+  }
+
+  .tiles {
+    gap: 0.75rem;
+  }
+
+  .strip {
+    margin-block-start: 1.5rem;
   }
 }
 
@@ -935,21 +958,14 @@
     order: initial;
     width: 100%;
     margin: 0;
-    padding: 1.75rem 1.5rem;
+    padding: 1.75rem 1.5rem 0.875rem;
     gap: 1.875rem;
   }
 
-  /* Keep the three frozen labels on one line, but leave a clear gutter
-     between columns at the approved control width.
-     The middle column carries the longest label in every language ("Total
-     YouTube Views" / "Vues YouTube totales" / "Total vistas YouTube") while
-     its value ("6.8B+") is the narrowest of the three, so the base 1.12/1/1
-     split — which is derived from the reference's VALUE positions — starves
-     exactly the column that needs the most room. Widening it here, at the
-     expense of the third column (whose "Dozens" value and label are both
-     short), is what buys the last few pixels fr needs. */
+  /* Give both localized metric labels equal room now that the unsupported
+     build-count column has been removed. */
   .statsList {
-    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.22fr) minmax(0, 0.78fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 1rem;
   }
 
@@ -1077,7 +1093,7 @@
   }
 
   .cards {
-    inset-block-start: clamp(10rem, 21%, 13rem);
+    inset-block-start: clamp(8.5rem, 18%, 12rem);
     gap: 1rem;
   }
 
@@ -1093,6 +1109,14 @@
   .stats {
     padding: 1.25rem;
     gap: 1rem;
+    padding-block-end: 0.625rem;
+  }
+
+  .statsSource {
+    margin-block-start: -0.5rem;
+    padding-block-start: 0.375rem;
+    font-size: 0.6875rem;
+    line-height: 1.35;
   }
 
   .stat {
@@ -1126,11 +1150,6 @@
 /* ===== Narrow phones — simplify, never shrink ===== */
 
 @media (max-width: 380px) {
-  .inner {
-    /* The bar wraps onto a third row at this width. */
-    padding-block-start: 14rem;
-  }
-
   .actions {
     align-self: stretch;
     flex-direction: column;
@@ -1146,10 +1165,20 @@
   }
 
   .tile {
-    grid-template-columns: 1fr;
+    /* A compact image-and-copy row avoids giving every thumbnail a full
+       screen-width intrinsic height at 320px. The copy still has enough
+       measure to wrap cleanly in the longer locales. */
+    grid-template-columns: 38% minmax(0, 1fr);
+    gap: 0.75rem;
   }
 
   .tileMedia {
-    min-height: 6rem;
+    min-height: 5rem;
+  }
+
+  .tileText {
+    padding-inline-end: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
   }
 }

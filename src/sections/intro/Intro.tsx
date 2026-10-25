@@ -14,7 +14,7 @@ interface IntroProps {
  *
  * There's no real asset loading to gate on at this phase, so this doesn't
  * pretend to be a progress/loading bar — it's a short, fixed branding beat
- * (~1.4s) that never risks trapping the visitor. It renders on top of Hero
+ * (~1.0s) that never risks trapping the visitor. It renders on top of Hero
  * (already mounted underneath) rather than blocking Hero from mounting, so
  * screen-reader and reduced-motion users reach real content immediately.
  */
@@ -35,12 +35,12 @@ function Intro({ onComplete }: IntroProps) {
         .fromTo(
           wordRef.current,
           { clipPath: 'inset(0 100% 0 0)', y: 12 },
-          { clipPath: 'inset(0 0% 0 0)', y: 0, duration: 0.7 },
+          { clipPath: 'inset(0 0% 0 0)', y: 0, duration: 0.55 },
         )
-        .to({}, { duration: 0.3 }) // brief hold so the mark registers
+        .to({}, { duration: 0.12 }) // brief hold so the mark registers
         .to(rootRef.current, {
           autoAlpha: 0,
-          duration: 0.45,
+          duration: 0.3,
           ease: 'power2.inOut',
         })
     }, rootRef)

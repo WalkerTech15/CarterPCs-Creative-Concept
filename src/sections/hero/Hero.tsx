@@ -3,11 +3,8 @@ import { gsap, ScrollTrigger } from '../../animations/gsap'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
 import portrait from '../../assets/hero/carter-hero-portrait-cutout.webp'
-import audienceAvatars from '../../assets/hero/about-audience-avatars.webp'
-import tileBuilds from '../../assets/hero/tile-media-builds.webp'
-import tileStudio from '../../assets/hero/tile-media-studio.webp'
-import tileUniverse from '../../assets/hero/tile-media-universe.webp'
 import { CHANNELS } from '../../data/channels'
+import { HERO_STATS, HERO_TILES } from '../../data/hero'
 import styles from './Hero.module.css'
 
 interface HeroProps {
@@ -26,24 +23,22 @@ const REVEAL_SELECTOR =
  * Numbers card, three lower content tiles, and the row at the foot, in the
  * reference's positions and proportions.
  *
- * Two of the reference's elements are deliberately not reproduced: its left
- * editorial index rail (removed as the page's redundant second progression
- * language — see the note where it used to be mounted below) and its
- * "Featured in" wordmark row (see the FACTUAL-INTEGRITY note that follows).
+ * One reference element remains deliberately omitted: its "Featured in"
+ * wordmark row (see the FACTUAL-INTEGRITY note that follows). The left
+ * left editorial rail and its "01 /06" marker are intentionally omitted;
+ * the six top-level editorial sections remain in the page structure.
  *
  * FACTUAL-INTEGRITY DEVIATIONS (the only intentional ones):
  * - The By The Numbers card keeps the reference's container geometry but
- *   carries user-verified statistics (see STATS' provenance notes),
- *   never the concept image's illustrative 1.2M+ / 100M+ / 4K+.
+ *   carries dated public-tracker statistics (see data/hero.ts's HERO_STATS
+ *   provenance note), never the concept image's illustrative 1.2M+ / 100M+ / 4K+.
  * - The reference's "Featured in" wordmark row is NOT reproduced. It has
  *   been replaced by the real channel row (see data/channels.ts for the
  *   full reasoning): the same quiet full-width beat at the composition's
  *   foot, but carrying three destinations a visitor can actually open
  *   instead of six publication names this project cannot support.
- * - The About card reproduces the reference's avatar-row geometry with
- *   finished circular crops from the approved reference render and the
- *   supported qualitative claim "Millions across platforms" — the
- *   reference's "+1.2M" figure is not reproduced.
+ * - The reference's avatar row and cross-platform audience claim are omitted:
+ *   they are illustrative social proof, not verified audience evidence.
  *
  * PORTRAIT MEDIA
  * The supplied asset is used as-is — nothing is scraped, generated, or
@@ -70,87 +65,18 @@ const REVEAL_SELECTOR =
  * tiles to real sections, the channel row to the real channels.
  */
 
-/**
- * Lower editorial tiles, matched to the reference's three modules.
- * MEDIA: temporary reference assets, cropped non-destructively from the
- * media regions of the user's approved concept render (no text, borders
- * or UI cropped; nothing scraped from third parties). Swap for final
- * approved photography when it exists.
- */
-/**
- * Structure only — index, destination and media never change with language.
- * `copy` names the tile's entry in the active dictionary (`t.hero.tiles`), so
- * a translated title/body can never drift away from its own href or asset.
- */
-const TILES = [
-  {
-    index: '03',
-    copy: 'builds',
-    href: '#hardware',
-    media: tileBuilds,
-  },
-  {
-    index: '04',
-    copy: 'content',
-    href: '#featured',
-    media: tileStudio,
-  },
-  {
-    index: '05',
-    copy: 'universe',
-    href: '#content-universe',
-    media: tileUniverse,
-  },
-] as const
-
-/**
- * USER-VERIFIED STATISTICS (discrepancy resolved by the user,
- * 2026-08-08): a Social Blade read — 2.94M subscribers and
- * 6,868,093,822 total YouTube views as of 28 July 2026 — supersedes the
- * stale ~4.5B tracker figure. The label reads "Total YouTube Views"
- * precisely so the figure is never taken as a cross-platform total.
- *
- * ROUNDING DIRECTION (corrected): these were displayed as "3.0M+" and
- * "7.0B+", and both rounded the verified reading UP past a threshold the
- * source does not reach — 2.94M is not "3.0M or more", and 6.87B is not
- * "7.0B or more". The "+" makes each one a floor claim, so rounding up
- * turns a verified number into an overstatement of it. Both now round
- * DOWN to the nearest tenth, which is the only direction a "+" figure can
- * safely be rounded: every visitor-facing number here is now one the
- * cited reading actually clears.
- * - "Dozens" stays qualitative: no verified lifetime build counter
- *   exists, so no precise total may be invented.
- *
- * The card now also carries its own dated provenance line on screen
- * (`t.hero.statsSource`) rather than keeping it in this comment alone. A
- * figure a visitor cannot date is a figure they have to take on trust;
- * social metrics are time-sensitive, and the reading is already two months
- * old at the time of writing. Refresh the values AND that date together
- * against live sources before any production release, and never substitute
- * the concept image's illustrative figures (1.2M+ / 100M+ / 4K+).
- *
- * LOCALIZATION: the two numeric values are rendered from this module
- * constant in every language and are never passed through the dictionary —
- * a verified figure must not be re-typed per locale where it could be
- * mistranscribed. Only the LABELS are translated, plus the third row's
- * deliberately qualitative value ("Dozens"), which is a word rather than a
- * figure and is resolved from `t.hero.stats.dozens` (see `statLines`).
- */
-const STATS = [
-  { value: '2.9M+', label: 'subscribers' },
-  { value: '6.8B+', label: 'views' },
-  { value: null, label: 'builds' },
-] as const
+// HERO_TILES (lower content tiles) and HERO_STATS (By The Numbers card,
+// including its public-tracker source and rounding-direction notes) live in
+// data/hero.ts — the same structure-vs-dictionary-copy split data/channels.ts
+// uses for the channel row below.
 
 function Hero({ ready }: HeroProps) {
   const reducedMotion = useReducedMotion()
   const { t } = usePreferences()
   const rootRef = useRef<HTMLElement>(null)
 
-  // `value: null` marks the one qualitative row, whose value is a translated
-  // word rather than a verified figure (see STATS' provenance note).
-  const statLines = STATS.map(({ value, label }) => ({
-    value: value ?? t.hero.stats.dozens,
+  const statLines = HERO_STATS.map(({ value, label }) => ({
+    value,
     label: t.hero.stats[label],
   }))
 
@@ -172,39 +98,39 @@ function Hero({ ready }: HeroProps) {
         .from('[data-stage]', {
           opacity: 0,
           scale: 1.04,
-          duration: 1.6,
+          duration: 1.05,
           ease: 'power2.out',
         })
         .from(
           '[data-reveal="eyebrow"]',
-          { opacity: 0, y: 12, duration: 0.7 },
-          0.1,
+          { opacity: 0, y: 10, duration: 0.5 },
+          0.05,
         )
         // Masked vertical reveal: each line rises out of its own clip box.
         .fromTo(
           '[data-headline-line]',
           { yPercent: 110 },
-          { yPercent: 0, duration: 1.15, stagger: 0.09, ease: 'power4.out' },
-          0.18,
+          { yPercent: 0, duration: 0.78, stagger: 0.07, ease: 'power4.out' },
+          0.12,
         )
         .from(
           '[data-reveal="support"]',
-          { opacity: 0, y: 14, duration: 0.75 },
-          0.66,
+          { opacity: 0, y: 10, duration: 0.5 },
+          0.48,
         )
         .from(
           '[data-reveal="actions"]',
-          { opacity: 0, y: 12, duration: 0.65 },
-          0.8,
+          { opacity: 0, y: 10, duration: 0.45 },
+          0.58,
         )
-        .from('[data-about]', { opacity: 0, y: 20, duration: 0.85 }, 0.92)
-        .from('[data-stats]', { opacity: 0, y: 20, duration: 0.85 }, 1.02)
+        .from('[data-about]', { opacity: 0, y: 14, duration: 0.55 }, 0.62)
+        .from('[data-stats]', { opacity: 0, y: 14, duration: 0.55 }, 0.68)
         .from(
           '[data-reveal="tiles"]',
-          { opacity: 0, y: 24, duration: 0.9 },
-          1.12,
+          { opacity: 0, y: 16, duration: 0.6 },
+          0.72,
         )
-        .from('[data-reveal="strip"]', { opacity: 0, duration: 0.8 }, 1.3)
+        .from('[data-reveal="strip"]', { opacity: 0, duration: 0.5 }, 0.85)
 
       // Scroll depth — a few pixels of differential drift, desktop only.
       // Restrained so the resting frame stays the reference composition;
@@ -229,6 +155,7 @@ function Hero({ ready }: HeroProps) {
             .to('[data-headline]', { y: -30 }, 0)
             .to('[data-about]', { y: 16 }, 0)
             .to('[data-stats]', { y: 22 }, 0)
+
         },
       })
     }, rootRef)
@@ -338,28 +265,10 @@ function Hero({ ready }: HeroProps) {
                 ↗
               </span>
             </a>
-            {/* Reference avatar row — the finished circular crops from
-            the approved reference render (cropped non-destructively,
-            like the tile media), paired with the supported qualitative
-            claim. The reference's "+1.2M" figure is deliberately not
-            reproduced. Decorative. */}
-            <p className={styles.aboutAudience}>
-              <img
-                className={styles.audienceAvatars}
-                src={audienceAvatars}
-                alt=""
-                width={376}
-                height={144}
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-              />
-              {t.hero.audience}
-            </p>
           </aside>
 
-          {/* 4 — By The Numbers card: reference geometry, user-verified
-          statistics (see STATS' provenance notes). */}
+          {/* 4 — By The Numbers card: reference geometry, dated
+          public-tracker statistics (see data/hero.ts's HERO_STATS). */}
           <aside className={styles.stats} data-stats>
             <p className={styles.cardMeta}>
               <span>{t.hero.statsTitle}</span>
@@ -373,16 +282,18 @@ function Hero({ ready }: HeroProps) {
                 </li>
               ))}
             </ul>
+            <p className={styles.statsSource}>{t.hero.statsSource}</p>
           </aside>
         </div>
 
         {/* 5 — Lower rail: three content tiles + Featured-In strip */}
         <div className={styles.lower}>
           <div className={styles.tiles} data-reveal="tiles">
-            {TILES.map(({ index, copy, href, media }) => (
+            {HERO_TILES.map(({ index, copy, href, media }) => (
               <a key={index} className={styles.tile} href={href}>
-                {/* Temporary reference asset (see TILES' provenance note);
-                  decorative — the tile's text names the destination. */}
+                {/* Temporary reference asset (see data/hero.ts's HERO_TILES
+                  provenance note); decorative — the tile's text names the
+                  destination. */}
                 <img
                   className={styles.tileMedia}
                   src={media}
@@ -441,20 +352,9 @@ function Hero({ ready }: HeroProps) {
               ))}
             </ul>
           </div>
-          {/* The Hero's fine print. The unofficial-concept line is unchanged;
-              the provenance line beneath it dates the two YouTube figures in
-              the By The Numbers card, because a "+" number with no date
-              behind it is the exact shape of an invented statistic and these
-              are real.
-
-              It sits here rather than inside that card on purpose: the card
-              is held to the reference composition's geometry and already
-              reaches the tile rail, so a third block of text inside it ran
-              68px into the tiles at 1440 and 107px at 1280 (measured). This
-              row is the one place in the Hero built for small print, and it
-              is directly below the figures in the reading order either way. */}
+          {/* The metrics source sits beneath its figures; this note keeps
+              the separate non-affiliation statement with the lower rail. */}
           <p className={styles.disclaimer}>{t.hero.disclaimer}</p>
-          <p className={styles.statsSource}>{t.hero.statsSource}</p>
         </div>
       </div>
 
