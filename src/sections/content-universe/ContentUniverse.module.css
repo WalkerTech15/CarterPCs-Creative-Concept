@@ -4,11 +4,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* Clears the FIXED bar on an anchor jump ("Universe" in the bar, or a deep
-     link). Same measured fix as Hardware's: tier values and the 600px
-     boundary come from the compact header's real heights per language — see
-     the derivation comment in Hardware.module.css, which these three tiers
-     mirror exactly. */
   scroll-margin-block-start: 9rem;
 }
 
@@ -24,11 +19,9 @@
   }
 }
 
-/* Hardware -> Content Universe transition: same hairline motif used at
-   every prior section boundary. */
-.seam {
+.seam,
+.seamEnd {
   position: absolute;
-  inset-block-start: 0;
   inset-inline: var(--container-padding-inline);
   height: 1px;
   z-index: 2;
@@ -37,45 +30,41 @@
     var(--color-text-primary) 14%,
     transparent
   );
+}
+
+.seam {
+  inset-block-start: 0;
 }
 
 .seamEnd {
-  position: absolute;
   inset-block-end: 0;
-  inset-inline: var(--container-padding-inline);
-  height: 1px;
-  z-index: 2;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 14%,
-    transparent
-  );
 }
-
-/* ===== Canvas ===== */
 
 .canvas {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  padding: calc(var(--space-7) + var(--space-1)) var(--container-padding-inline)
-    var(--space-6);
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+  width: min(100%, 100rem);
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4rem) var(--container-padding-inline)
+    clamp(2.5rem, 5vw, 4.5rem);
 }
 
 .intro {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  max-width: 34rem;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  max-width: none;
 }
 
 .meta {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-block-end: var(--space-1);
+  margin: 0;
   font-size: 0.625rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -93,6 +82,7 @@
 }
 
 .kicker {
+  margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.24em;
@@ -101,103 +91,79 @@
 }
 
 .headline {
+  max-width: none;
   font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 1.9rem + 4vw, 5rem);
+  font-size: clamp(2.5rem, 4.5vw, 4.75rem);
   font-weight: 700;
   line-height: 0.98;
-  letter-spacing: -0.03em;
-  max-width: 18ch;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 
 .support {
-  margin-block-start: var(--space-1);
-  max-width: 46ch;
+  max-width: 78ch;
+  margin-block-start: 0;
   font-size: var(--font-size-body);
+  line-height: 1.55;
   color: var(--color-text-muted);
 }
 
-/* ===== Field — the connected composition =====
-   Layering model (why the ecosystem reads as one space):
-     z 0 — the two "05" digits: shared environmental ground
-     z 2 — entries (type + Short crops): they genuinely occlude the digits,
-           which is real depth rather than two flat layers side by side.
-   z 1 held a decorative connecting thread and is now unused (see
-   ContentUniverse.tsx for why the thread was removed). */
-
+/* Six territories: two real Shorts lead, four text-led categories support. */
 .field {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-7);
-  padding-inline-start: var(--space-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
 }
 
 .tierRow {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
+  display: contents;
 }
-
-/* ---- Environmental digits ---- */
 
 .digitZero,
 .digitFive {
   position: absolute;
   z-index: 0;
   font-family: var(--font-family-display);
+  font-size: clamp(12rem, 24vw, 23rem);
   font-weight: 700;
   line-height: 0.75;
   letter-spacing: -0.04em;
-  color: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   pointer-events: none;
 }
 
-/* Mobile/tablet: each digit shadows its dominant territory in the stack —
-   the 0 behind Hardware at the top, the 5 behind Mobile Tech below it. */
 .digitZero {
-  inset-block-start: -2rem;
-  inset-inline-end: -1rem;
-  font-size: clamp(9rem, 42vw, 15rem);
+  inset-block-start: 0;
+  inset-inline-start: 28%;
 }
 
 .digitFive {
-  inset-block-start: 24%;
-  inset-inline-start: -1.25rem;
-  font-size: clamp(9rem, 42vw, 15rem);
+  inset-block-end: -8%;
+  inset-inline-end: 8%;
 }
-
-/* ---- Connective spine (below desktop) ---- */
 
 .spine {
-  position: absolute;
-  inset-block: 0.5em 0;
-  inset-inline-start: 0;
-  width: 1px;
-  z-index: 1;
-  background: linear-gradient(
-    to bottom,
-    var(--color-accent-primary),
-    var(--color-accent-secondary)
-  );
-  opacity: 0.35;
+  display: none;
 }
-
-/* ---- Entries ---- */
 
 .entry {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  gap: var(--space-1);
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
-/* Type always sits above the entry's own media crop. */
 .entryName,
 .entrySecondary,
 .entryDescription {
   position: relative;
   z-index: 1;
+  margin: 0;
 }
 
 .entryName {
@@ -205,7 +171,9 @@
   flex-direction: column;
   font-family: var(--font-family-display);
   font-weight: 700;
-  letter-spacing: -0.03em;
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 .entryLine {
@@ -213,89 +181,41 @@
 }
 
 .entrySecondary {
-  font-size: 0.75rem;
+  width: fit-content;
+  color: var(--color-accent-secondary);
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.16em;
+  line-height: 1.4;
   text-transform: uppercase;
-  color: var(--color-accent-secondary);
-  /* The label occludes the digits, exactly as the Short crops do — the
-     section's own idiom, applied to its smallest text. The plate was first
-     added for the connecting thread, whose cyan hairline crossed these 12px
-     labels ("Budget Gear" at every desktop width, most of the others
-     somewhere in the states across the three languages — probed at 600
-     points per state); a cyan line through a 9px glyph is a 1.55:1 ground no
-     accessible violet exists for. The thread is gone, but the plate is kept:
-     the digits are still behind these labels, and on the plain base ground it
-     is invisible anyway — it IS the base token. fit-content keeps it the
-     width of the words, not the column. */
-  width: fit-content;
-  padding-inline: 0.375rem;
-  margin-inline-start: -0.375rem;
-  background-color: var(--color-bg-base);
-}
-
-/* Right-aligned territories: the plate hugs the right edge instead (auto
-   start margin pushes the fit-content box over), so the optical alignment of
-   the label against its own headline is unchanged. */
-.entry[data-cat='mobile'] .entrySecondary,
-.entry[data-cat='tech-news'] .entrySecondary,
-.entry[data-cat='emerging-tech'] .entrySecondary {
-  margin-inline-start: auto;
-  margin-inline-end: -0.375rem;
-}
-
-@media (max-width: 767px) {
-  /* The mobile stack is left-aligned everywhere, so the base rule's
-     left-hugging plate is already right for every entry. */
-  .entry[data-cat='mobile'] .entrySecondary,
-  .entry[data-cat='tech-news'] .entrySecondary,
-  .entry[data-cat='emerging-tech'] .entrySecondary {
-    margin-inline-start: -0.375rem;
-    margin-inline-end: 0;
-  }
 }
 
 .entryDescription {
-  margin-block-start: var(--space-1);
-  max-width: 32ch;
+  max-width: 38ch;
   font-size: var(--font-size-body);
+  line-height: 1.5;
   color: var(--color-text-muted);
 }
 
-/* ---- Short windows ----
-   Each tier-1 territory's real Short, in an asymmetric silhouette (hard
-   clipped corners, different per territory). The silhouettes are kept from
-   the placeholder pass that preceded these — they are what stops the crops
-   reading as two stock image cards — but what they now hold is the Short's
-   own poster rather than a blurred colour field. No icons, grids, captions
-   or invented UI chrome: the frame is the image, and the whole frame is the
-   link. */
-
 .entryMedia {
   position: relative;
-  z-index: 0;
-  order: -1;
-  overflow: hidden;
+  z-index: 2;
+  order: 0;
   display: block;
-  /* The crop is clipped to a polygon, so an outline on the box itself would
-     be drawn outside the shape and clipped to nothing. The ring is drawn
-     INSIDE instead, as an inset shadow on the image. */
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 0.75rem;
   outline: none;
+  background-color: var(--color-bg-elevated, var(--color-bg-base));
 }
 
 .mediaImage {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* The posters are 1280x720 YouTube thumbnails whose real portrait frame is
-     the centre column (see Featured.media.module.css's note) — `cover` on these
-     narrower boxes shows that column and crops the blurred filler bars. */
   object-position: center;
-  display: block;
-  /* Seats the footage in the section's own ground rather than letting two
-     bright rectangles punch out of a restrained editorial field. Both values
-     lift on hover/focus, which is the only motion in this section that a
-     visitor drives directly. */
   filter: saturate(0.92) contrast(1.02) brightness(0.9);
   transition:
     filter var(--duration-base) var(--ease-standard),
@@ -311,355 +231,184 @@
   box-shadow: inset 0 0 0 3px var(--color-accent-primary);
 }
 
-/* BOTH windows are 9:16, which is not a style choice — it is arithmetic.
-   These posters are 1280x720 YouTube thumbnails, and YouTube pads a Short's
-   portrait frame with a blurred, darkened zoom of itself to fill that
-   landscape box; the real frame is the centre 31.6% of the width (the same
-   measurement Featured.media.module.css derives). `cover` on a 9:16 box shows
-   0.5625/1.7778 = exactly that centre column, so the filler never appears.
-   The previous 16:9 and 4:5 windows showed it: the wide one rendered as
-   three visible vertical bands — blurred, real, blurred — which reads as a
-   broken image rather than a crop.
-
-   The two silhouettes stay distinct through their corner cuts and their very
-   different sizes and positions in the field, not through their ratio. And
-   9:16 is the shape of the thing itself, which is the more honest frame for
-   an index of Shorts to use. */
-
-/* Hardware — the "$250k PC" Short. Diagonal-cut lower-left corner; overlaps
-   its own headline on mobile via negative margin. */
-.entryMedia[data-media='hardware'] {
-  width: 46%;
-  aspect-ratio: 9 / 16;
-  margin-block-end: calc(-1 * var(--space-4));
-  clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 78% 100%, 0% 100%);
+.entry[data-tier='1'] {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 34%) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  align-items: center;
+  gap: 0.5rem clamp(0.75rem, 2vw, 1.75rem);
+  padding-block: 1.25rem;
+  border-block-start: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 18%, transparent);
 }
 
-/* Mobile Tech — the Apple/Samsung Short. Clipped top-left corner, mirroring
-   Hardware's cut rather than repeating it. */
-.entryMedia[data-media='mobile'] {
-  width: 52%;
-  margin-inline-start: auto;
-  aspect-ratio: 9 / 16;
-  margin-block-end: calc(-1 * var(--space-5));
-  clip-path: polygon(24% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 18%);
+.entry[data-tier='1'] .entryMedia {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  align-self: center;
 }
-
-/* ---- Tier scale — deliberately unequal ---- */
 
 .entry[data-tier='1'] .entryName {
-  font-size: clamp(3rem, 2rem + 6vw, 5.5rem);
-  line-height: 0.9;
+  grid-column: 2;
+  grid-row: 1;
+  font-size: clamp(1.75rem, 2.5vw, 3rem);
+}
+
+.entry[data-tier='1'] .entrySecondary {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+}
+
+.entry[data-tier='1'] .entryDescription {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: start;
+}
+
+.entry[data-tier='2'],
+.entry[data-tier='3'] {
+  padding-block: 1.125rem 0.25rem;
+  border-block-start: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 18%, transparent);
 }
 
 .entry[data-tier='2'] .entryName {
-  font-size: clamp(1.9rem, 1.5rem + 2.8vw, 3rem);
-  line-height: 0.96;
-}
-
-.entry[data-tier='2'] {
-  max-width: 24rem;
-}
-
-.entry[data-tier='3'] {
-  max-width: 18rem;
-}
-
-/* The tertiary tier recedes through INK, not element opacity. `opacity: 0.6`
-   on the whole entry rendered the same pixels for the big annotation name —
-   but it also dragged the entry's 12px label down with it, to a measured
-   3.44:1 in dark and 2.54:1 in light (opacity multiplies; a child cannot
-   opt back out). Mixing the dim into the name's colour is pixel-identical
-   for the name on the flat ground, while the label below keeps its full
-   muted ink — 7.7:1 dark, 5.76:1 light. */
-.entry[data-tier='3'] .entryName {
-  color: color-mix(in srgb, var(--color-text-primary) 60%, var(--color-bg-base));
+  font-size: clamp(1.25rem, 1.45vw, 1.75rem);
 }
 
 .entry[data-tier='3'] .entryName {
-  font-size: clamp(1.3rem, 1.15rem + 1vw, 1.75rem);
-  line-height: 1.05;
+  color: color-mix(
+    in srgb,
+    var(--color-text-primary) 78%,
+    var(--color-bg-base)
+  );
+  font-size: clamp(1.125rem, 1.3vw, 1.5rem);
 }
 
-.entry[data-tier='3'] .entrySecondary {
-  color: var(--color-text-muted);
+.entry[data-tier='2'] .entryDescription,
+.entry[data-tier='3'] .entryDescription {
+  font-size: 0.875rem;
 }
-
-/* ===== Index — the resolved, connected list ===== */
 
 .index {
-  padding-block-start: var(--space-4);
+  margin: 0;
+  padding-block-start: 1rem;
   border-block-start: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 12%, transparent);
-  font-size: 0.8125rem;
-  letter-spacing: 0.05em;
-  color: var(--color-text-primary);
-  opacity: 0.85;
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
 }
 
-/* ===== Tablet (768–1023): authored asymmetric stack =====
-   Not the desktop grid, but no longer a flat left-aligned list either:
-   territories alternate alignment axes down the page, media keeps its
-   two distinct silhouettes, and the digits shadow their territories. */
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .digitZero {
-    font-size: clamp(14rem, 34vw, 18rem);
-    inset-inline-end: 0;
+@media (min-width: 520px) {
+  .field {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2.5vw, 2.5rem);
+    row-gap: 1.75rem;
   }
 
-  /* Measured against the real tablet stack: Mobile Tech's headline sits
-     ~26% down the field, so the 5 shadows it as a left-side counterweight
-     to the right-aligned territory (22% left it floating against
-     Hardware's bottom edge instead). */
-  .digitFive {
-    font-size: clamp(14rem, 34vw, 18rem);
-    inset-block-start: 26%;
+  .entry[data-tier='1'] {
+    grid-column: span 1;
+    grid-template-columns: minmax(5rem, 34%) minmax(0, 1fr);
+    align-items: start;
   }
 
-  .entry[data-cat='hardware'] {
-    max-width: 88%;
-  }
-
-  .entry[data-cat='mobile'] {
-    align-self: flex-end;
-    max-width: 88%;
-    text-align: right;
-  }
-
-  .entry[data-cat='mobile'] .entryName {
-    align-items: flex-end;
-  }
-
-  .entry[data-cat='mobile'] .entryDescription {
-    margin-inline-start: auto;
-  }
-
-  .entryMedia[data-media='mobile'] {
-    width: 52%;
-    margin-inline-start: auto;
-    margin-inline-end: -4%;
-  }
-
-  .entry[data-cat='tech-news'] {
-    margin-inline-start: 34%;
-  }
-
-  .entry[data-cat='scam-tech'] {
-    transform: rotate(-1.2deg);
-  }
-
-  .entry[data-cat='emerging-tech'] {
-    align-self: flex-end;
-    text-align: right;
-    margin-inline-end: 6%;
-  }
-
-  .entry[data-cat='emerging-tech'] .entryName {
-    align-items: flex-end;
-  }
-
-  .entry[data-cat='community'] {
-    margin-inline-start: 14%;
-    transform: rotate(1deg);
+  .entry[data-tier='2'],
+  .entry[data-tier='3'] {
+    min-height: 9rem;
   }
 }
 
-/* ===== Desktop: one connected field, digit-to-digit diagonal =====
-   The tierRow wrappers keep mobile/tablet reading order but drop out of
-   layout (display: contents) so every entry places directly on the field's
-   12-column grid. The composition's main axis runs from the "0" (upper
-   left, Hardware's ground) to the "5" (lower right, Mobile Tech's ground);
-   the Short crops cross the former dead center and genuinely occlude the
-   digits. */
-
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .canvas {
-    padding-block: calc(var(--space-7) + var(--space-3)) var(--space-6);
-    min-height: 100vh;
-  }
-
-  .intro {
-    max-width: 34rem;
+    gap: clamp(2rem, 3vw, 3rem);
   }
 
   .field {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    /* Equal-fraction rows + an explicit near-viewport height: the pin
-       freezes this exact frame, so the field must be a designed full
-       canvas, not an auto-collapsed stack of content heights. */
-    grid-template-rows: repeat(8, 1fr);
-    /* 5.75rem, not 9rem: exactly the 3.25rem that moved from here into the
-       top padding below, so the grid rows keep the same space on every
-       height-bound viewport — (100vh − 9rem) − 3.25rem and
-       (100vh − 5.75rem) − 6.5rem are the same number. */
-    min-height: min(53rem, calc(100vh - 5.75rem));
-    column-gap: var(--space-4);
-    row-gap: var(--space-2);
-    flex: 1;
-    /* Clears the fixed bar while the field is pinned at viewport top. The bar
-       is 5rem tall (and rem-scaled above 1536px, so a rem value tracks it at
-       every width) and carries NO background — anything parked under it
-       interleaves with its own link labels. 3.25rem did not clear it:
-       measured pinned states showed the "Hardware" headline's cap band
-       running through the bar's row and the About Carter button sitting on
-       "Tech News" at 1024/1440/1920, for the entire 1.1-viewport pin.
-       6.5rem parks the field's first row ~1.5rem below the bar instead. */
-    padding-block-start: 6.5rem;
-    padding-inline-start: 0;
+    row-gap: 2rem;
   }
 
-  .tierRow {
-    display: contents;
-  }
-
-  .spine {
-    display: none;
-  }
-
-  .entry {
-    max-width: none;
-  }
-
-  /* ---- Digits: the composition's two anchors ---- */
-
-  /* "0" sits directly under the "Hardware" headline — the word overlaps
-     the glyph's top, the glyph's bulk fills the otherwise-empty left-middle
-     band between Hardware and Scam Tech. NOT centered behind the media
-     crop, which would (and in an earlier pass did) hide it entirely. */
-  .digitZero {
-    inset-block-start: -6%;
-    inset-inline-start: 1%;
-    inset-inline-end: auto;
-    font-size: clamp(18rem, 26vw, 25rem);
-    color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  }
-
-  /* "5" anchors Mobile Tech: its left edge slips behind the vertical media
-     crop and the "Tech" word overlaps it — occluded on both sides, so it
-     reads as part of the territory rather than wallpaper behind it. */
-  .digitFive {
-    inset-block-start: auto;
-    inset-block-end: -10%;
-    inset-inline-start: auto;
-    inset-inline-end: 12%;
-    font-size: clamp(18rem, 26vw, 25rem);
-    color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  }
-
-  /* ---- Hardware — dominant, upper-left, inhabiting the "0" ---- */
-
-  .entry[data-tier='1']:nth-of-type(1) {
-    grid-column: 1 / 8;
-    grid-row: 1 / 4;
-    align-self: start;
-  }
-
-  /* Sized and placed against the real rendered grid at 1280/1440/1920, with
-     one constraint that did not exist while these windows held a faint
-     gradient: a photograph must not pass behind display type. The crop used
-     to start at 42% of this entry and run 86% wide, which put a dark frame
-     directly under the "Hardware" headline — invisible when the window was a
-     10%-opacity wash, and near-black-on-near-black (light theme: dark type on
-     dark footage) the moment it held a real poster. It now begins after the
-     headline's ink and occupies the field's empty middle instead, which is
-     also where it still crosses the "0" — so the intended depth is kept and
-     only the collision is gone. */
-  .entryMedia[data-media='hardware'] {
-    position: absolute;
-    inset-block-start: -6%;
-    /* Far enough right of Mobile Tech's window that the two upright crops
-       read as two points in the field rather than as one column. */
-    inset-inline-start: 80%;
-    width: 27%;
-    margin: 0;
-  }
-
-  /* ---- Mobile Tech — dominant, lower-right, inhabiting the "5" ---- */
-
-  .entry[data-tier='1']:nth-of-type(2) {
-    grid-column: 5 / 13;
-    grid-row: 4 / 9;
-    align-self: end;
-    text-align: right;
-  }
-
-  .entry[data-tier='1']:nth-of-type(2) .entryName {
-    align-items: flex-end;
-  }
-
-  .entry[data-tier='1']:nth-of-type(2) .entryDescription {
-    margin-inline-start: auto;
-  }
-
-  /* Same correction as Hardware's, mirrored: this entry is right-aligned, so
-     its crop is pulled left and narrowed until it clears the "Mobile Tech"
-     headline's ink rather than running under it. It still crosses the "5",
-     which is the overlap this composition is actually about. */
-  .entryMedia[data-media='mobile'] {
-    position: absolute;
-    inset-block-end: 0%;
-    inset-inline-start: 4%;
-    width: 25%;
-    margin: 0;
-  }
-
-  /* ---- Tech News — secondary, right anchor at the top ---- */
-
-  .entry[data-tier='2']:nth-of-type(1) {
-    grid-column: 10 / 13;
-    grid-row: 1 / 3;
-    align-self: start;
-    justify-self: end;
-    text-align: right;
-  }
-
-  .entry[data-tier='2']:nth-of-type(1) .entryName {
-    align-items: flex-end;
-  }
-
-  /* ---- Scam Tech — secondary, left margin between the dominants ---- */
-
-  .entry[data-tier='2']:nth-of-type(2) {
-    grid-column: 1 / 5;
-    grid-row: 4 / 6;
-    align-self: start;
-    transform: rotate(-1.4deg);
-  }
-
-  /* ---- Emerging Tech — tertiary annotation, right margin ---- */
-
-  .entry[data-tier='3']:nth-of-type(1) {
-    grid-column: 10 / 13;
-    grid-row: 3 / 4;
-    align-self: center;
-    justify-self: end;
-    text-align: right;
-  }
-
-  .entry[data-tier='3']:nth-of-type(1) .entryName {
-    align-items: flex-end;
-  }
-
-  /* ---- Community — tertiary annotation, lower left ---- */
-
-  .entry[data-tier='3']:nth-of-type(2) {
-    grid-column: 2 / 5;
-    grid-row: 7 / 9;
-    align-self: end;
-    transform: rotate(1deg);
+  .entry[data-tier='1'] {
+    grid-template-columns: minmax(6.5rem, 36%) minmax(0, 1fr);
+    min-height: 22rem;
+    padding-block: 1.5rem;
   }
 
   .entry[data-tier='1'] .entryName {
-    font-size: clamp(3.25rem, 1.9rem + 5.4vw, 7rem);
+    font-size: clamp(1.7rem, 2.2vw, 2.5rem);
+  }
+
+  .entry[data-tier='2'],
+  .entry[data-tier='3'] {
+    min-height: 10rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .canvas {
+    gap: clamp(1.75rem, 2.5vw, 2.5rem);
+    min-height: 100vh;
+    padding-block: clamp(2rem, 4vw, 3.75rem) 3rem;
   }
 
   .headline {
-    font-size: clamp(2.75rem, 1.8rem + 3vw, 4rem);
+    font-size: clamp(3.5rem, 4.5vw, 4.75rem);
   }
 
-  .index {
-    margin-block-start: var(--space-1);
+  .support {
+    max-width: 76ch;
+  }
+
+  .field {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1rem, 1.8vw, 1.75rem);
+    row-gap: 1.5rem;
+  }
+
+  .entry[data-tier='1'] {
+    grid-column: span 6;
+    grid-template-columns: minmax(8rem, 34%) minmax(0, 1fr);
+    min-height: clamp(22rem, 30vw, 27rem);
+    gap: 0.5rem clamp(1rem, 1.5vw, 1.5rem);
+    padding-block: 1.25rem;
+  }
+
+  .entry[data-tier='1'] .entryName {
+    font-size: clamp(2rem, 2.3vw, 2.75rem);
+  }
+
+  .entry[data-cat='mobile'] {
+    border-inline-start: 1px solid
+      color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+    padding-inline-start: clamp(1rem, 1.8vw, 1.75rem);
+  }
+
+  .entry[data-tier='2'],
+  .entry[data-tier='3'] {
+    grid-column: span 3;
+    min-height: 9rem;
+    padding-block-start: 1rem;
+  }
+
+  .entry[data-tier='2'] .entryName {
+    font-size: clamp(1.35rem, 1.5vw, 1.75rem);
+  }
+
+  .entry[data-tier='3'] .entryName {
+    font-size: clamp(1.2rem, 1.35vw, 1.5rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .entry[data-tier='1'] {
+    min-height: clamp(23rem, 29vw, 28rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mediaImage {
+    transition: none;
   }
 }
