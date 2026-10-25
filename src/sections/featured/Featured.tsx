@@ -1,11 +1,12 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef } from 'react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
 import { getFeaturedStories } from '../../data/featured'
 import FeaturedPanel from './FeaturedPanel'
+import FeaturedProgress from './FeaturedProgress'
 import { useFeaturedActions } from './useFeaturedActions'
 import { useFeaturedPlayer } from './useFeaturedPlayer'
-import { useFeaturedSequence } from './useFeaturedSequence'
+import { useFeaturedIntro } from './useFeaturedIntro'
 import styles from './Featured.module.css'
 
 /**
@@ -13,26 +14,25 @@ import styles from './Featured.module.css'
  * set of standout content pieces as large editorial stories, not a video
  * grid." Narrative pacing steps up here on purpose — Hero (dramatic) →
  * Creator (calm editorial pause) → Featured (dynamic showcase) — expressed
- * through punchier multi-line headlines, richer color balance per panel, and
- * (desktop only) the site's first horizontal-motion sequence, not through a
- * "transition effect" bolted on for spectacle.
+ * through punchier story typography and an asymmetric lead/supporting layout,
+ * not through a "transition effect" bolted on for spectacle.
  *
- * Layout is CSS-first, JS-enhanced: below 1024px (and under reduced motion at
- * any width) the stories are a plain vertical stack; above it, full-bleed
- * panels in a horizontal track that useFeaturedSequence pins and scrubs.
+ * Layout is CSS-first and remains a natural vertical page scroll at every
+ * width. One story leads; the other two sit beside it on wide screens and
+ * follow it on smaller screens.
  *
  * Content status: `data/featured.ts` documents in full why every panel's copy
  * is what it is — see that file's top comment before editing panel copy.
  *
  * WHERE THINGS LIVE
- *  - FeaturedPanel.tsx        one story: stage, media + rail, copy, progress
+ *  - FeaturedPanel.tsx        one story: copy, portrait media, and actions
  *  - FeaturedMedia.tsx        poster ⇄ player swap inside the 9:16 frame
  *  - FeaturedActionRail.tsx   Like / Comments / Share / Watch
- *  - FeaturedProgress.tsx     per-panel sequence position
+ *  - FeaturedProgress.tsx     quiet horizontal story index
  *  - useFeaturedPlayer.ts     one player at a time, Escape, focus restoration
  *  - useFeaturedActions.ts    local likes, share + its live-region notice
- *  - useFeaturedSequence.ts   GSAP: intro wipe, desktop pin/scrub/snap, copy fade
- *  - featured.utils.ts        pure helpers (titles, embed src, fade math, share)
+ *  - useFeaturedIntro.ts      GSAP: restrained section-entry reveal
+ *  - featured.utils.ts        pure helpers (titles, embed src, share)
  *  - Featured*.module.css     base/panel layout, media, rail, progress
  */
 function Featured() {
@@ -40,50 +40,45 @@ function Featured() {
   const { t, language } = usePreferences()
   const stories = useMemo(() => getFeaturedStories(language), [language])
   const rootRef = useRef<HTMLElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const railRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
 
   const player = useFeaturedPlayer()
   const actions = useFeaturedActions()
 
-  useFeaturedSequence({
-    rootRef,
-    trackRef,
-    railRef,
-    reducedMotion,
-    onActiveIndexChange: setActiveIndex,
-  })
+  useFeaturedIntro({ rootRef, reducedMotion })
 
   return (
     <section id="featured" className={styles.featured} ref={rootRef}>
       <span className={styles.seam} aria-hidden="true" />
 
       <div className={styles.intro}>
-        <p className={styles.meta} data-intro-reveal>
-          <span>{t.featured.metaLabel}</span>
-          <span className={styles.metaRule} aria-hidden="true" />
-          <span>{t.featured.metaNote}</span>
+        <div className={styles.headingGroup}>
+          <p className={styles.meta} data-intro-reveal>
+            <span>{t.featured.metaLabel}</span>
+          </p>
+          <h2 className={styles.title} data-intro-line>
+            {t.featured.title}
+          </h2>
+        </div>
+        <p className={styles.metaNote} data-intro-reveal>
+          {t.featured.metaNote}
         </p>
-        <h2 className={styles.title} data-intro-line>
-          {t.featured.title}
-        </h2>
       </div>
 
-      <div className={styles.track} ref={trackRef}>
-        <div className={styles.rail} ref={railRef}>
-          {stories.map((story) => (
-            <FeaturedPanel
-              key={story.index}
-              story={story}
-              stories={stories}
-              activeIndex={activeIndex}
-              reducedMotion={reducedMotion}
-              player={player}
-              actions={actions}
-            />
-          ))}
-        </div>
+      <div className={styles.storyGrid}>
+        {stories.map((story, index) => (
+          <FeaturedPanel
+            key={story.index}
+            story={story}
+            featured={index === 0}
+            reducedMotion={reducedMotion}
+            player={player}
+            actions={actions}
+          />
+        ))}
+      </div>
+
+      <div className={styles.progressWrap}>
+        <FeaturedProgress stories={stories} />
       </div>
 
       {/* Featured → Hardware transition: same minimal hairline-seam motif

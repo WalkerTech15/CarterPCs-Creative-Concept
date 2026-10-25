@@ -21,9 +21,9 @@
      screen; min() with 100% is what keeps it inside the panel's padding at
      320px, so the frame can never introduce horizontal overflow — the cap
      itself is what grew, from 16rem, and 100% is what still holds it. */
-  inline-size: min(100%, 20rem);
+  inline-size: min(100%, 23rem);
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   background-color: color-mix(in srgb, var(--color-bg-base) 92%, black);
   box-shadow: 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 55%);
 }
@@ -111,6 +111,9 @@
     transparent 50% 100%
   );
   position: relative;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .playIcon::after {
@@ -124,8 +127,10 @@
   border-inline-end: 0;
 }
 
-.play:hover .playIcon {
+.play:hover .playIcon,
+.play:focus-visible .playIcon {
   border-color: var(--color-accent-primary);
+  transform: scale(1.04);
 }
 
 /* The label carries its own ground rather than relying on the scrim. A poster
@@ -169,25 +174,4 @@
 .close:focus-visible {
   outline: 2px solid var(--color-accent-primary);
   outline-offset: 2px;
-}
-
-/* Desktop pinned sequence — same query as Featured.module.css, which explains
-   why it is gated on motion as well as width. */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .mediaFrame {
-    /* The frame is sized by its own height and aspect ratio; without this it
-       is a flex item and would be shrunk by the rail beside it. */
-    flex: none;
-    inline-size: auto;
-    /* 48rem rather than 44rem: at 1920 the rem cap was binding before 78vh
-       was, which held the plate to 443px wide while the gap between the copy
-       and it grew to 204px — the "excess empty space" between the two. Letting
-       the viewport-height term bind instead makes the plate 474px there and
-       closes that gap from the other side. Below ~1600px nothing changes:
-       78vh was already the smallest of the three. */
-    block-size: min(78vh, 48rem, 100vh - 11rem);
-    /* Softer corners than the small plate carried: at 8px a 700px-tall frame
-       reads as a hard rectangle. */
-    border-radius: 1rem;
-  }
 }

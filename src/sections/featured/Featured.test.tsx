@@ -70,13 +70,13 @@ describe('Featured', () => {
       }),
     ).toBeInTheDocument()
 
-    expect(
-      screen.getByText(/^hardware$/i, { selector: 'p' }),
-    ).toBeInTheDocument()
-    expect(screen.getByText(/^tech$/i, { selector: 'p' })).toBeInTheDocument()
-    expect(
-      screen.getByText(/^commentary$/i, { selector: 'p' }),
-    ).toBeInTheDocument()
+    for (const story of getFeaturedStories('en')) {
+      expect(
+        screen.getByText(`${story.index} — ${story.category}`, {
+          selector: 'p',
+        }),
+      ).toBeInTheDocument()
+    }
   })
 
   /**

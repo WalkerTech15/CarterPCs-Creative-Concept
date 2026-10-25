@@ -15,13 +15,3 @@ export interface ShareNotice {
   id: string
   copied: boolean
 }
-
-/**
- * Where a panel's readable glyphs sit inside the panel, in px from its left
- * edge. Measured once per pin setup by useFeaturedSequence and fed to
- * `copyFocus()` every frame — see the comment on that function.
- */
-export interface CopyInsets {
-  textLeft: number
-  textRight: number
-}

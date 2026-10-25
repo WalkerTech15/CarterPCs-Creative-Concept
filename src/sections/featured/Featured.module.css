@@ -1,19 +1,243 @@
 .featured {
   position: relative;
+  isolation: isolate;
   overflow: clip;
-  /* Clears the fixed Nav on an anchor jump (the "Featured" nav link, or any
-     future deep link to #featured) — without this, the browser's native
-     scroll-into-view lands the section flush with the viewport top, behind
-     the fixed bar, leaving no room for .intro's own padding to register.
-     Tier values and the 600px boundary are measured against the compact
-     header's real heights per language — see the derivation comment in
-     Hardware.module.css, which these three tiers mirror exactly. */
   scroll-margin-block-start: 9rem;
+  padding-block: var(--space-6) var(--space-5);
+}
+
+.featured::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background:
+    radial-gradient(
+      48rem 34rem at 4% 58%,
+      color-mix(in srgb, var(--color-accent-primary) 12%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      42rem 30rem at 94% 68%,
+      color-mix(in srgb, var(--color-accent-secondary) 10%, transparent),
+      transparent 72%
+    );
+}
+
+.seam,
+.seamEnd {
+  position: absolute;
+  inset-inline: var(--container-padding-inline);
+  height: 1px;
+  background-color: color-mix(
+    in srgb,
+    var(--color-text-primary) 14%,
+    transparent
+  );
+}
+
+.seam {
+  inset-block-start: 0;
+}
+
+.seamEnd {
+  inset-block-end: 0;
+}
+
+.intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-inline: var(--container-padding-inline);
+  padding-block-end: clamp(1.5rem, 2vw, 2rem);
+  border-block-end: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+}
+
+.headingGroup {
+  min-inline-size: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent-primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.metaNote {
+  max-inline-size: 24ch;
+  margin: 0 0 0.25rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+.storyGrid {
+  display: grid;
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-inline: var(--container-padding-inline);
+}
+
+.panel {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.panelFeatured {
+  display: grid;
+  grid-template-areas:
+    'content'
+    'media'
+    'actions';
+  gap: var(--space-3);
+}
+
+.panelCopy {
+  display: contents;
+  min-inline-size: 0;
+}
+
+.panelCopyFeatured {
+  grid-area: copy;
+}
+
+.panelSupporting {
+  display: grid;
+  grid-template-areas:
+    'content media'
+    'actions actions';
+  grid-template-columns: minmax(0, 1fr) minmax(6rem, 0.42fr);
+  align-items: start;
+  gap: var(--space-2) var(--space-3);
+  padding-block: var(--space-3);
+  border-block-start: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+}
+
+.panelContent {
+  grid-area: content;
+  min-inline-size: 0;
+  align-self: center;
+}
+
+.panelIndex {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent-primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.panelHeadline {
+  max-inline-size: 22ch;
+  font-family: var(--font-family-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.panelSupport {
+  max-inline-size: 55ch;
+  margin-block-start: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: 1.65;
+}
+
+.panelTags {
+  margin-block-start: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+}
+
+.media {
+  grid-area: media;
+  min-inline-size: 0;
+}
+
+.mediaFeatured {
+  display: flex;
+  justify-content: center;
+}
+
+.mediaSupporting {
+  justify-self: end;
+  inline-size: 100%;
+  max-inline-size: 9rem;
+}
+
+.actions {
+  grid-area: actions;
+  min-inline-size: 0;
+}
+
+.progressWrap {
+  padding: clamp(2rem, 4vw, 3.5rem) var(--container-padding-inline) 0;
 }
 
 @media (min-width: 600px) {
   .featured {
     scroll-margin-block-start: 6.5rem;
+  }
+
+  .panelFeatured {
+    grid-template-areas:
+      'media copy'
+      'media copy';
+    grid-template-columns: minmax(12rem, 0.68fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+  }
+
+  .panelCopyFeatured {
+    display: flex;
+    min-block-size: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1rem, 1.5vw, 1.5rem);
+  }
+
+  .mediaFeatured {
+    justify-self: end;
+    inline-size: clamp(12rem, 29vw, 23rem);
+    max-inline-size: 100%;
+  }
+
+  .panelSupporting {
+    grid-template-areas:
+      'media content'
+      'media actions';
+    grid-template-columns: minmax(6rem, 0.42fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--space-3);
+  }
+
+  .mediaSupporting {
+    justify-self: start;
+    max-inline-size: 100%;
   }
 }
 
@@ -21,495 +245,162 @@
   .featured {
     scroll-margin-block-start: 6rem;
   }
-}
 
-/* Creator → Featured transition: continues the same hairline motif used at
-   Hero → Creator (see Creator.module.css's new bottom .seam). Deliberately
-   just a continuity thread, not a spectacle transition — the pacing step-up
-   itself comes from this section's typography and (desktop) motion, not a
-   special transition effect. */
-.seam {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: var(--container-padding-inline);
-  height: 1px;
-  z-index: 1;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 14%,
-    transparent
-  );
-}
-
-/* Featured → Hardware transition: same hairline motif, picked up by
-   Hardware's matching top seam. See the comment on this element in
-   Featured.tsx and on .seam in Hardware.module.css. */
-.seamEnd {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: var(--container-padding-inline);
-  height: 1px;
-  z-index: 1;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 14%,
-    transparent
-  );
-}
-
-/* ===== Section intro — static, not part of the horizontal track ===== */
-
-.intro {
-  padding: calc(var(--space-7) + var(--space-1)) var(--container-padding-inline)
-    var(--space-5);
-}
-
-.meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-block-end: var(--space-3);
-  font-size: 0.625rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.metaRule {
-  width: clamp(1.5rem, 6vw, 5rem);
-  height: 1px;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 22%,
-    transparent
-  );
-}
-
-.title {
-  font-family: var(--font-family-display);
-  font-size: clamp(2.75rem, 2rem + 5vw, 6.5rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-}
-
-/* ===== Track / rail =====
-   Mobile-first baseline: a plain vertical stack — works with animation
-   disabled, with media blank, and with JS absent entirely. The ≥1024px
-   query below is the ONLY thing that turns this into a horizontal
-   sequence, and it does so with a native scroll-snap fallback that works
-   with zero JS; GSAP (see useFeaturedSequence.ts) only additionally pins +
-   scrubs that same layout when motion is allowed. */
-
-.track {
-  position: relative;
-}
-
-.rail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-7);
-  padding-block-end: var(--space-7);
-}
-
-.panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: 0 var(--container-padding-inline);
-}
-
-/* Decorative backdrop for the whole panel — gradient field, framing marks and
-   the environmental numeral. It used to be a 4/3 block in the mobile stack
-   holding the thumbnail; the thumbnail now lives in .mediaFrame, so this is
-   free to become what it already was on desktop: a layer behind everything,
-   in the same idiom as Creator's and Closing's backdrop numerals. */
-.panelStage {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.panelStageSurface {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgb(0 0 0 / 45%) 14%,
-    rgb(0 0 0) 40%
-  );
-}
-
-.panelGuide {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 8%,
-    transparent
-  );
-}
-
-.panelCorner {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  inset-block-start: 10%;
-  inset-inline-start: 10%;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-block-start: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-  border-inline-start: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-}
-
-.panelCornerEnd {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  inset-block-end: 12%;
-  inset-inline-end: 12%;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-block-end: 1px solid
-    color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
-  border-inline-end: 1px solid
-    color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
-}
-
-/* Environmental numeral — same technique as Creator's "02": a plain,
-   unmasked sibling of the stage surface (nesting it inside a masked layer
-   produced a Chromium compositing seam around the glyphs there — see
-   Creator.module.css's note), cropped by .featured's page-level
-   overflow: clip. Positioned to sit near/behind its own headline (rather
-   than floating in otherwise-empty upper space) so the numeral reads as
-   anchoring the copy, not as disconnected texture — a visual-review fix. */
-.panelNumeral {
-  position: absolute;
-  inset-block-start: 28%;
-  inset-inline-start: 4%;
-  font-family: var(--font-family-display);
-  font-size: clamp(7rem, 4rem + 20vw, 11rem);
-  font-weight: 700;
-  line-height: 0.8;
-  letter-spacing: -0.04em;
-  color: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
-}
-
-/* ---- Per-panel decorative variants ----
-   Same restrained system (near-black surface, dimmed accent glow, thin
-   framing lines) with just enough per-panel difference to feel curated
-   rather than three identical stamps — no icons, no grids, no stock
-   decoration. */
-
-.panel[data-variant='hardware'] .panelStageSurface {
-  background:
-    radial-gradient(
-      75% 65% at 22% 20%,
-      color-mix(in srgb, var(--color-accent-primary) 30%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(
-      60% 55% at 80% 85%,
-      color-mix(in srgb, var(--color-accent-secondary) 20%, transparent),
-      transparent 72%
-    );
-}
-
-.panel[data-variant='hardware'] .panelGuide {
-  inset-inline: 55% 15%;
-  inset-block-start: 22%;
-  height: 1px;
-  transform: rotate(-8deg);
-}
-
-.panel[data-variant='tech'] .panelStageSurface {
-  background:
-    radial-gradient(
-      65% 75% at 78% 15%,
-      color-mix(in srgb, var(--color-accent-secondary) 32%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(
-      55% 55% at 20% 90%,
-      color-mix(in srgb, var(--color-accent-primary) 18%, transparent),
-      transparent 72%
-    );
-}
-
-.panel[data-variant='tech'] .panelGuide {
-  inset-block: 14% 40%;
-  inset-inline-start: 68%;
-  width: 1px;
-}
-
-.panel[data-variant='commentary'] .panelStageSurface {
-  background: radial-gradient(
-    70% 60% at 50% 12%,
-    color-mix(in srgb, var(--color-accent-primary) 16%, transparent),
-    transparent 75%
-  );
-}
-
-.panel[data-variant='commentary'] .panelGuide {
-  inset-inline: 12% 45%;
-  inset-block-start: 85%;
-  height: 1px;
-}
-
-.media {
-  position: relative;
-  z-index: 1;
-  order: 3;
-  display: flex;
-  /* Stacked at these widths: frame, then its rail directly beneath it, both
-     centred on the panel. The rail beside the frame would cost the frame the
-     width it needs to stay a readable portrait on a 320px screen. */
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-/* ===== Panel content ===== */
-
-.panelContent {
-  position: relative;
-  z-index: 1;
-  order: 1;
-}
-
-.panelIndex {
-  margin-block-end: var(--space-2);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-accent-primary);
-}
-
-.panelHeadline {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 2rem + 5vw, 4.5rem);
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  max-width: 14ch;
-}
-
-.panelSupport {
-  margin-block-start: var(--space-3);
-  max-width: 42ch;
-  font-size: var(--font-size-body);
-  color: var(--color-text-muted);
-}
-
-.panelTags {
-  margin-block-start: var(--space-3);
-  font-size: 0.8125rem;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  opacity: 0.85;
-}
-
-/* ===== Desktop ===== */
-
-@media (min-width: 1024px) {
-  .intro {
-    padding-block: calc(var(--space-8) + var(--space-1)) var(--space-6);
-  }
-}
-
-/* Full-bleed horizontal panels, native scroll-snap fallback, enhanced by
-   GSAP's pin/scrub (see useFeaturedSequence.ts) — gated on
-   prefers-reduced-motion, not just width. Reduced-motion visitors at any viewport get the plain
-   vertical stack above instead: it's already a fully keyboard/reading-order
-   accessible "natural layout" (per the task's reduced-motion requirement),
-   whereas the horizontal track's native scroll-snap fallback has no
-   standard keyboard path (nothing inside a panel is focusable) — fine as a
-   *progressive enhancement* layered under active motion, not acceptable as
-   the reduced-motion baseline itself. */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .track {
-    height: 100vh;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-  }
-
-  .rail {
-    flex-direction: row;
-    flex-wrap: nowrap;
+  .storyGrid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
     align-items: stretch;
-    width: max-content;
-    height: 100%;
-    gap: 0;
-    padding-block-end: 0;
   }
 
-  .panel {
-    flex: 0 0 100vw;
-    width: 100vw;
-    padding: 0;
-    overflow: hidden;
-    scroll-snap-align: start;
+  .panelFeatured {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+    column-gap: clamp(1.25rem, 2.2vw, 2.5rem);
   }
 
-  .panelStage {
-    order: initial;
+  .mediaFeatured {
+    inline-size: clamp(13rem, 23vw, 23rem);
   }
 
-  /* ===== The Short's plate =====
-     Copy on the left, a tall portrait plate through the panel's middle, and a
-     deliberately empty right side carrying nothing but the stage's own glow.
-     The same treatment on all three panels — the earlier per-story size bump
-     is gone, because one hierarchy repeated three times is the point.
+  .panelSupporting {
+    min-block-size: 0;
+    grid-template-columns: minmax(6rem, 0.42fr) minmax(0, 1fr);
+    column-gap: clamp(1rem, 1.8vw, 1.75rem);
+  }
 
-     POSITION is anchored from the LEFT, not inset from the right. The copy
-     column is a fixed 36rem whatever the viewport is, so as a fraction of the
-     panel it is far wider at 1024px than at 1920px; an inset measured from the
-     right edge therefore tracks the wrong thing and walks into the headline as
-     the window narrows. max() reads as: sit at 38% of the panel, but never
-     closer to the left edge than the copy column plus its gutter. Above
-     ~1280px the percentage wins and the plate settles around the middle;
-     below it the rem floor takes over and slides the plate right, which is
-     the only place it can go while the copy keeps its measure.
+  .mediaSupporting {
+    inline-size: clamp(6.5rem, 10vw, 9rem);
+  }
 
-     VERTICALLY the plate hangs from a fixed TOP offset rather than being
-     centred. Centring made the top edge a function of the plate's height, so
-     it moved as the viewport changed — measured at 8.9% of the panel at
-     1024x768 and 11.8% at 1920x1080, and at 1024 that put 11px of video
-     underneath the fixed nav bar. Hanging it at 7rem puts the same 2rem of
-     air under the 5rem bar at every viewport, and reads as the "upper" half
-     of the panel rather than the middle of it.
+  .panelSupporting .panelHeadline {
+    font-size: clamp(1.25rem, 1.45vw, 1.75rem);
+  }
+}
 
-     The last term of the frame's min() is the matching guard at the other
-     end: 11rem reserves the 7rem above plus 4rem below, so the plate can
-     never reach the panel's bottom edge either. */
-  .media {
-    position: absolute;
-    z-index: 1;
-    order: initial;
-    inset-block-start: 7rem;
-    inset-inline-start: max(36%, 34rem);
-    inset-inline-end: auto;
-    translate: none;
-    /* Frame and rail side by side, the rail against the frame's right edge and
-       centred on its height. */
-    display: flex;
-    flex-direction: row;
+@media (min-width: 1280px) {
+  .featured {
+    padding-block-start: var(--space-3);
+  }
+
+  .intro {
+    padding-block-end: clamp(0.75rem, 1vw, 1rem);
+  }
+
+  .storyGrid {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1fr) minmax(0, 1.26fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 1.6vw, 1.75rem);
+    padding-block-start: clamp(1.5rem, 2vw, 2rem);
+  }
+
+  .panelFeatured {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+    align-content: stretch;
+    grid-template-areas: 'media copy';
+    grid-template-columns: subgrid;
+    grid-template-rows: minmax(0, 1fr);
     align-items: center;
-    gap: clamp(0.25rem, 0.5vw, 0.5rem);
+    column-gap: inherit;
+    row-gap: 0;
   }
 
-  .panelNumeral {
-    inset-block-end: 6%;
-    inset-inline-start: 5%;
-    font-size: clamp(14rem, 9rem + 13vw, 21rem);
-    color: color-mix(in srgb, var(--color-text-primary) 16%, transparent);
+  .panelCopyFeatured {
+    grid-area: copy;
   }
 
-  /* Per-variant directional lighting + guide-line placement, tuned for
-     desktop's full-bleed stage — replaces the mobile/tablet top-fade with a
-     mask direction that fits each panel's personality, and moves each
-     guide line down into the same lower band as the (bottom-anchored)
-     headline so it reads as framing the copy, not floating in empty
-     upper-stage space. */
-  .panel[data-variant='hardware'] .panelStageSurface {
-    mask-image: linear-gradient(
-      to top,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0) 55%,
-      rgb(0 0 0 / 35%) 82%,
-      transparent 100%
-    );
+  .mediaFeatured {
+    justify-self: start;
+    inline-size: 100%;
+    max-inline-size: 23rem;
   }
 
-  .panel[data-variant='hardware'] .panelGuide {
-    inset-inline: 8% 58%;
-    inset-block-start: 74%;
-    height: 1px;
-    transform: rotate(-4deg);
+  .panelSupporting {
+    grid-template-areas:
+      'media content'
+      'media actions';
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: clamp(1rem, 1.4vw, 1.5rem);
+    padding-inline-start: clamp(1rem, 1.4vw, 1.5rem);
+    border-inline-start: 1px solid
+      color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   }
 
-  .panel[data-variant='tech'] .panelStageSurface {
-    mask-image: linear-gradient(
-      100deg,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0) 60%,
-      rgb(0 0 0 / 30%) 82%,
-      transparent 100%
-    );
+  .panelSupporting:nth-child(2) {
+    grid-column: 3;
+    grid-row: 1;
+    padding-block: 0 0.5rem;
+    border-block-end: 1px solid
+      color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   }
 
-  .panel[data-variant='tech'] .panelGuide {
-    inset-block: 30% 20%;
-    inset-inline-start: 34%;
-    width: 1px;
+  .panelSupporting:nth-child(3) {
+    grid-column: 3;
+    grid-row: 2;
+    padding-block: 0.5rem 0;
   }
 
-  .panel[data-variant='commentary'] .panelStageSurface {
-    mask-image: linear-gradient(
-      132deg,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0) 46%,
-      rgb(0 0 0 / 25%) 68%,
-      transparent 90%
-    );
+  .mediaSupporting {
+    justify-self: start;
+    inline-size: clamp(8rem, 8.6vw, 8.5rem);
+    max-inline-size: 100%;
   }
 
-  .panel[data-variant='commentary'] .panelGuide {
-    inset-inline: 6% 68%;
-    inset-block-start: 70%;
-    height: 1px;
-    transform: rotate(-16deg);
+  .panelSupporting .panelTags {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
-  /* Tech panel: a distinct, more deliberate vertical anchor (centered
-     rather than bottom-weighted like Hardware/Commentary) plus a modest
-     headline-scale bump — a visual-review fix for this panel reading as
-     the weakest/emptiest of the three. Kept short of the section intro's
-     own scale so it doesn't out-shout the rest of Featured. */
-  .panelHeadline {
-    font-size: clamp(2.5rem, 1.75rem + 4.5vw, 4.25rem);
+  .panelSupporting .panelHeadline {
+    max-inline-size: 18ch;
+    font-size: clamp(1.25rem, 1.45vw, 1.75rem);
   }
 
-  .panel[data-variant='tech'] .panelHeadline {
-    font-size: clamp(2.5rem, 1.9rem + 4.75vw, 4.6rem);
+  .progressWrap {
+    padding-block-start: clamp(1.5rem, 2vw, 2rem);
+  }
+}
+
+@media (max-width: 599px) {
+  .featured {
+    padding-block: var(--space-5) var(--space-4);
   }
 
-  .panel[data-variant='tech'] .panelNumeral {
-    inset-block-end: auto;
-    inset-block-start: 50%;
-    inset-inline-start: 4%;
-    transform: translateY(-50%);
-  }
-
-  /* The column hangs from a shared BASELINE, not from its own centre.
-     Centring made the block's bottom edge a function of its own height, and
-     the three stories are three different heights — so the gap from the tags
-     down to the timeline came out at 50px on one panel and 98px on another at
-     1440, which is three rhythms, not one. Anchoring the bottom makes that gap
-     a constant (the bottom padding minus the timeline's own offset) on every
-     panel and at every width, and it is the top of the block that moves
-     instead, which is what a baseline-aligned editorial column should do.
-     The 10rem top padding is the floor that keeps the tallest block — Story 02
-     in French — clear of the fixed nav bar. */
-  .panelContent {
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    display: flex;
+  .intro {
+    align-items: start;
     flex-direction: column;
-    justify-content: flex-end;
-    max-width: 36rem;
-    padding: 10rem calc(var(--container-padding-inline) * 1.4)
-      calc(var(--space-8) + 4rem);
+    gap: var(--space-2);
+  }
+
+  .metaNote {
+    max-inline-size: 38ch;
+  }
+
+  .storyGrid {
+    gap: var(--space-4);
+  }
+
+  .panelFeatured .panelContent {
+    order: 1;
+  }
+
+  .panelFeatured .mediaFeatured {
+    order: 2;
+    justify-self: center;
+    inline-size: min(100%, 20rem);
+  }
+
+  .panelFeatured .actionsFeatured {
+    order: 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured :global(*) {
+    scroll-behavior: auto;
   }
 }

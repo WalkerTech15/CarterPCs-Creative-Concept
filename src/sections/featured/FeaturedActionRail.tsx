@@ -77,6 +77,7 @@ function FeaturedActionRail({
   notice,
   onToggleLike,
   onShare,
+  layout,
 }: {
   story: FeaturedStory
   title: string
@@ -85,12 +86,15 @@ function FeaturedActionRail({
   notice: ShareNotice | null
   onToggleLike: () => void
   onShare: () => void
+  layout: 'featured' | 'supporting'
 }) {
   const { t } = usePreferences()
   const newTab = `(${t.featured.a11y.opensInNewTab})`
 
   return (
-    <div className={styles.actions}>
+    <div
+      className={`${styles.actions} ${layout === 'featured' ? styles.actionsFeatured : styles.actionsSupporting}`}
+    >
       <button
         type="button"
         className={`${styles.action} ${styles.actionLike}`}

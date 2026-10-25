@@ -88,9 +88,9 @@ const featuredStorySources: FeaturedStorySource[] = [
       es: ['What has Apple copied', 'from Samsung??'],
     },
     support: {
-      en: 'A fast comparison of the features Apple borrowed and the ideas Samsung brought first.',
-      fr: 'Une comparaison rapide des fonctions reprises par Apple et des idées lancées d’abord par Samsung.',
-      es: 'Una comparación rápida entre las funciones que Apple adoptó y las ideas que Samsung lanzó primero.',
+      en: 'Carter compares Apple and Samsung features through the question of who introduced them first.',
+      fr: 'Carter compare les fonctions d’Apple et de Samsung en se demandant qui les a lancées en premier.',
+      es: 'Carter compara funciones de Apple y Samsung a partir de quién las presentó primero.',
     },
     tags: {
       en: ['YouTube Short', 'Smartphones', 'Consumer Tech'],
