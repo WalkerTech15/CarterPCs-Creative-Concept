@@ -29,10 +29,8 @@
   }
 }
 
-/* Featured -> Hardware transition: same hairline motif used at every prior
-   section boundary (see Featured.module.css's new .seamEnd) — a dark pause,
-   not a spectacle transition. The pacing step-up itself comes from this
-   section's own depth/stage composition once scroll choreography is added. */
+/* Featured -> Hardware transition: the same quiet boundary hairline used by
+   the neighboring editorial sections. */
 .seam {
   position: absolute;
   inset-block-start: 0;
@@ -60,31 +58,6 @@
     var(--color-text-primary) 14%,
     transparent
   );
-}
-
-/* ===== Background layer — environmental "04" =====
-   A full-bleed backdrop the stage visually sits "in", not a corner accent
-   beside it (see top-of-file comment in Hardware.tsx for why this differs
-   from Creator's/Featured's numeral treatment). Cropped by .hardware's own
-   overflow: clip. Purely decorative — aria-hidden on the parent. */
-.backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding-inline-end: 2%;
-  pointer-events: none;
-}
-
-.backdropNumeral {
-  font-family: var(--font-family-display);
-  font-size: clamp(12rem, 6rem + 34vw, 26rem);
-  font-weight: 700;
-  line-height: 0.8;
-  letter-spacing: -0.04em;
-  color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
 }
 
 /* ===== Canvas ===== */
@@ -150,142 +123,30 @@
   color: var(--color-text-muted);
 }
 
-/* ===== Hardware stage — an assembled object, not stacked cards =====
-   A visual-review fix: an earlier version used three similarly-sized,
-   fully-visible rectangles at different offsets, which read as stacked UI
-   cards rather than a physical object. This version authors one actual
-   silhouette instead — a single dominant surface with a cut (not square)
-   corner, a rear plate that's *mostly hidden*, only exposing a narrow
-   vertical sliver + a peek above the main surface's own top edge, and a
-   thin foreground slab that visibly crosses the main surface's lower edge
-   and extends past the stage's own right boundary. Depth here comes from
-   occlusion (which plane hides how much of which other plane), not from
-   three complete shapes sitting side by side. */
-
 .hardwareStage {
   position: relative;
-  aspect-ratio: 4 / 5;
-  /* Sized by its own box rather than by whatever width the column happens to
-     be. Stretched to the full column it came out 706x883 on a 768px tablet and
-     776x971 in mobile landscape — two and a half viewport heights of a
-     deliberately quiet object, which reads as the section having run out of
-     things to say. The three terms are the three ways it can be too big: wider
-     than the column, larger than its own natural size, or taller than the
-     screen it is on (48vh here is 60vh of height expressed as the width that
-     produces it at 4:5). */
-  inline-size: min(100%, 24rem, 48vh);
+  inline-size: min(100%, 40rem);
+  aspect-ratio: 8 / 5;
   margin: 0;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  border-radius: 0.375rem;
+  background-color: var(--color-bg-surface);
 }
 
-/* From the point where the capped object stops filling the column — 322px of
-   it left over on a 768px tablet — it moves to the outer edge instead of
-   hugging the copy's own left margin. Same reading order, and it rehearses
-   the desktop composition (copy inboard, object outboard) one breakpoint
-   early rather than inventing a third arrangement for tablets. */
 @media (min-width: 600px) and (max-width: 1023px) {
   .hardwareStage {
     margin-inline-start: auto;
   }
 }
 
-.stageAccentBack,
-.mediaLayer,
-.stageAccentFront {
-  position: absolute;
-  overflow: hidden;
-}
-
-/* Rear plate — deliberately mostly hidden behind .mediaLayer. Only its own
-   left sliver (outside mediaLayer's left edge) and the portion above
-   mediaLayer's top edge are ever visible — "a plane emerging from behind,"
-   not a second card next to the first. */
-.stageAccentBack {
-  inset: -5% 80% 28% 3%;
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--color-text-primary) 10%, transparent) 0%,
-    color-mix(in srgb, var(--color-bg-surface) 85%, transparent) 45%,
-    var(--color-bg-base) 100%
-  );
-  box-shadow: inset 1px 0 0
-    color-mix(in srgb, var(--color-accent-secondary) 35%, transparent);
-  transform: rotate(-2deg);
-}
-
-/* Primary media surface. The clipped top-right corner keeps the workshop
-   photograph part of the engineered stage rather than a plain image card. */
-.mediaLayer {
-  inset: 3% 6% 26% 19%;
-  clip-path: polygon(0 0, 86% 0, 100% 9%, 100% 100%, 0 100%);
-  background-color: var(--color-bg-surface);
-  box-shadow:
-    /* An engineered edge all the way round, and a brighter lit top — the
-       silhouette was previously described only by where the gradient
-       happened to stop. */
-    inset 0 0 0 1px
-      color-mix(in srgb, var(--color-text-primary) 12%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 22%, transparent),
-    inset 0 0 3.5rem rgb(0 0 0 / 35%);
-}
-
 .mediaImage {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 76% center;
-  filter: saturate(0.9) contrast(1.04) brightness(0.82);
-}
-
-/* Foreground slab — thin, wide, and crosses .mediaLayer's own lower edge
-   and right boundary rather than sitting fully inside the stage like a
-   third card. The bright top edge is the one deliberate highlight line —
-   describing a physical seam, not decoration. */
-.stageAccentFront {
-  inset: 76% -6% 3% 11%;
-  background: linear-gradient(
-    -6deg,
-    color-mix(in srgb, var(--color-bg-surface) 90%, transparent) 0%,
-    var(--color-bg-base) 88%
-  );
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
-  transform: rotate(1.4deg);
-}
-
-.stageGuide {
-  position: absolute;
-  inset-inline: 8% 46%;
-  inset-block-start: 84%;
-  height: 1px;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 9%,
-    transparent
-  );
-}
-
-.stageCorner {
-  position: absolute;
-  inset-block-start: 6%;
-  inset-inline-start: 6%;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-block-start: 1px solid
-    color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
-  border-inline-start: 1px solid
-    color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
-}
-
-.stageCornerEnd {
-  position: absolute;
-  inset-block-end: 30%;
-  inset-inline-end: 6%;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-block-end: 1px solid
-    color-mix(in srgb, var(--color-accent-secondary) 45%, transparent);
-  border-inline-end: 1px solid
-    color-mix(in srgb, var(--color-accent-secondary) 45%, transparent);
+  object-position: center;
 }
 
 /* ===== Beats — restrained internal chapter markers =====
@@ -311,6 +172,27 @@
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
+}
+
+.beatDetail {
+  display: block;
+}
+
+.beatIcon {
+  display: none;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 22%, transparent);
+  border-radius: 0.625rem;
+  color: var(--color-text-muted);
+}
+
+.beatIcon svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .beatIndex {
@@ -341,109 +223,125 @@
   opacity: 0.85;
 }
 
-/* ===== Desktop: headline and object side by side, beats as a band =====
-   Two measured problems drove this arrangement, and both were about the
-   section not fitting the viewport it is pinned in.
-
-   1. The stage used to span columns 5-11 while the copy spanned 1-5, so the
-      two shared a column ON PURPOSE — an "overlapping headline". At 1920 the
-      headline is short enough that nothing meets; at 1440 it is not, and the
-      rear plate crossed 4,856px² of live headline ink in English and 6,229px²
-      in Spanish, greying out the last glyph of "the". A composition whose
-      correctness depends on how long a translated headline happens to be is
-      not a composition. The two now sit in their own columns with a full
-      column of gutter between them, at every width and in every language.
-
-   2. The beats were a vertical stack in the left column, which made the
-      section 1,110px tall at 1440x900 and 1,315px at 1024x768 — while the
-      desktop trigger PINS it for 0.65 of a viewport. Measured across the pin,
-      the tags line was off-screen for its entire duration at every desktop
-      size and the third beat was off-screen too at 1024: the visitor scrolled
-      ~585px, nothing moved, and the part they had not read yet was below the
-      fold the whole time. Across the bottom, the three beats are ~90px
-      instead of ~390px, which is what brings the whole composition inside one
-      viewport — so the pin now holds a complete frame, which is the only
-      thing a pin is for. Their hairline runs the full canvas width and reads
-      as the base rule of the section rather than a divider in one column. */
-
+/* Desktop: align the copy and workshop image from the same top edge, then
+   carry the three editorial beats across the full canvas beneath them. */
 @media (min-width: 1024px) {
   .canvas {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto 1fr auto;
-    column-gap: var(--space-4);
-    /* The mobile rule's 4rem gap applied to ROWS here too — 64px between the
-       intro and the beats and again before the tags, unasked for. */
-    row-gap: var(--space-4);
-    /* 7rem, down from 9rem: the pin parks the section's own top edge at the
-       viewport top, so this padding is what clears the 5rem bar — 7rem leaves
-       exactly 2rem of air under it, where 9rem left 4rem of dead space above
-       the first line while the tail of the section sat below the fold. */
-    padding-block: var(--space-7) var(--space-6);
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1.85fr);
+    grid-template-rows: auto auto auto;
+    column-gap: clamp(1.25rem, 1.6vw, 1.5rem);
+    row-gap: clamp(1.25rem, 2.3vw, 2rem);
+    padding-block: clamp(3.75rem, 6vh, 4.5rem) var(--space-5);
     min-height: 100vh;
+    align-content: space-between;
   }
 
   .intro {
-    grid-column: 1 / 7;
-    grid-row: 1 / 2;
+    grid-column: 1;
+    grid-row: 1;
     align-self: start;
+    margin-block-start: 0;
     max-width: none;
   }
 
   .hardwareStage {
-    /* Half the grid, starting one gap after the copy's own six columns. The
-       object is the largest thing in the section, as it should be, without
-       ever being in the same column as a word. */
-    grid-column: 7 / 13;
-    grid-row: 1 / 2;
+    grid-column: 2;
+    grid-row: 1;
     align-self: start;
-    /* Back to the column's own width here: the mobile cap above is about
-       screens the object would otherwise swallow, and on this grid the six
-       columns already are the measure. Landscape rather than the old 6/5:
-       across half a 12-column grid, 6/5 is 538px of height at 1440 and the
-       section has to fit a viewport. */
-    /* 100%, not auto: with justify-self below, the item no longer stretches,
-       and an auto inline-size would resolve to the fit-content of a box whose
-       children are all absolutely positioned — zero. 100% of the grid area is
-       the same six columns stretch resolved to. */
     inline-size: 100%;
-    aspect-ratio: 7 / 5;
-    /* HEIGHT GOVERNOR for ultra-wide, short viewports (the 2560×900 class).
-       The six columns are width-driven, so on a full-width canvas the object
-       kept growing with the window while the window's height did not: at
-       2560×900 it resolved 1198×856 and its lower 152px sat below the fold
-       after an anchor jump. Same idea as the mobile rule's 48vh term — the
-       tallest the object may be is what still fits below the bar at rest
-       (6rem anchor margin + 6rem canvas padding + 0.75rem of air above the
-       fold), expressed as the width that produces it at 7:5. Engages only
-       when the columns outgrow that height budget (~2100px+ windows under
-       ~1000px tall); at 1024–1920 the cap resolves far above the column
-       width and changes nothing. justify-self keeps the capped object on
-       its outboard edge, where the composition already puts it. */
-    max-inline-size: calc((100vh - 12.75rem) * 7 / 5);
+    aspect-ratio: 8 / 5;
     justify-self: end;
+    border-radius: 0.75rem;
   }
 
   .beats {
-    grid-column: 1 / 13;
-    grid-row: 2 / 3;
-    align-self: end;
+    grid-column: 1 / -1;
+    grid-row: 2;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
+    padding-block-start: var(--space-4);
+  }
+
+  .beat {
+    min-width: 0;
+  }
+
+  .beatDetail {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .beatIcon {
+    display: grid;
+  }
+
+  .beat + .beat {
+    border-inline-start: 1px solid
+      color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+    padding-inline-start: clamp(1rem, 2.4vw, 2rem);
   }
 
   .tags {
-    grid-column: 1 / 13;
-    grid-row: 3 / 4;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
     margin-block-start: 0;
+    text-align: center;
+  }
+
+  .tags::before,
+  .tags::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background-color: color-mix(
+      in srgb,
+      var(--color-text-primary) 18%,
+      transparent
+    );
   }
 
   .headline {
-    font-size: clamp(3.25rem, 1.5rem + 4.5vw, 5.5rem);
+    font-size: clamp(3.25rem, 2.35rem + 3vw, 5.25rem);
+    text-wrap: balance;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .headline {
+    font-size: clamp(2.75rem, 1.75rem + 2.3vw, 3.75rem);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) and (max-height: 800px) {
+  .canvas {
+    row-gap: var(--space-3);
+    padding-block-end: var(--space-2);
   }
 
-  .backdropNumeral {
-    font-size: clamp(18rem, 4rem + 28vw, 32rem);
+  .intro {
+    margin-block-start: 2rem;
+  }
+}
+
+@media (min-width: 1280px) and (max-height: 960px) {
+  .canvas {
+    row-gap: var(--space-3);
+    padding-block-end: var(--space-2);
+  }
+
+  .beats {
+    padding-block-start: var(--space-3);
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1023px) and (max-height: 500px) {
+  .hardwareStage {
+    inline-size: min(100%, 36rem);
   }
 }

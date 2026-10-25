@@ -7,35 +7,52 @@ import {
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
 import { getHardwareBeats } from '../../data/hardware'
-import hardwareWorkshopBuild from '../../assets/hardware/hardware-workshop-build.png'
+import hardwareCreatorBuild from '../../assets/hardware/hardware-creator-build.webp'
 import styles from './Hardware.module.css'
 
+function BeatIcon({ index }: { index: string }) {
+  const icon = {
+    '01': (
+      <>
+        <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+        <path d="m4.3 7.7 7.7 4.4 7.7-4.4M12 12v9" />
+      </>
+    ),
+    '02': (
+      <>
+        <rect x="6" y="6" width="12" height="12" rx="2" />
+        <path d="M9 2v4m6-4v4m-6 12v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4" />
+      </>
+    ),
+    '03': (
+      <>
+        <path d="M4 20V11m5 9V5m5 15v-7m5 7V8" />
+        <path d="M2 20h20" />
+      </>
+    ),
+  }[index]
+
+  return (
+    <span className={styles.beatIcon} aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {icon}
+      </svg>
+    </span>
+  )
+}
+
 /**
- * Hardware Experience, per ARCHITECTURE.md's Section 5 spec: the site's
- * signature hardware showcase, shifting the narrative from "what CarterPCs
- * creates" (Featured) into "the physical technology world his content
- * revolves around." One immersive composition, not three more panels —
- * Featured already owns the multi-entry/horizontal-story grammar, so this
- * section is deliberately a single dominant stage instead.
- *
- * Depth is real DOM layering, not a 3D library (TECH_STACK.md §3 keeps
- * Three.js/R3F optional and explicitly scopes Hardware's default
- * implementation to CSS/GSAP): `.backdrop` (background — the environmental
- * "04"), `.hardwareStage` (midground — the layered component-scale planes),
- * `.intro`/`.beats`/`.tags` (foreground — headline and editorial metadata).
- * Three real, independently-positioned layers, so the depth-separation
- * scroll choreography can move each at its own subtle rate instead of
- * faking depth with a single flattened layer.
- *
- * The "04" is deliberately NOT a repeat of Creator's/Featured's corner-accent
- * numeral treatment: it lives in its own full-bleed `.backdrop` layer
- * *behind* the stage rather than beside it, so the stage's layered planes
- * visually sit "in" the numeral's environment — integrated background
- * typography, not a decorative corner label.
- *
- * The single primary media surface uses original workshop photography. The
- * two accent planes around it remain decorative depth/composition elements,
- * not additional media slots.
+ * Hardware Experience: the section shifts from the creator's stories
+ * (Featured) to the PC hardware behind them. A restrained split editorial
+ * composition keeps the copy and a single wide creator-workshop image
+ * together, with the three existing translated beats below.
  *
  * Copy: headline/support/beat text is original editorial development
  * language grounded in RESEARCH.md §7's "Custom PCs vs. Overpriced
@@ -44,14 +61,8 @@ import styles from './Hardware.module.css'
  * top comment for the full sourcing note. No specs, benchmarks, prices, or
  * quotes are used anywhere.
  *
- * Motion: one entrance reveal and nothing else — the headline clip, the
- * stage fade, and the staggered beats/tags, on the same one-time "top 75%"
- * trigger Hero/Creator/Featured already use. The section previously also
- * borrowed 0.65 of a viewport for a pinned depth-separation effect on its
- * decorative planes; see the note where that timeline used to be built for
- * why it was removed rather than tuned. Featured's horizontal pin is now the
- * page's only borrowed-scroll moment on the desktop path, which is also what
- * makes it read as this page's one signature move rather than as a habit.
+ * Motion: a short entrance reveal for the headline, image, beats, and tags.
+ * It runs once when the section enters view and is skipped for reduced motion.
  */
 function Hardware() {
   const reducedMotion = useReducedMotion()
@@ -101,19 +112,6 @@ function Hardware() {
           { opacity: 0, y: 18, duration: 0.7, stagger: 0.08 },
           '-=0.8',
         )
-
-      // The depth-separation pin that used to live here is gone. It held the
-      // page for 0.65 of a viewport while the two decorative accent planes
-      // and the background numeral pulled apart and then recomposed to
-      // exactly the frame they started from — a round trip that ended where
-      // it began, so nothing it showed survived it. Its own history says as
-      // much: the movement had been enlarged once already because a recording
-      // showed the effect was imperceptible, which is the tell that the
-      // motion was there to be noticed rather than to communicate. Borrowing
-      // a visitor's scroll is the most expensive thing a section can do, and
-      // this section now spends it on nothing: the stage's depth is real
-      // static layering, the photograph is the subject, and the entrance
-      // reveal above still introduces both.
     }, rootRef)
 
     return () => ctx.revert()
@@ -122,13 +120,6 @@ function Hardware() {
   return (
     <section id="hardware" className={styles.hardware} ref={rootRef}>
       <span className={styles.seam} aria-hidden="true" />
-
-      {/* Background layer — environmental "04", see top-of-file comment. */}
-      <div className={styles.backdrop} aria-hidden="true">
-        <span className={styles.backdropNumeral} data-numeral>
-          04
-        </span>
-      </div>
 
       <div className={styles.canvas}>
         <div className={styles.intro}>
@@ -148,25 +139,18 @@ function Hardware() {
           </p>
         </div>
 
-        {/* Workshop image is decorative: the adjacent copy provides the
-            section's meaning, while the accent planes retain the stage depth. */}
+        {/* Decorative, AI-generated illustrative media (not a verified photo
+            of Carter). The adjacent heading and copy carry the meaning. */}
         <figure
           className={styles.hardwareStage}
           aria-hidden="true"
           data-reveal-stage
         >
-          <div className={styles.stageAccentBack} data-stage-plane="back" />
-          <div className={styles.mediaLayer} data-stage-plane="mid">
-            <img
-              className={styles.mediaImage}
-              src={hardwareWorkshopBuild}
-              alt=""
-            />
-            <span className={styles.stageGuide} aria-hidden="true" />
-            <span className={styles.stageCorner} aria-hidden="true" />
-            <span className={styles.stageCornerEnd} aria-hidden="true" />
-          </div>
-          <div className={styles.stageAccentFront} data-stage-plane="front" />
+          <img
+            className={styles.mediaImage}
+            src={hardwareCreatorBuild}
+            alt=""
+          />
         </figure>
 
         <ul className={styles.beats}>
@@ -176,7 +160,10 @@ function Hardware() {
                 <span className={styles.beatIndex}>{beat.index}</span>
                 <span className={styles.beatLabel}>{beat.label}</span>
               </p>
-              <p className={styles.beatDescription}>{beat.description}</p>
+              <div className={styles.beatDetail}>
+                <BeatIcon index={beat.index} />
+                <p className={styles.beatDescription}>{beat.description}</p>
+              </div>
             </li>
           ))}
         </ul>
