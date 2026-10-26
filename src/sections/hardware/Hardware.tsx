@@ -143,7 +143,6 @@ function Hardware() {
             of Carter). The adjacent heading and copy carry the meaning. */}
         <figure
           className={styles.hardwareStage}
-          aria-hidden="true"
           data-reveal-stage
         >
           <img
@@ -151,6 +150,9 @@ function Hardware() {
             src={hardwareCreatorBuild}
             alt=""
           />
+          <figcaption className={styles.mediaDisclosure}>
+            {t.hardware.imageDisclosure}
+          </figcaption>
         </figure>
 
         <ul className={styles.beats}>

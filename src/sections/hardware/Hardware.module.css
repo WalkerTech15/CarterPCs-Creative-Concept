@@ -149,6 +149,28 @@
   object-position: center;
 }
 
+.mediaDisclosure {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  inset-block-end: 0.75rem;
+  z-index: 1;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--color-text-primary) 18%,
+    transparent
+  );
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--color-bg-base) 88%,
+    transparent
+  );
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+  line-height: 1.2;
+}
+
 /* ===== Beats — restrained internal chapter markers =====
    Hairline-separated, not cards: no per-item background, border-box, or
    shadow, matching the site's established borderless system. */
