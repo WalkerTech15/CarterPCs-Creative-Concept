@@ -54,6 +54,55 @@ test('scrolling from Hero reveals the Creator section', async ({ page }) => {
   await expect(creatorHeading).toBeVisible()
 })
 
+test('Creator stacked layouts keep the workshop image below all copy', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 844, height: 390 },
+    { width: 1024, height: 768 },
+    { width: 1063, height: 804 },
+    { width: 1199, height: 800 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await page
+      .locator('#creator')
+      .evaluate((section) => section.scrollIntoView())
+
+    const layout = await page.locator('#creator').evaluate((section) => {
+      const footer = section.querySelector('[class*="footer"]')!
+      const stage = section.querySelector('[data-reveal-stage]')!
+      const headline = section.querySelector('h2')!
+      const nav = document.querySelector('nav')!
+      const rect = (element: Element) => element.getBoundingClientRect()
+
+      return {
+        footerBottom: rect(footer).bottom,
+        stageTop: rect(stage).top,
+        headlineTop: rect(headline).top,
+        navBottom: rect(nav).bottom,
+        viewportWidth: document.documentElement.clientWidth,
+        pageWidth: document.documentElement.scrollWidth,
+      }
+    })
+
+    expect(
+      layout.headlineTop,
+      `${viewport.width}x${viewport.height}: anchor must clear the fixed nav`,
+    ).toBeGreaterThanOrEqual(layout.navBottom)
+    expect(
+      layout.stageTop,
+      `${viewport.width}x${viewport.height}: media must follow copy`,
+    ).toBeGreaterThanOrEqual(layout.footerBottom)
+    expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewportWidth)
+  }
+})
+
 test('Creator uses an inset image and balanced text on wide screens, then stacks cleanly', async ({
   page,
 }) => {
