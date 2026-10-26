@@ -163,6 +163,50 @@ test('Hardware nav link scrolls to the Hardware section', async ({ page }) => {
   await expect(page).toHaveURL(/#hardware$/)
 })
 
+test('section links replay a heading arrival cue, including repeat clicks', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const hardware = page.locator('#hardware')
+  const heading = hardware.locator('h2')
+  const systemsLink = primaryNav(page).getByRole('link', { name: /^systems$/i })
+
+  await heading.evaluate((element) => {
+    element.addEventListener('animationstart', () => {
+      const count =
+        Number(element.getAttribute('data-arrival-count') ?? '0') + 1
+      element.setAttribute('data-arrival-count', String(count))
+    })
+  })
+
+  await systemsLink.click()
+  await expect(hardware).toHaveAttribute('data-navigation-arrival', 'true')
+  await expect(heading).toHaveAttribute('data-arrival-count', '1')
+  await expect(heading).toHaveCSS('animation-duration', '0.35s')
+
+  await page.waitForTimeout(600)
+  await systemsLink.click()
+  await expect(hardware).toHaveAttribute('data-navigation-arrival', 'true')
+  await expect(heading).toHaveAttribute('data-arrival-count', '2')
+})
+
+test('section arrival motion is omitted when reduced motion is requested', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+
+  await primaryNav(page)
+    .getByRole('link', { name: /^systems$/i })
+    .click()
+  await expect(page).toHaveURL(/#hardware$/)
+  await expect(page.locator('#hardware')).not.toHaveAttribute(
+    'data-navigation-arrival',
+    'true',
+  )
+})
+
 /**
  * Switches language the way the persisted preference does, then reloads so the
  * first paint is already translated — the alternative, seeding an init script

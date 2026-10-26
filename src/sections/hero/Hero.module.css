@@ -759,7 +759,9 @@
 
 @media (min-width: 768px) and (max-width: 1239px) {
   .inner {
-    padding-block-start: calc(var(--space-8) + var(--space-4));
+    /* Keep the stacked tablet layout clear of the wrapped nav without
+       carrying desktop-sized top whitespace into a shorter viewport. */
+    padding-block-start: clamp(9.5rem, 15vh, 11rem);
   }
 
   .about,
@@ -777,7 +779,9 @@
    tightens at phone widths. */
 @media (max-width: 767px) {
   .inner {
-    padding-block-start: clamp(9rem, 21vh, 10.5rem);
+    /* The mobile nav is compact; reserve its clearance, but avoid a large
+       dead band before the headline on short iPhone viewports. */
+    padding-block-start: clamp(8.75rem, 18vh, 9.5rem);
   }
 
   .stage {

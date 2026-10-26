@@ -114,6 +114,24 @@ body {
   animation: control-press var(--duration-fast) var(--ease-out) both;
 }
 
+/* A small arrival cue makes same-page navigation feel deliberate, including
+   when a visitor selects the section they are already viewing. */
+@keyframes section-navigation-arrival {
+  from {
+    opacity: 0.82;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+section[data-navigation-arrival='true'] :is(h1, h2) {
+  animation: section-navigation-arrival var(--duration-base) var(--ease-out)
+    both;
+}
+
 /* Skip-to-content link: visually hidden until focused */
 .skip-link {
   position: fixed;

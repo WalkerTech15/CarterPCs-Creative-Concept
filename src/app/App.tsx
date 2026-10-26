@@ -10,6 +10,8 @@ import Closing from '../sections/closing/Closing'
 import Footer from '../components/footer/Footer'
 import { ScrollTrigger } from '../animations/gsap'
 import { useLenis } from '../hooks/useLenis'
+import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useSectionNavigationMotion } from '../hooks/useSectionNavigationMotion'
 import { PreferencesProvider, usePreferences } from './Preferences'
 
 /**
@@ -19,7 +21,10 @@ import { PreferencesProvider, usePreferences } from './Preferences'
  */
 function Site() {
   const { t, language } = usePreferences()
+  const reducedMotion = useReducedMotion()
   const [introComplete, setIntroComplete] = useState(false)
+
+  useSectionNavigationMotion(reducedMotion)
 
   // Translated copy changes how tall the sections are (French and Spanish
   // paragraphs set to more lines than the English ones), which moves every

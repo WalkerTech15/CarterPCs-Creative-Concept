@@ -18,7 +18,10 @@ export function useLenis(): void {
       return
     }
 
-    const lenis = new Lenis()
+    // A slightly firmer lerp reaches the requested scroll position sooner
+    // without removing the smooth, native-scroll feel. Touch scrolling stays
+    // native because syncTouch remains disabled.
+    const lenis = new Lenis({ lerp: 0.15 })
     lenis.on('scroll', ScrollTrigger.update)
 
     // GSAP's ticker (not a raw rAF loop) keeps Lenis in step with every other

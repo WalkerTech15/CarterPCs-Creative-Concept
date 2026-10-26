@@ -5,9 +5,19 @@ test('phone Hero stays compact, readable, and clear of the navigation in every l
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
-  for (const width of [320, 390]) {
+  const phoneViewports = [
+    { width: 320, height: 568 }, // small iPhone / narrow viewport floor
+    { width: 360, height: 780 }, // compact Android-sized phone
+    { width: 375, height: 812 }, // iPhone SE / mini class
+    { width: 390, height: 844 }, // current standard iPhone class
+    { width: 402, height: 874 }, // larger iPhone class
+    { width: 430, height: 932 }, // large iPhone class
+  ]
+
+  for (const viewport of phoneViewports) {
     for (const language of ['en', 'fr', 'es'] as const) {
-      await page.setViewportSize({ width, height: width === 320 ? 568 : 844 })
+      const { width } = viewport
+      await page.setViewportSize(viewport)
       await page.addInitScript((locale) => {
         window.localStorage.setItem('carterpcs-language', locale)
         window.localStorage.setItem('carterpcs-theme', 'dark')
@@ -64,6 +74,43 @@ test('phone Hero stays compact, readable, and clear of the navigation in every l
         `${language} ${width}px page overflow`,
       ).toBe(0)
     }
+  }
+})
+
+test('phone landscape keeps the Hero readable and the page inside the viewport width', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+
+  for (const language of ['en', 'fr', 'es'] as const) {
+    await page.setViewportSize({ width: 844, height: 390 })
+    await page.addInitScript((locale) => {
+      window.localStorage.setItem('carterpcs-language', locale)
+      window.localStorage.setItem('carterpcs-theme', 'dark')
+    }, language)
+    await page.goto('/')
+
+    const layout = await page.evaluate(() => {
+      const nav = document.querySelector('nav')!.getBoundingClientRect()
+      const headline = document
+        .querySelector('#hero h1')!
+        .getBoundingClientRect()
+
+      return {
+        navBottom: nav.bottom,
+        headlineTop: headline.top,
+        pageWidth: document.documentElement.scrollWidth,
+        viewportWidth: innerWidth,
+      }
+    })
+
+    expect(
+      layout.headlineTop,
+      `${language} landscape nav clearance`,
+    ).toBeGreaterThan(layout.navBottom)
+    expect(layout.pageWidth, `${language} landscape horizontal overflow`).toBe(
+      layout.viewportWidth,
+    )
   }
 })
 
