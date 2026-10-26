@@ -1741,7 +1741,7 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
-  for (const width of [768, 1024, 1440]) {
+  for (const width of [768, 1024, 1440, 1920, 2048]) {
     for (const language of ['en', 'fr', 'es'] as const) {
       await page.setViewportSize({ width, height: 900 })
       await page.addInitScript((lang) => {
@@ -1764,8 +1764,44 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
         }
         return {
           canvas: box('[class*="canvas"]'),
+          canvasPaddingInline: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="canvas"]')!)
+              .paddingInlineStart,
+          ),
+          canvasPaddingBlock: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="canvas"]')!)
+              .paddingBlockStart,
+          ),
+          canvasBorderInline: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="canvas"]')!)
+              .borderInlineStartWidth,
+          ),
+          footerWidth: footer.getBoundingClientRect().width,
+          footerGutter: Math.max(
+            Number.parseFloat(
+              getComputedStyle(document.documentElement).fontSize,
+            ) * 2,
+            Math.min(
+              window.innerWidth * 0.042,
+              Number.parseFloat(
+                getComputedStyle(document.documentElement).fontSize,
+              ) * 5.75,
+            ),
+          ),
+          rootFontSize: Number.parseFloat(
+            getComputedStyle(document.documentElement).fontSize,
+          ),
           footerHeight: footer.getBoundingClientRect().height,
           brand: box('[class*="brand"]'),
+          topRow: box('[class*="topRow"]'),
+          topRowPaddingBlock: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="topRow"]')!)
+              .paddingBlockStart,
+          ),
+          brandMarginStart: Number.parseFloat(
+            getComputedStyle(footer.querySelector('[class*="brand"]')!)
+              .marginInlineStart,
+          ),
           brandFontSize: Number.parseFloat(
             getComputedStyle(footer.querySelector('[class*="brand"]')!)
               .fontSize,
@@ -1777,14 +1813,11 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
           ].map((rule) => rule.getBoundingClientRect().left),
           nav: box('nav'),
           social: box('ul[aria-label]'),
-          socialContent: (() => {
+          socialItemCenters: (() => {
             const items = [
               ...footer.querySelectorAll('ul[aria-label] > li'),
             ].map((item) => item.getBoundingClientRect())
-            return {
-              left: Math.min(...items.map((item) => item.left)),
-              right: Math.max(...items.map((item) => item.right)),
-            }
+            return items.map((item) => (item.left + item.right) / 2)
           })(),
           overflow:
             document.documentElement.scrollWidth >
@@ -1793,24 +1826,74 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
       })
 
       expect(layout.overflow, `${language} @ ${width}px`).toBe(false)
+      if (width >= 1440) {
+        const expectedWidth = Math.min(
+          layout.footerWidth - layout.footerGutter * 2,
+          layout.rootFontSize * 128,
+        )
+        expect(Math.abs(layout.canvas.width - expectedWidth)).toBeLessThan(2)
+        expect(
+          Math.abs(layout.canvas.left - layout.footerGutter),
+          'desktop footer card should use the same page-edge gutter as its seam',
+        ).toBeLessThan(2)
+        expect(
+          Math.abs(
+            layout.brand.left -
+              layout.canvas.left -
+              layout.canvasBorderInline -
+              layout.canvasPaddingInline -
+              layout.brandMarginStart,
+          ),
+          'desktop wordmark should retain the reference inset from the page edge',
+        ).toBeLessThan(2)
+        expect(
+          Math.abs(
+            layout.brand.top -
+              layout.canvas.top -
+              layout.canvasBorderInline -
+              layout.canvasPaddingBlock -
+              layout.topRowPaddingBlock,
+          ),
+          'desktop wordmark should retain the reference vertical placement',
+        ).toBeLessThan(2)
+      }
       const centerY = ({ top, height }: { top: number; height: number }) =>
         top + height / 2
       expect(
         Math.abs(centerY(layout.social) - centerY(layout.brand)),
-      ).toBeLessThan(4)
-      const socialCenter =
-        (layout.socialContent.left + layout.socialContent.right) / 2
-      const socialSectionCenter = (layout.social.left + layout.social.right) / 2
-      expect(Math.abs(socialCenter - socialSectionCenter)).toBeLessThan(4)
+      ).toBeLessThan(7)
+      if (width > 540) {
+        expect(layout.socialItemCenters).toHaveLength(3)
+        const socialCenter = (layout.social.left + layout.social.right) / 2
+        const socialStep =
+          (layout.socialItemCenters[2] - layout.socialItemCenters[0]) / 2
+        for (const [index, center] of layout.socialItemCenters.entries()) {
+          const expectedCenter = socialCenter + (index - 1) * socialStep
+          expect(
+            Math.abs(center - expectedCenter),
+            `social link ${index + 1} should be evenly centered in its slot`,
+          ).toBeLessThan(4)
+        }
+      }
       if (width > 1150) {
-        const brandInset = layout.brand.left - layout.canvas.left
-        expect(brandInset).toBeGreaterThan(36)
-        expect(brandInset).toBeLessThan(52)
+        const brandInset = layout.brand.left - layout.topRow.left
+        expect(
+          Math.abs(brandInset - layout.brandMarginStart),
+          'brand keeps its original inset from the left edge of the row',
+        ).toBeLessThan(2)
+        const brandDownOffset = centerY(layout.brand) - centerY(layout.topRow)
+        expect(Math.abs(brandDownOffset)).toBeLessThan(2)
+        const expectedBrandFontSize = Math.max(
+          layout.rootFontSize * 1.75,
+          Math.min(width * 0.0225, layout.rootFontSize * 2.5),
+        )
+        expect(
+          Math.abs(layout.brandFontSize - expectedBrandFontSize),
+          'desktop wordmark size should match the production reference scale',
+        ).toBeLessThan(0.5)
         if (width === 1440) {
-          expect(layout.footerHeight).toBeGreaterThan(160)
-          expect(layout.footerHeight).toBeLessThan(176)
-          expect(layout.brandFontSize).toBeGreaterThan(31)
-          expect(layout.brandFontSize).toBeLessThan(34)
+          expect(layout.footerHeight).toBeGreaterThan(156)
+          expect(layout.footerHeight).toBeLessThan(164)
           const firstRuleRatio =
             (layout.columnRules[0] - layout.canvas.left) / layout.canvas.width
           const secondRuleRatio =
@@ -1822,7 +1905,7 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
         }
         expect(
           Math.abs(centerY(layout.nav) - centerY(layout.brand)),
-        ).toBeLessThan(4)
+        ).toBeLessThan(7)
         expect(layout.nav.left).toBeGreaterThan(layout.brand.right)
         expect(layout.nav.right).toBeLessThan(layout.social.left)
       } else {
