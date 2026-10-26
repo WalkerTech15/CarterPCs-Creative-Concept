@@ -2380,3 +2380,616 @@ test commit. This was a local commit-and-push task; no deployment was performed.
 
 **Yes — the scoped changes passed the checks above and are committed locally.**
 Push status is reported after remote verification.
+
+## Closing image replacement — October 26, 2026
+
+### Objective and scope
+
+Replace the Closing section's old PC-build photo with the approved generated
+scene of CarterPCs filming with the foldable iPhone Duo and a white MacBook Neo.
+Keep the full wide composition visible instead of cropping it into the old 4:3
+frame. The generated art is illustrative, not documentary photography.
+
+### Files changed
+
+- `src/assets/closing/creator-filming-devices.webp` — optimized 1672×941 WebP
+  replacement (127,554 bytes); original generated PNG left unchanged.
+- `src/sections/closing/Closing.tsx` — use the new asset and document its
+  decorative, generated-image rationale; preserve empty alt text.
+- `src/sections/closing/Closing.module.css` — preserve the image's 16:9 ratio
+  at desktop and mobile sizes.
+- `src/app/App.test.tsx` and `e2e/app.spec.ts` — update the image description
+  and assert the displayed image ratio.
+- `AI_REPORT.md` — record this task and its verification.
+
+### Verification
+
+- **Verified:** `npm run typecheck`, focused ESLint, `npm run build`, and
+  `git diff --check` passed.
+- **Verified:** focused unit tests passed, 20/20.
+- **Verified:** focused Playwright test passed, 3/3 for EN, FR, and ES; image
+  visible and displayed at 16:9.
+- **Verified:** build emits the new WebP at 127.55 kB.
+- **Not run:** full test and full E2E suites; this is a scoped asset/layout
+  replacement.
+- **Remaining limitation:** generated imagery is an editorial illustration,
+  not a verified photograph of CarterPCs or proof that the products shown are
+  his personal devices.
+
+### Commit verdict
+
+**Yes — this scoped change is ready to commit.** Nothing was staged, committed,
+pushed, or deployed.
+
+Suggested commit message: `feat: replace closing section image`
+
+## Creator image replacement — October 26, 2026
+
+### Objective and scope
+
+Replace the Creator section's workshop image with the approved updated version,
+which includes a blue triple-camera iPhone inspired by the user's iPhone 18 Pro
+Max reference. No copy, layout, or other section was changed. The generated
+phone is an illustrative approximation, not a product-accurate photograph.
+
+### Files changed
+
+- `src/assets/creator/creator-build-session.webp` — replaced in place with the
+  approved 1448×1086 WebP (156,350 bytes); keeping the same path avoids markup
+  changes and preserves the existing section composition.
+- `src/sections/creator/Creator.tsx` — updated the asset metadata comment only;
+  the existing decorative-image rationale and empty alt text remain unchanged.
+- `AI_REPORT.md` — recorded this task and verification.
+
+### Verification
+
+- **Verified:** WebP signature and decoded dimensions (1448×1086); rendered
+  image visually inspected and includes the blue phone.
+- **Verified:** `npm run build` passed (includes TypeScript project checks).
+- **Verified:** focused Playwright Creator responsive-image test passed, 1/1
+  across its four desktop/mobile viewport sizes.
+- **Not run:** full lint, unit, and E2E suites; markup and styles were unchanged.
+
+### Remaining limitations
+
+The generated phone resembles the supplied blue triple-camera reference but is
+not a verified iPhone 18 Pro Max product image. The portrait itself remains an
+illustrative fictional creator, not documentary evidence of CarterPCs.
+
+### Commit verdict
+
+**Yes — this scoped change passed the build and focused responsive-image check.**
+Nothing was staged, committed, pushed, or deployed.
+
+Suggested commit message: `style: update creator workshop image`
+
+## Closing camera-preview refinement — October 26, 2026
+
+### Objective and scope
+
+Refine only the Closing section image so the foreground camera's LCD preview
+shows Carter filming the same open foldable phone held in the scene. The pose,
+phone, laptop, composition, and all other scene details remain unchanged.
+
+### Files changed
+
+- `src/assets/closing/creator-filming-devices.webp` — updated generated image,
+  1672×941 WebP, 141,776 bytes (about 14.2 kB larger than the prior version).
+- `AI_REPORT.md` — recorded this scoped image refinement and its checks.
+
+### Verification
+
+- **Verified:** final image inspected; camera LCD now visibly previews the
+  subject holding the foldable phone.
+- **Verified:** `npm run build` passed; Vite emits the updated WebP at 141.77 kB.
+- **Verified:** focused Closing Playwright test passed, 3/3 (EN, FR, ES),
+  including image visibility and 16:9 presentation.
+- **Not run:** full lint, unit, and E2E suites; no code or styles changed.
+
+### Remaining limitations
+
+The image remains generated illustrative artwork; the LCD is a plausible
+matching preview, not actual footage from a physical camera.
+
+### Commit verdict
+
+**Yes — this scoped image change passed its build and focused browser checks.**
+Nothing was staged, committed, pushed, or deployed.
+
+Suggested commit message: `style: match filming preview to featured device`
+
+## Responsive footer alignment — October 26, 2026
+
+### Objective and scope
+
+Keep the footer's brand, section links, social channels, and ownership copy
+visually balanced on tablet and mobile while preserving the desktop reference
+layout and all existing destinations and wording.
+
+### Files changed
+
+- `src/components/footer/Footer.module.css` — center the tablet section links
+  and disclaimer; on narrow mobile, center the wordmark, social group, section
+  links, and stacked metadata with subtle separators.
+- `e2e/app.spec.ts` — assert mobile group alignment at 320px and 390px, and
+  tablet navigation/disclaimer alignment at 768px and 1024px.
+- `AI_REPORT.md` — record this change and its verification.
+
+### Verification
+
+- **Verified:** `npm run build` passed.
+- **Verified:** focused Chromium footer checks passed **3/3 tests**, covering
+  320px and 390px in EN/FR/ES, plus tablet and desktop layout checks at
+  768px–2048px in EN/FR/ES. The tablet assertions specifically cover 768px and
+  1024px.
+- **Verified:** `npm run typecheck`, `npx eslint e2e/app.spec.ts`,
+  `npx prettier --check src/components/footer/Footer.module.css`, and
+  `git diff --check` passed.
+- **Not run:** full test suites, physical iPhone/Safari, and deployed-site
+  validation.
+
+### Remaining limitations
+
+Automated mobile coverage uses Chromium viewport emulation; it does not replace
+testing on a physical iPhone.
+
+### Commit verdict
+
+**No for the entire working tree.** Other unrelated changes were already
+pending and remain untouched. Nothing was staged, committed, pushed, or
+deployed.
+
+Suggested commit message: `style: balance footer alignment on mobile`
+
+## Hardware camera-preview refinement — October 26, 2026
+
+### Objective and scope
+
+Update only the Hardware section image so the foreground filming camera's LCD
+shows the same creator presenting the same open PC build visible in the scene.
+No section copy, layout, or behavior changed.
+
+### Files changed
+
+- `src/assets/hardware/hardware-creator-build.webp` — replaced with the
+  selected image, converted to 1672×941 WebP, 177,224 bytes. The camera LCD
+  now shows the matching PC-building scene with a recording indicator.
+- `AI_REPORT.md` — recorded this change and verification.
+
+### Verification
+
+- **Verified:** inspected the selected source and final WebP; the camera screen
+  shows the matching creator/PC scene and recording indicator.
+- **Verified:** image dimensions remain 1672×941; WebP file size is 177,224
+  bytes (about 20,758 bytes larger than the original asset).
+- **Verified:** `npm run build` passed; Vite emitted the selected image at
+  177.22 kB.
+- **Verified:** focused Chromium Hardware E2E passed, 7/7 tests, including
+  anchor navigation, responsive section reachability, and scroll behavior.
+- **Not run:** full lint, unit, and E2E suites; code, markup, and styles were
+  unchanged.
+
+### Remaining limitations
+
+The picture is generated illustrative artwork, not documentary footage of
+CarterPCs or an actual camera recording.
+
+### Commit verdict
+
+**No for the entire working tree.** Other unrelated changes are still pending
+and were left untouched. Nothing was staged, committed, pushed, or deployed.
+
+Suggested commit message: `style: align hardware camera preview with PC build`
+
+## Full-site finish-readiness audit — October 26, 2026
+
+### Objective and scope
+
+Independent visual/responsive, accessibility/interaction, and content reviews
+checked whether the current portfolio is a credible local release candidate.
+The only confirmed issue was that generated editorial artwork was described as
+illustrative in developer notes but not disclosed to visitors. Added a visible,
+localized caption to the Creator, Hardware, and Closing images. Kept the
+approved image compositions, copy, and section layouts unchanged.
+
+### Files changed in this audit follow-up
+
+- `src/sections/creator/Creator.tsx`
+- `src/sections/creator/Creator.module.css`
+- `src/sections/hardware/Hardware.tsx`
+- `src/sections/hardware/Hardware.module.css`
+- `src/sections/closing/Closing.tsx`
+- `src/sections/closing/Closing.module.css`
+- `src/i18n/en.ts`, `src/i18n/fr.ts`, `src/i18n/es.ts`
+- `src/app/App.test.tsx`
+- `e2e/app.spec.ts`
+- `AI_REPORT.md`
+
+Captions use semantic `figcaption` elements and are translated in all three
+locales. Decorative images remain `alt=""`; disclosure text is outside hidden
+accessibility wrappers. Closing's `<figure>` margin is reset to preserve its
+existing 16:9 composition.
+
+### Audit findings
+
+- **Verified:** Independent agents found no confirmed layout, overflow, or
+  interaction defects across 320–1920px checks. The existing automated suite
+  also covers navigation, focus, reduced motion, language switching, stories,
+  footer behavior, and section anchors.
+- **Fixed:** Visitors can now distinguish illustrative concept artwork from
+  documentary photographs, in English, French, and Spanish.
+- **Limitation:** The images remain generated illustrations, not verified
+  photographs of CarterPCs, his actual devices, or his actual filming setup.
+  Captions clarify this; factual likeness/product accuracy is not claimed.
+
+### Verification
+
+- **Verified:** `npm run lint` — pass.
+- **Verified:** `npm run test:run` — 69/69 tests passed. JSDOM emitted its
+  existing `Window.scrollTo()` not-implemented warnings; they did not fail
+  tests.
+- **Verified:** `npm run build` — pass; production output generated.
+- **Verified:** `npx playwright test` — 92/92 Chromium E2E tests passed.
+- **Verified:** Focused disclosure test — 1/1; checks visibility and image
+  containment on 390×844 mobile and 1440×900 desktop, across EN/FR/ES.
+- **Verified:** `git diff --check` — pass.
+- **Not run:** Physical iPhone/iOS Safari testing or independent validation of
+  the deployed Vercel build.
+
+### Finish and commit verdict
+
+**PASS — local release candidate; yes, ready to commit after reviewing the
+pending diff.** No changes were staged, committed, pushed, or deployed. The
+entire worktree includes earlier user-requested edits as well as this audit
+follow-up, so review the full status before making a commit.
+
+Suggested commit message: `content: disclose illustrative portfolio imagery`
+
+## Hero reference redesign — October 26, 2026
+
+### Objective, scope and design preflight
+
+Implemented the user's explicitly approved studio Hero reference locally.
+Hierarchy: full-bleed studio image, left headline/support, two real section
+links, and three lower image/title tiles. Existing Inter, restrained violet
+indices, inset navigation, and shared motion tokens remain. Desktop landmarks
+are derived from the 1585×992 reference; mobile reflows rather than shrinking
+the desktop screenshot. No baked-in UI text, new dependencies, fake metrics,
+scroll pinning, or changes to other section designs.
+
+Model: GPT-6.1-sol; effort setting not independently exposed. Skills used:
+adaptive workflow, existing-project redesign, UI/UX, and built-in imagegen.
+Explicit user implementation request takes precedence over the workflow's
+usual Claude-builder/Codex-reviewer split for this task.
+
+### Changes in this task
+
+- `src/sections/hero/Hero.tsx` and `Hero.module.css`: studio background,
+  reference copy/actions/tiles, flow-based responsive layout, reduced-motion
+  entrance, keyboard feedback, and a visible illustration disclosure. Removed
+  the old portrait/card/statistics/channel-strip composition from this section.
+  Social links remain in the Footer.
+- `src/components/navigation/Nav.module.css`: desktop capsule width/top inset
+  follow the reference; compact padding preserves section-anchor clearance.
+- `src/data/hero.ts`: new thumbnail imports and indices 01–03.
+- `src/i18n/en.ts`, `fr.ts`, `es.ts`: localized Hero headline, support and CTA
+  text. Existing pending image-disclosure additions were preserved.
+- `src/app/App.test.tsx`, `App.localization.test.tsx`, `e2e/app.spec.ts`,
+  `e2e/interaction-feedback.spec.ts`, `e2e/layout-comfort.spec.ts`: replace old
+  composition assertions with approved new content, layout and focus checks.
+- `e2e/hero.spec.ts`: desktop reference landmarks and a 54-state matrix
+  (9 viewport sizes × EN/FR/ES × dark/light, reduced motion).
+- Four new production WebP assets under `src/assets/hero/`: studio scene
+  (1585×992, 140,082 bytes) and three approved-reference thumbnail crops
+  (232×187, 17,590 / 12,428 / 12,600 bytes). Total 182,700 bytes. Original
+  assets and source images were not overwritten. No network service was added.
+
+### Asset provenance and generation prompt
+
+User-approved concept reference: `codex-clipboard-8efe942c-bbf0-4028-85a1-993dbb22fb08.png`.
+Built-in imagegen produced a clean background from it, saved originally as
+`exec-8cf2eb37-2c99-4da8-a144-256f081208da.png` under Codex generated images;
+the project consumes the WebP derivative, not the temporary user attachment.
+Prompt: remove the website navigation, text, buttons and bottom cards;
+reconstruct only the underlying studio; preserve the face, curls, pose,
+framing, PC and lighting; keep the left half dark; no new text or UI.
+Thumbnail crops contain only media, not UI or attribution. These remain
+illustrative concepts, not documentary photos or a verified likeness. A
+caption discloses this; decorative `alt=""` avoids repeating link/headline
+content. No claim of independent photo licensing or 100% facial accuracy.
+
+### Verification
+
+- [x] Verified: `npm run typecheck` — exit 0; also repeated by final build.
+- [x] Verified: `npm run lint` — pass after final code/test edits.
+- [x] Verified: `npm run test:run` — 6 files, 68/68 tests passed (24.58s).
+  Existing JSDOM scrollTo warnings remain. The obsolete Hero social-proof
+  tests were consolidated, not skipped.
+- [x] Verified: `npm run build` — pass; JS 385.08 kB (128.59 kB gzip),
+  CSS 56.32 kB (10.46 kB gzip). No dependency or lockfile changes.
+- [x] Verified: initial focused Hero browser tests — 2/2, including 54 states.
+- [x] Verified: final `npx playwright test --reporter=line --workers=2` —
+  93/93 Chromium tests passed (2.0m). Obsolete statistics spacing tests were
+  replaced by copy/actions/tiles/disclosure spacing checks.
+- [x] Verified: initial full run exposed a desktop anchor-clearance regression
+  and missing keyboard arrow feedback. Both were fixed and reverified in the
+  final run; remaining initial failures were obsolete composition selectors.
+- [x] Verified: `git diff --check` — no whitespace errors; Git emits its
+  existing LF-to-CRLF notices.
+- [x] Verified: rendered desktop/mobile inspected; 1585×992 reference tiles
+  start at x54/y689 vs reference about x54/y690. No overflow, image failures,
+  nav/title collisions, clipped labels, or page errors in the 54-state matrix.
+  Keyboard CTA activation, focus styling, normal-motion tile feedback,
+  reduced motion, and both themes are covered by the browser suite.
+- [x] Verified: the user's existing local tab was reloaded to `#hero`; a stale
+  development hot-reload context error cleared on full reload. No unrelated
+  provider changes were made.
+- Not run: physical iPhone/iOS Safari, deployed Vercel verification, and
+  literal per-pixel equivalence. Generated photography, glyph rendering and
+  responsive adaptation differ from the flattened mockup; no 100% claim.
+
+### Scope and commit verdict
+
+PASS for this local implementation; **Yes, this scoped Hero change is ready
+for review/commit**. Earlier pending Creator, Hardware, Closing, Footer and
+asset edits remain intact and are not silently included in that verdict.
+Nothing staged, committed, pushed or deployed. No hosting changes.
+
+Suggested commit message: `style: match hero to approved studio reference`
+
+## Follow-up: approved center-left Hero with restored information
+
+### Objective and scope
+
+Implement the newly approved preview, not another generated image: small
+Cinematic Computers eyebrow, Built / Different. headline, original paragraph
+and two real section links, vertically centered on the left. Restore About
+Carter, By The Numbers, tile descriptions and the channel row. Explicit user
+implementation request takes precedence over the default Claude/Codex role
+split. Existing unrelated pending changes are preserved.
+
+### Changes
+
+- `src/sections/hero/Hero.tsx`: reuse existing HERO_STATS, CHANNELS and translated
+  card/tile copy. Semantic aside, headings and definition list; external links
+  disclose new-tab behavior. Preserve illustrative-image disclosure.
+- `src/sections/hero/Hero.module.css`: normal-flow overview grid with center-left
+  copy and right cards, stacking below 1024px, single card column on phones.
+  Existing typography/colors/reduced-motion behavior retained; focus rings and
+  44px link targets included. UI/UX skill informed overflow and wrapping checks.
+- `src/i18n/en.ts`, `fr.ts`, `es.ts`: approved Hero headline, support and CTA
+  labels localized. Primary goes to Universe; secondary goes to real Shorts.
+- `src/app/App.test.tsx`, `App.localization.test.tsx`, `e2e/app.spec.ts`,
+  `e2e/hero.spec.ts`: update old composition expectations and verify restored
+  content, correct destinations, card separation and two-line headings.
+
+### Verification
+
+- [x] Verified: production build (includes TypeScript) and lint, exit 0.
+- [x] Verified: Vitest 68/68, six files, 22.10s. Initial five failures were old
+  content expectations plus a mistakenly edited nav expectation; corrected
+  before the final successful run. Existing JSDOM scrollTo warnings remain.
+- [x] Verified: full Chromium run completed: 88 passed, five failed (2.5m).
+  All five were obsolete Hero headline/destination assertions. After correcting
+  those assertions, a focused rerun passed 6/6 (17.1s), including all five and
+  the primary CTA contrast check. No claim of a second all-green full run.
+- [x] Verified: Hero's 54-state matrix (nine viewports, EN/FR/ES, dark/light,
+  reduced motion): no horizontal overflow, unloaded images, text spill,
+  nav/card/copy/tile collisions, or runtime errors; headline spans stay single
+  lines. Keyboard focus and primary CTA activation covered.
+- [x] Verified: actual Chromium desktop 1585x992 and fresh mobile 390x844 renders
+  inspected in both palettes. Center-left heading at desktop x54/y274; mobile
+  cards stack below copy. This is responsive adaptation, not pixel-identical
+  equivalence to a generated image. A resize-only capture was stale; the fresh
+  mobile load confirmed the correct 42px two-line headline.
+- [x] Verified: changed source/test files pass Prettier; git diff --check clean
+  apart from informational LF/CRLF notices.
+
+Performance: no new dependencies, assets, network integrations or lockfile
+changes. Final JS 386.94 kB / 129.05 kB gzip; CSS 58.54 kB / 10.80 kB gzip.
+Compared with the previous recorded Hero build, approximately +1.86 kB JS and
++2.22 kB CSS uncompressed. Existing dated tracker figures/source were reused,
+not independently refreshed or represented as current private analytics.
+
+Not run: physical iPhone/Safari, production deployment verification, a second
+complete browser suite, and literal pixel equivalence. This is local only.
+
+### Commit verdict
+
+Yes for this focused Hero follow-up after separating its hunks from earlier
+pending work; no blanket approval to commit the entire mixed worktree. Nothing
+staged, committed, pushed or deployed. No other section or asset changed here.
+
+Suggested commit: `style: restore centered-left hero and information cards`
+
+## Follow-up: keep Hero cards clear of the portrait
+
+User approved the preview with About Carter and By The Numbers side by side
+below the buttons, rather than stacked over the right-side portrait.
+
+- Changed `src/sections/hero/Hero.module.css`: normal-flow copy above a 54%-wide
+  two-column card row; full-width tablet row and single-column phone cards.
+  More compact card padding. Preserved all content, imagery and interactions.
+- Changed `e2e/hero.spec.ts`: desktop regression asserts cards below buttons,
+  side by side and confined to the left 56% of the frame. Existing 54-state
+  matrix continues to check overflow, nav clearance, heading lines and overlap.
+- Verified: build/typecheck and lint pass. JS unchanged (386.94 kB;
+  129.05 kB gzip); CSS 58.55 kB / 10.79 kB gzip. No dependency/asset changes.
+- Verified: focused Hero browser tests 2/2, including the 54-state matrix.
+  Focused Hero layout/contrast browser checks also pass 4/4 (15.4s);
+  git diff --check passes with existing LF/CRLF informational notices.
+  Actual 1585x1100 desktop capture inspected: face and hair unobstructed;
+  card row at x54/y564, width798, above lower tiles.
+- Unit and full browser suites not repeated for this CSS-only follow-up;
+  prior implementation results remain recorded above. Physical iOS/Safari
+  and deployment remain not run. No claim of exact generated-image equality.
+
+Commit verdict: Yes for this scoped follow-up once separated from existing
+pending changes. Nothing staged, committed, pushed or deployed.
+Suggested commit: `style: move hero cards below copy to clear portrait`
+
+## Follow-up: approved hoodie/cap portrait with relaxed smile
+
+- User selected the relaxed-smile TECHNO INSIDER cap preview. Built-in imagegen
+  reconstructed its photographic background without the mockup's UI, preserving
+  the cap, hoodie, face, pose and studio. Prompt: remove all website UI, retain
+  the approved relaxed expression and physical cap lettering, reconstruct the
+  studio behind overlays, keep the left half dark for live HTML text.
+- Added `src/assets/hero/hero-techno-insider.webp` (1506x1045, 110,970 bytes),
+  converted from generated `exec-574f2e34-d5e8-4ce1-ba39-3d4b2fd097ab.png`.
+  Source approval: user-selected illustrative concept, not documentary photo
+  or guaranteed exact likeness. Existing illustrative-image caption retained.
+- `src/sections/hero/Hero.tsx`: changed image import and intrinsic dimensions
+  only. Previous asset preserved; all live copy, cards and links unchanged.
+- Verified: build/typecheck pass; focused Hero browser tests 2/2 including
+  54 responsive/language/theme states, image loading and keyboard navigation.
+  Desktop and phone renders inspected after image decode. Initial desktop
+  capture raced the image load; fresh decoded capture used for inspection.
+- Asset is about 29 KB smaller than previous hero background (140,082 bytes).
+  No dependency/network integrations added. Full/unit suites not repeated
+  for an image import change; physical iOS and deployment not run.
+- Scoped commit verdict: Yes, separate from earlier pending changes. Nothing
+  committed, pushed or deployed. Suggested message:
+  `style: use approved relaxed techno insider hero portrait`
+
+## Codex QA/SEO findings — completion audit, 26 October 2026
+
+Read-only multi-agent review (code, content, rendered UI) of the actual mixed
+working tree on HEAD `0d540a8`, not an assumption that earlier reports prove it
+finished. Only this audit record was edited; no implementation, staging,
+commit, push or deployment.
+
+### Verified
+
+- Full Vitest: 68/68, six files, 27.27s. Existing JSDOM scrollTo warnings.
+- Lint and production build/typecheck: exit 0. JS 386.95 kB / 129.05 kB gzip;
+  CSS 58.55 kB / 10.79 kB gzip. No dependency changes during audit.
+- Full Chromium Playwright: 93/93, 1.8m, against freshly built production.
+- Additional axe-core WCAG2A/2AA/21AA checks: zero violations in eight states
+  (320/390/768/1440px, dark/light, reduced motion). Zero page errors or failed
+  initial requests. This does not certify complete accessibility compliance.
+- Share handles cancellation versus failure; video remains click-to-load on
+  youtube-nocookie; external action links use safe rel attributes.
+- Content reviewer confirmed all three real Shorts and CarterPCs author using
+  official YouTube oEmbed responses for JekaYRzZRfU, 1iBOP4Gyfi8 and dT49PluhENM.
+  Earlier report claims of two unconfirmed pairs are now superseded.
+- Generated-media captions, dated tracker caveat and fan-made/non-affiliation
+  disclosures are present; EN/FR/ES copy and shared channel/navigation mappings
+  inspected. No current image licensing or exact-likeness certification claimed.
+- Visual reviewer: normal-motion full-page inspection at 1440/768/390/320px
+  found no confirmed layout blocker, broken images, overflow, hidden headings
+  or runtime errors. Fresh desktop landing clears navbar; portrait unobstructed.
+  A scrollIntoView capture initially looked obscured but was ruled out with a
+  fresh scrollY=0 landing and is not an application finding.
+
+### Failed — confirmed blocker
+
+P2: `src/app/Preferences.tsx:45` and `:52` read localStorage without handling
+denied access; persistence writes at `:110` and `:114` are also unguarded.
+Independent reviewer and coordinator both reproduced a blank application by
+making the storage getter throw SecurityError: page error `Storage denied`,
+zero h1 elements, empty #root. The pre-paint index.html fallback does not guard
+the React provider. Before calling the site finished, make reads/writes safely
+fall back to functional in-memory preferences and test denied reads/writes.
+No fix applied in this audit-only request.
+
+### Recommended, not release blockers
+
+- Refresh contradictory provenance comments in src/data/featured.ts and
+  src/i18n/en.ts (still say provisional/unconfirmed/English-only).
+- Make the displayed statistics source inspectable via a link.
+- Add an approved share preview/Open Graph metadata and canonical URL when
+  final production publishing decisions are made. index.html currently has
+  title/description but no OG/Twitter/canonical tags; public has no sitemap.
+- Consistent wardrobe/likeness across illustrative section images is visual
+  polish, not a functional failure. Concept disclosures remain necessary.
+
+### Not run / limitations / verdict
+
+WebKit launch blocked: browser executable is not installed. No physical iPhone,
+iOS Safari or Firefox verification, measured field Core Web Vitals, media-use
+permission confirmation, or deployed Vercel parity check. This audit cannot
+claim those. Existing source/assets/tests remain unstaged and mixed with prior
+work; review scoped commit boundaries separately.
+
+Finished: No — close the confirmed storage-denial blank-page bug, then recheck
+that case and do a Safari/iPhone smoke test. Normal tested Chromium behavior
+is otherwise green. No new code commit message: this phase was verification.
+
+## Storage resilience fix and WebKit follow-up — 26 October 2026
+
+- Objective: fix the confirmed storage-denial blank page and run Safari-like checks.
+- Changes: Preferences.tsx now isolates optional storage reads/writes with safe fallbacks; in-memory language/theme changes remain available. Preferences.test.tsx adds four regression cases (denied getter, read, write, and invalid saved values). en.ts removes obsolete localization comments.
+- VERIFIED: focused Vitest 4/4; lint exit 0; production build/typecheck exit 0; git diff --check exit 0 (line-ending warnings only).
+- VERIFIED: installed Playwright WebKit; 24 states (320/390/768/1440 widths, EN/FR/ES, dark/light, reduced motion), all six sections scrolled, zero horizontal overflow or page errors. Separate denied-storage WebKit page renders its heading successfully.
+- First WebKit attempt was inconclusive after a dev-server hot reload detached a locator; the stable rerun above completed successfully.
+- Bundle: JS 387.03 kB / 129.13 kB gzip; CSS unchanged 58.55 kB / 10.79 kB gzip. No dependency added.
+- NOT RUN: full suites after this focused fix; earlier audit's 68 unit and 93 Chromium e2e results predate it. Physical Safari/iPhone testing remains manual; WebKit on Windows is a simulation, not certification of iOS Safari.
+- Recommended, not implemented here: social/canonical metadata, clickable statistics citation, and remaining older data-file commentary cleanup. These are not storage/runtime blockers.
+- Commit verdict: Yes for this focused fix, subject to keeping unrelated existing changes separate. This is not a guarantee that the entire site is finished or deployed.
+- Suggested commit: `fix: keep preferences usable when browser storage is denied`.
+- Nothing staged, committed, pushed, or deployed.
+
+## Approved Content Creation thumbnail replacement
+
+## Approved Watch On strip implementation
+
+## Hero disclosure alignment follow-up
+
+## Language trigger preview implementation
+
+## Matching theme selector
+
+## Automatic first-visit language and system theme
+
+## Authorized separate commits and push — 26 October 2026
+
+- User explicitly requested all uncommitted changes committed separately and pushed to origin/main.
+- Reviewed worktree, staged state and remote; fetched origin and confirmed no divergence before commits.
+- Verified current production build/typecheck and lint passed. Unit suite initially failed two outdated hero disclosure assertions; corrected them to the approved normal-flow disclosure plus three remaining figure captions. Final unit suite: 78/78 (7 files). Existing JSDOM scrollTo warnings remain non-failing.
+- Chromium full suite: 91/93 passed; remaining two failures were outdated disclosure selectors. Corrected them and reran the affected layout-comfort file: 6/6 passed. Did not rerun all 93 after test-only corrections. Disclosure contrast test explicitly measures text tokens against base palette, not photographic pixel contrast.
+- Commits grouped by preferences, localized disclosures, navigation selectors, hero/social composition, Creator artwork, Hardware artwork, Closing artwork/numeral, Universe numeral, footer alignment, approved unused image variants, tests, and this report. No temporary screenshots or secrets staged.
+- Push verification follows this report commit. Physical iOS Safari, deployment status and field metrics are not established by this Git operation.
+
+- Preferences.tsx now resolves unsaved language from the browser's ordered language preferences (regional variants supported), English fallback. Saved selections retain priority. Existing system-theme default and OS change listener retained. No geolocation, IP service, permission prompt or dependency added.
+- Preferences.test.tsx: 10/10 focused tests passed (locale selection, unsupported language fallback, saved preference precedence, denied storage resilience). Build/typecheck and lint passed.
+- Live Chromium first-visit locale checks cover fr-FR/en-US/es-ES/de-DE plus dark-to-light OS emulation. Physical location is intentionally not inferred. Existing visitors with saved preferences keep those values; automatic initial selections are persisted by the existing preferences effect.
+- Full suites not rerun. Suggested commit: `feat: initialize language from browser preferences`. No commit/push/deployment performed.
+
+- Nav.tsx/Nav.module.css and new ThemeIcon.tsx: theme trigger displays preference icon, translated selected preference and chevron; below 1280px compact icon-only avoids crowding. Dropdown adds matching Light/Dark/System icons and selected check. Existing handlers untouched.
+- Verified: build/typecheck and lint passed; Chromium French labels at 320/390/1140/1280/1440: trigger in bounds, Enter opens menu, Dark selection sets palette and checked state, Escape returns focus. Desktop trigger crop visually inspected.
+- Performance: no new dependency; JS388.91kB/129.60kB gzip, CSS58.75kB/10.78kB gzip. Full suites and Safari not rerun for this focused presentation change.
+- Commit verdict: Yes for isolated theme selector change. Suggested commit: `style: match theme and language selectors`. Nothing committed, pushed or deployed.
+
+- Nav.tsx/Nav.module.css replace target glyph with thin-line globe, current EN/FR/ES code and chevron. Below 1140px globe-only preserves narrow navbar fit. Existing flags, menu, focus handlers and translated accessible name preserved.
+- Verified: build/typecheck and lint pass. Live Chromium 320/390/768/1140/1440 with French initial labels: trigger stays within viewport, language menu opens, Spanish selection closes it, desktop code updates to ES. No dependency added.
+- Full suite and Safari not rerun for this icon-only change. No claim of exact pixel equality to generated preview.
+- Suggested commit: `style: clarify navigation language selector`. Nothing staged, committed, pushed or deployed.
+
+## Remove decorative section numerals
+
+- Removed only the background 05 (Content Universe) and 06 (Closing), plus their unused CSS and obsolete comment. Section heading labels and layout preserved.
+- Verified: live Chromium finds no decorative digit elements in either section and both retain their heading; typecheck passed. Full suites not rerun for decorative-only removal.
+- Suggested commit: `style: remove universe and closing background numerals`. No commit, push or deployment.
+
+- User-requested wording follow-up: hero image label shortened to “Illustrative image.” with corresponding FR/ES translations. Only the three locale strings changed; image metadata, attribution records and layout untouched. Full suites not rerun for this text-only edit.
+
+- Changed Hero.tsx/Hero.module.css and EN/FR/ES hero strings: one normal-flow disclosure row below social links, 12px matching muted text, no badges or separate backgrounds; stacked below 600px. Figure references image disclosure via aria-describedby.
+- Verified: build/typecheck and lint passed; Chromium 320/390 stacks both disclosures without overflow. Desktop/tablet checks also run in the focused browser probe.
+- No links, cards, imagery, dependencies or animation behavior changed. Full suites not rerun for this presentation-only change.
+- Suggested commit: `style: align hero concept disclosures`. Nothing committed, pushed or deployed.
+
+- Scope: hero social strip only; cards and destinations unchanged.
+- Files: Hero.tsx, Hero.module.css, new ChannelIcon.tsx. Monochrome platform marks, equal-width link columns, separators and top hairline; mobile label stacks above the same three links.
+- Verified: build/typecheck and lint pass. Chromium 320/390/768/1440: three icons, three links, no page overflow. Desktop crop visually inspected; accessible link names, external-tab disclosures and 44px minimum link height preserved.
+- Performance: JS 387.77 kB /129.39 kB gzip; CSS59.11 kB /10.87 kB gzip. No dependencies.
+- Not run: full suites or physical Safari for this isolated presentation change. Responsive adaptation is intentional; no claim of pixel-identical mobile rendering to the desktop concept.
+- Commit verdict: Yes for isolated strip files. Suggested message: `style: refine hero social links strip`. No commit, push or deployment performed.
+
+- Scope: replace only the hero's Content Creation thumbnail, preserving layout and text.
+- Changed: src/data/hero.ts imports new src/assets/hero/hero-content-creation.webp. Original thumbnail preserved.
+- Asset: user-approved built-in generated illustration, 1000x694 WebP, 84.37 kB (previous thumbnail 12.42 kB); not represented as documentary photography. Existing illustrative disclosure and decorative alt behavior unchanged.
+- Verified: production build/typecheck passed; live Chromium at 390 and 1440 loads the new asset with correct natural dimensions and no horizontal overflow; desktop thumbnail crop visually inspected.
+- Not run: full test suite, unnecessary for this import-only asset substitution. No CSS, behavior, or dependencies changed.
+- Commit verdict: Yes for the isolated thumbnail change, excluding unrelated worktree changes. Suggested message: `style: match content thumbnail to approved hero portrait`.
+- Nothing committed, pushed, or deployed.
