@@ -47,7 +47,7 @@ import styles from './Creator.module.css'
  *
  * SECTION MEDIA
  * `src/assets/creator/creator-build-session.webp` is an illustrative image
- * generated from the user's approved Creator mockup (1448 × 1086, 142 560
+ * generated from the user's approved Creator mockup (1448 × 1086, 156 350
  * bytes). It depicts a fictional creator and is not documentary evidence of
  * Carter or a specific build. It is used as atmosphere only, so alt="" avoids
  * implying facts the accompanying copy does not establish.
@@ -159,7 +159,7 @@ function Creator() {
           stacks text-then-image (per ARCHITECTURE.md's Section 3 responsive
           spec) without needing a separate mobile-only DOM order; desktop lifts
           it out of flow with position: absolute (see Creator.module.css). */}
-      <div className={styles.stage} aria-hidden="true" data-reveal-stage>
+      <figure className={styles.stage} data-reveal-stage>
         <div className={styles.stageSurface}>
           {/* This section is one scroll below the Hero, so load its compact
               WebP early and reserve its 4:3 intrinsic dimensions. */}
@@ -172,7 +172,10 @@ function Creator() {
             decoding="async"
           />
         </div>
-      </div>
+        <figcaption className={styles.mediaDisclosure}>
+          {t.creator.imageDisclosure}
+        </figcaption>
+      </figure>
 
       {/* Creator → Featured transition: mirrors the Hero → Creator seam
           above, picked up by Featured's matching top seam (see
