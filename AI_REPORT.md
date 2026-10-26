@@ -1653,3 +1653,730 @@ performed.
 hashes. Working tree was checked clean after the push.
 
 Suggested commit: `style: refine CarterPCs portfolio sections`
+
+## Codex QA findings — whole-site consistency audit
+
+### Objective and scope
+
+Read-only review of the current local CarterPCs site for information, visual,
+responsive, interaction, accessibility, and content consistency. Three
+independent reviewers checked content, layout, and interaction/accessibility.
+No site code or assets were changed.
+
+### Confirmed findings
+
+- **Featured headlines are not localized:** `src/data/featured.ts` lines 57–121
+  repeat the English headline values for French and Spanish, although the
+  summaries, labels, and tags change language. The source identifies these as
+  provisional editorial copy, not verified original-language video titles.
+  This makes the section visibly inconsistent after switching language.
+  **Recommended:** translate the editorial headlines, or explicitly identify
+  them as original English titles and keep the supporting copy localized.
+- **Unsupported same-day promise:** `src/data/contentUniverse.ts` lines 132–134
+  promise tech-news coverage on the same day in all three languages. The
+  research dossier describes quick-reaction content but does not establish a
+  consistent same-day publishing commitment. **Recommended:** verify that
+  cadence or soften the wording.
+- **Research dossier statistics are stale relative to the interface:**
+  `src/data/hero.ts` lines 52–77 uses a TubeLeader snapshot from 24 October 2026
+  (3.8M+ subscribers and 10.0B+ views), while `docs/RESEARCH.md` lines 37 and
+  211 still lists approximately 3.07M subscribers and 6.8B views. They may be
+  different snapshots or sources; the mismatch is internal and could mislead a
+  future editor. **Recommended:** refresh the dossier with source/date or label
+  its figures historical.
+- **Featured video/title mapping still needs source confirmation:** the data
+  file calls the headlines provisional editorial copy, and earlier report
+  notes flag unresolved Short/title matches. This audit did not open or verify
+  the external videos, so no specific mapping error is claimed.
+
+### Recommendations, not confirmed defects
+
+- **Hero is very long at tablet/narrow-desktop widths:** measured at 3,136px
+  at 1024px wide and 2,626px at 768px wide. The stacked layout is intentional,
+  but this length delays the next section; consider a tablet-specific cap for
+  the media stage and tighter lower-rail spacing. Reference:
+  `src/sections/hero/Hero.module.css` lines 753–773.
+- **Small Hero stat labels:** the desktop rule renders `.statLabel` at 9px
+  (`src/sections/hero/Hero.module.css` lines 972–984). The source note itself
+  measured 11–12px in browser checks, so the finding is limited to the stat
+  labels; consider increasing them only if they remain readable without
+  causing localized overlap.
+- **Content Universe scanability:** its deliberate asymmetry and varied type
+  scales may make six territories harder to scan quickly. This is a design
+  judgment, not a measured failure; preserve the editorial character if
+  adjusting hierarchy.
+- **Share/search metadata:** `index.html` currently has a title and description
+  but no canonical URL or Open Graph/Twitter preview metadata. These are
+  optional discoverability improvements, not functional defects; verify the
+  intended public URL before adding a canonical tag.
+- **Development dependency advisories:** `npm audit` reports 8 vulnerabilities
+  in the installed dependency tree (6 high, 2 moderate). `npm audit
+  --omit=dev` reports 0 vulnerabilities, so this audit found no vulnerable
+  production dependencies. Review and update the development toolchain in a
+  separate dependency task; no package or lockfile changes were made here.
+- **Positioning and topic repetition:** Hero, Creator, and Closing each use a
+  different short brand promise, and Hero/Creator both summarize the broad
+  subject range. Consider making one phrase primary and using the others for
+  distinct roles; treat this as an editorial choice, not a correction.
+
+### Verification
+
+- **Verified:** local preview at `http://localhost:5173/` returned HTTP 200;
+  the current git branch was `main` and clean before this report update.
+- **Verified:** browser/DOM checks found no horizontal overflow at 320, 390,
+  768, 844×390 landscape, 1024, 1440, and 1920 widths, and no browser page
+  errors or failed requests in the sampled run.
+- **Verified:** skip-link destination and subsequent keyboard tab order were
+  manually checked; the focused skip-link Playwright test passed in the
+  interaction audit.
+- **Verified:** `npm audit --omit=dev` reported 0 production dependency
+  vulnerabilities. **Failed:** full `npm audit` exited non-zero with 8
+  development-tree advisories (6 high, 2 moderate); dependency remediation was
+  not part of this read-only design/content audit.
+- **Prior verification, unchanged:** typecheck, lint, unit tests 60/60, build,
+  and Playwright 86/86 passed immediately before this audit on the same
+  application and test sources. They were not rerun because this pass made no
+  application changes.
+- **Not run:** fresh external-source verification for public creator claims,
+  full screen-reader audit, Lighthouse/Core Web Vitals, every theme/language
+  combination, and a deployed-site review.
+- **Changes in this audit:** `AI_REPORT.md` only, to record the findings.
+
+### Commit verdict
+
+**No new site fix is ready to commit yet.** The findings above are a read-only
+handoff for prioritizing the next focused fixes. Nothing was committed, pushed,
+or deployed in this audit.
+
+Suggested first fix: `content: localize featured story headlines`
+
+## Responsive and content consistency fixes — October 25, 2026
+
+### Objective and scope
+
+Address the confirmed content inconsistencies above and improve the stacked
+Hero spacing for phone and tablet layouts, with iPhone widths explicitly
+covered. Desktop composition and unrelated sections remain unchanged.
+
+### Changes
+
+- `src/data/featured.ts`: translated the three editorial headlines into French
+  and Spanish. They remain provisional editorial copy, not claims of verbatim
+  video titles.
+- `src/data/contentUniverse.ts`: removed the unsupported same-day news promise
+  in EN/FR/ES and replaced it with a concise, non-guaranteed description.
+- `docs/RESEARCH.md`: aligned YouTube figures with the dated public tracker
+  snapshot already used in the interface; labeled it third-party and dated,
+  and removed stale cross-platform aggregate claims presented as current.
+- `src/sections/hero/Hero.module.css`: reduced excess top spacing in the
+  stacked phone/tablet layouts while retaining the nav clearance invariant.
+- `src/data/data.test.ts`: added regression tests for localized headlines and
+  unsupported same-day wording.
+- `e2e/layout-comfort.spec.ts`: expanded phone checks from two widths to six
+  (320–430px) in EN/FR/ES and added 844×390 landscape checks for headline/nav
+  clearance and horizontal overflow.
+- `AI_REPORT.md`: preserved the prior audit and recorded this implementation
+  and its verification.
+
+### Verification
+
+- **Verified:** `npm run test:run` — 62/62 tests passed. Vitest emitted its
+  existing jsdom `scrollTo()` “Not implemented” notices; they did not fail
+  tests.
+- **Verified:** `npm run lint` passed.
+- **Verified:** `npm run build` passed (TypeScript build included).
+- **Verified:** targeted `e2e/layout-comfort.spec.ts` — 7/7 passed after the
+  responsive adjustments; covers six phone widths × three languages and
+  landscape clearance/no-overflow.
+- **Verified:** full Playwright rerun with reduced concurrency — 87/87 passed.
+  The initial 10-worker run was 86/87 because the existing Creator
+  inset-image test timed out; it passed alone (1/1) and in the complete
+  4-worker rerun.
+- **Verified:** `git diff --check` passed. Prettier passes on the changed source,
+  CSS, and e2e files; the pre-existing report formatting warning in
+  `AI_REPORT.md` was not used as a reason to reformat the whole report.
+- **Not run:** physical iPhone/Safari testing and a fresh source review of
+  third-party creator statistics. Browser validation used Playwright Chromium.
+
+### Remaining risks and commit verdict
+
+- Public YouTube tracker values are third-party dated estimates and can change;
+  recheck the source before a public factual claim.
+- **Commit verdict: Yes, ready to commit.** No files were committed, pushed,
+  or deployed.
+- Suggested commit message: `fix: localize stories and tighten mobile hero layout`
+
+## Creator mobile layout verification — October 25, 2026
+
+### Objective and scope
+
+Check the reported Creator mobile issue: the fixed navigation appearing over
+the heading and the workshop image appearing to overlap the copy. Keep the
+approved desktop composition unchanged.
+
+### Changes
+
+- `e2e/app.spec.ts`: added a responsive regression check at 320×568,
+  390×844, 768×1024, 844×390, 1024×768, 1063×804, and 1199×800. It scrolls
+  Creator into view and verifies that the headline clears the fixed navigation,
+  the image starts after all copy, and the page has no horizontal overflow.
+- No Creator CSS change: the reported overlap was not reproduced in the current
+  application, so changing layout values would be speculative.
+
+### Verification
+
+- **Verified:** targeted Playwright test `Creator stacked layouts keep the
+  workshop image below all copy` passed (1/1) across all seven viewport sizes.
+- **Verified:** current dev page at 390×844, with reduced motion and Creator
+  scrolled into view: nav bottom 104.5px; headline top 296.9px; copy footer
+  bottom 742.8px; image top 798.8px; horizontal overflow 0px. A rendered
+  screenshot confirmed the headline is clear of the nav and the image follows
+  the copy.
+- **Not run:** full unit/e2e suites, physical iPhone/Safari checks, and a
+  re-capture of the user's original viewport state.
+- No application CSS or content changed in this follow-up.
+
+### Remaining risks and commit verdict
+
+- The screenshot symptom may reflect an older/stale browser render or a
+  different zoom/scroll state. The current standard mobile and landscape
+  layouts pass the geometry check; refresh the live page if the old overlap is
+  still visible.
+- **Commit verdict: No new UI fix is ready to commit.** The regression test is
+  useful coverage, but it does not implement a visual fix because none was
+  reproduced. Existing unrelated worktree changes remain untouched.
+- Suggested commit message if keeping the added test with the current work:
+  `test: guard creator mobile layout against overlap`
+
+## Codex responsive QA — October 25, 2026
+
+### Objective and scope
+
+Read-only responsive audit of the complete current CarterPCs page, including
+the pending responsive/content changes in the worktree. Checked the existing
+browser suite against its production preview server. No site CSS, layout, or
+content was changed during this audit.
+
+### Verified coverage and results
+
+- **Verified:** `npm run test:e2e -- --workers=4` — 88/88 Chromium tests passed
+  in 1.1 minutes.
+- **Verified:** the suite covers horizontal overflow, section heading clipping,
+  responsive navigation, anchor clearance, media framing, featured-story
+  ordering, Hardware pin/scroll behavior, Closing and Footer wrapping, and
+  reduced-motion behavior.
+- **Verified:** locale/responsive combinations include EN/FR/ES at 390px and
+  1536px for all section content; heading clipping at 320px and 390px in all
+  three languages; Hero phone widths 320–430px across all languages plus
+  844×390 landscape; Footer at 320px and 390px across all languages and at
+  768px, 1024px, and 1440px across all languages.
+- **Verified:** additional layout-specific cases cover Creator at
+  320×568, 390×844, 768×1024, 844×390, 1024×768, 1063×804, and 1199×800;
+  Featured from small mobile through 1920px; and Hardware overflow from
+  320px through 1920px, including 844×390 landscape.
+- **Verified:** the preview suite is configured for Chromium at
+  `http://localhost:4173`; the local interactive development server remains
+  available separately at `http://localhost:5173`.
+- **Not run:** Safari/WebKit, a physical iPhone, Android Chrome, exhaustive
+  48+ locale/theme/viewport combinations, and deployed production. Chromium
+  viewport tests are not a substitute for real mobile browser/device checks.
+
+### Findings and limits
+
+- **No confirmed responsive defect found** in the current Chromium suite.
+  The previously reported Creator title/nav and text/image collision was not
+  reproduced; the Creator regression test checks the nav clearance and image
+  position at seven sizes.
+- This is a strong automated local pass, not a guarantee for every device,
+  browser zoom, operating-system text scaling, or real iOS Safari behavior.
+- Existing uncommitted files were present before this audit. They were not
+  staged, committed, pushed, or otherwise changed by this QA pass.
+
+### Commit verdict
+
+**Responsive status: Yes for the tested Chromium viewports; not fully certified
+for physical mobile devices.** This audit added no responsive fix. The earlier
+Creator regression test remains an uncommitted test addition; other pending
+worktree changes remain outside this audit's scope.
+
+Suggested commit message for that test only: `test: guard creator mobile layout against overlap`
+
+## Repeatable section-navigation motion — October 25, 2026
+
+### Objective and scope
+
+Make internal section links feel animated on every activation, including a
+second click on the same section, while preserving smooth scrolling, the
+existing press feedback, and reduced-motion behavior.
+
+### Changes
+
+- `src/hooks/useSectionNavigationMotion.ts`: listens for same-page links to
+  section anchors and replays a small arrival cue when smooth scrolling ends;
+  repeated clicks restart the cue even if the hash and scroll position do not
+  change.
+- `src/app/App.tsx`: mounts the behavior with the existing reduced-motion
+  preference.
+- `src/styles/global.css`: animates only the destination heading (a subtle
+  10px rise and fade); no section geometry or copy changes.
+- `e2e/app.spec.ts`: verifies the cue fires on repeat navigation and is absent
+  with reduced motion. Also formatted the preceding Creator test addition so
+  the touched test file passes the formatter.
+
+### Verification
+
+- **Verified:** `npm run typecheck` — pass.
+- **Verified:** `npm run build` — pass.
+- **Verified:** focused Playwright tests for repeat navigation and reduced
+  motion — 2/2 pass.
+- **Verified:** `npm run test:e2e -- --workers=4` — 90/90 pass.
+- **Verified:** ESLint on the changed TypeScript files — pass.
+- **Verified:** Prettier on the changed source, styles, and e2e files — pass.
+- **Verified:** `git diff --check` — pass.
+- The first focused browser attempt used a stale preview already running on
+  port 4173 and failed to load the new code. After rebuilding and starting a
+  fresh preview, the focused tests passed; the complete suite passed on that
+  fresh build.
+- **Not run:** physical iPhone/Safari and other non-Chromium browser checks.
+
+### Remaining issues and commit verdict
+
+- This adds a motion cue for internal section navigation. External social/video
+  links keep the existing press feedback and normal browser behavior.
+- Existing uncommitted changes in other files were preserved; this task did
+  not stage, commit, push, or deploy anything.
+- **Commit verdict: No**, not as a complete-worktree verdict: unrelated
+  uncommitted project changes were already present. The navigation-motion
+  change itself passed its focused and full browser verification.
+- Suggested commit message for this change: `feat: animate section navigation arrivals`
+
+## Motion refinement inspired by Apple HIG — October 25, 2026
+
+### Objective and scope
+
+Make section navigation feel quicker and more precise using Apple’s motion
+principles as inspiration, without importing an Apple-only framework or
+changing the site’s visual direction. Apple's current HIG recommends purposeful,
+brief, precise, cancellable motion and honoring accessibility preferences; it
+does not prescribe a web animation library or fixed timing system.
+
+### Changes
+
+- `src/hooks/useLenis.ts`: set Lenis `lerp` from its package default `0.1` to
+  `0.15` so wheel-driven scroll settles sooner while remaining smooth. Touch
+  scrolling is unchanged (`syncTouch` remains disabled), and reduced-motion
+  users still skip Lenis.
+- `src/styles/global.css`: tightened the section-arrival cue to the shared
+  350ms duration and easing tokens, with a smaller 6px rise and gentler fade.
+- `e2e/app.spec.ts`: assert the arrival cue resolves to the shared 350ms
+  duration, while retaining repeat-click and reduced-motion coverage.
+- No dependency, visual redesign, copy, or section choreography changes.
+
+### Verification
+
+- **Verified:** `npm run typecheck` — pass.
+- **Verified:** `npm run lint` — pass.
+- **Verified:** `npm run build` — pass.
+- **Verified:** Prettier on the changed source and e2e files — pass. **Pre-existing:**
+  Prettier on the already-modified `AI_REPORT.md` still flags formatting in
+  earlier report entries; formatting the entire report would touch out-of-scope
+  content, so it was left unchanged.
+- **Verified:** focused navigation-motion tests — 2/2 pass on a fresh preview.
+- **Verified:** `npm run test:e2e -- --workers=4` — 90/90 Chromium tests pass.
+- **Verified:** reduced-motion test confirms no arrival animation when the
+  preference is active; existing anchor, mobile, and interaction tests remain
+  green.
+- **Not run:** physical iPhone/Safari testing and non-Chromium browsers.
+
+### Remaining issues and commit verdict
+
+- This applies Apple HIG principles to a web site; it does not copy iOS-native
+  transitions or imply pixel parity with Apple's platforms.
+- The worktree already contains unrelated uncommitted edits; they were
+  preserved. Nothing was staged, committed, pushed, or deployed.
+- **Commit verdict: No** for the full worktree until intended files are
+  separated from the existing pending changes. This motion refinement passed
+  its relevant verification.
+- Suggested commit message for this change: `style: refine navigation motion timing`
+
+## Whole-site completion audit — October 25, 2026
+
+### Scope and result
+
+Read-only audit of the current CarterPCs worktree and deployed Vercel page,
+covering content credibility, visual consistency, responsive behavior,
+interactions, accessibility, performance, and dependency/security basics.
+Three parallel reviewers checked responsive layout, content/design, and
+interaction/accessibility; a separate reviewer checked dependencies and
+technical boundaries. No application code or assets were changed.
+
+**Verdict: the site is technically stable in the tested Chromium environments,
+but I would not call it fully finished or content-cleared yet.** The main
+remaining risks concern whether featured copy accurately matches its linked
+videos, the provenance of realistic-looking artwork, and two keyboard/share
+interaction details.
+
+### Verified
+
+- `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:run`
+  passed. Unit tests: 62/62.
+- `npm run test:e2e -- --workers=4` passed on an isolated rerun: 90/90 Chromium
+  tests. Focused responsive checks also passed 9/9; focused interaction checks
+  passed 7/7. No confirmed overflow or layout collision was found in the tested
+  viewport matrix.
+- `npm audit --omit=dev --audit-level=low` found 0 production dependency
+  vulnerabilities. The app is static; YouTube embeds are deferred until Play,
+  and outbound links use `rel="noreferrer"`.
+- Production URL returned HTTP 200. The browser accessibility tree showed the
+  expected landmarks, section links, localized menu names, story controls, and
+  footer disclosures.
+- Local build output: JavaScript 390.07 kB (131.29 kB gzip), CSS 64.50 kB
+  (11.68 kB gzip). No Lighthouse/Core Web Vitals run was made.
+- `git diff --check` passed.
+- One initial full e2e attempt had 37 `ERR_CONNECTION_REFUSED` failures after
+  the shared temporary preview on port 4173 stopped during parallel browser
+  checks. After those checks ended, the full suite was rerun alone and passed
+  90/90; this is classified as test-environment contention, not an app failure.
+
+### Findings to resolve before calling the portfolio finished
+
+1. **Featured story accuracy and source mapping — high priority.**
+   `src/data/featured.ts` explicitly calls the visible headline/support copy
+   provisional editorial development copy, while the UI presents each item as
+   a specific selected story and links to a real Short. The audit did not
+   independently verify every URL, thumbnail, and headline against the actual
+   video. Confirm each pairing from the source videos or make the editorial
+   framing visibly clear; no specific mislink is claimed.
+2. **Illustrative artwork provenance — high priority for public credibility.**
+   Creator and Hardware source comments identify their images as generated
+   illustrations, and Closing reuses Creator artwork. Hero uses a supplied
+   portrait whose source does not establish that it is Carter. Empty alt text
+   correctly avoids a screen-reader identity claim, but sighted visitors may
+   read realistic imagery as documentary. Replace it with approved, licensed
+   media or clearly label generated/illustrative visuals.
+3. **Menu-button keyboard focus — medium accessibility issue.**
+   Theme, language, and section menu triggers expose `aria-haspopup="menu"`.
+   Arrow-key navigation is covered, but Enter/Space opens while focus remains
+   on the trigger. Define the intended menu-button behavior and test all opening
+   methods, ideally moving focus to the first menu item on open.
+4. **Share API error handling — low/medium interaction issue.**
+   `src/sections/featured/featured.utils.ts` treats every `navigator.share`
+   rejection as a successful share. Only user cancellation (`AbortError`)
+   should be silent; other failures should be reported to the existing status
+   region and tested.
+5. **Local and deployed content differ.** The current worktree's
+   `src/data/contentUniverse.ts` says “Quick context on policy shifts and
+   corporate missteps”; the deployed page still says the claims are “covered
+   the same day they happen.” This confirms the deployed page does not include
+   at least this pending local content edit. No deployment was made.
+
+### Recommended polish and verification gaps
+
+- `index.html` has a title and description but no Open Graph/Twitter preview
+  metadata or canonical URL. Add sharing metadata only after confirming the
+  preferred canonical domain and preview image.
+- The dated public tracker snapshot in `src/data/hero.ts` is 24 October 2026;
+  it is disclosed and current as of this audit date, but refresh it before a
+  later release and keep its source/date paired with the numbers.
+- No physical iPhone/iOS Safari, Android device, VoiceOver/NVDA, formal axe
+  scan, production Core Web Vitals run, or external-link destination check was
+  performed. Automated Chromium viewport tests do not certify these.
+- The website follows a coherent dark editorial visual language overall. The
+  six top-level section numbers, three Featured story numbers, and three
+  Hardware beat numbers are different systems; this is a subjective hierarchy
+  refinement, not a demonstrated usability failure.
+
+### Change state and commit verdict
+
+- No application files were changed during this audit. This entry is the only
+  audit documentation addition; existing source edits and the untracked
+  navigation-motion hook were preserved.
+- **Commit verdict: No.** The worktree already contains unrelated pending
+  changes, and the content/media questions above should be resolved before
+  treating the portfolio as final. No files were staged, committed, pushed, or
+  deployed.
+- Suggested commit message for this report entry: `docs: record whole-site completion audit`
+
+## Task: Improve menu focus and Share error feedback; verify CarterPCs context
+
+### Objective and scope
+
+- Make keyboard-opened menus move focus into the first menu item, consistent
+  with the existing arrow-key and Escape-return behavior.
+- Distinguish a dismissed native Share sheet from real share and clipboard
+  failures, and show a localized failure message where appropriate.
+- Research public CarterPCs sources to check whether portfolio claims and
+  story framing reflect the creator. Research was read-only; no uncertain
+  biography, statistics, or story copy was added.
+
+### Files changed for this task
+
+- `src/components/navigation/Nav.tsx`, `Nav.test.tsx`: Enter/Space now open
+  the menu and focus its first item; Escape still returns focus to the trigger.
+- `src/sections/featured/featured.utils.ts`, `featured.types.ts`,
+  `useFeaturedActions.ts`, `FeaturedActionRail.tsx`: report native-share
+  success, cancellation, and failure separately; report clipboard success and
+  failure separately; clear stale status before a new share attempt.
+- `src/i18n/en.ts`, `fr.ts`, `es.ts`: localized share-failure feedback.
+- `src/sections/featured/featured.utils.test.ts`, `Featured.test.tsx`,
+  `e2e/interaction-feedback.spec.ts`: unit/integration and browser regressions.
+
+### Research findings and limitations
+
+- The public YouTube channel is [CarterPCs](https://www.youtube.com/@actuallycarterpcs).
+  Indexed official-channel results include both PC/hardware and broader
+  consumer/EV technology, so avoid positioning the creator as exclusively an
+  Apple or PC channel.
+- The portfolio ThinkPad Short title is corroborated by the official
+  [CarterPCs video](https://www.youtube.com/watch?v=dT49PluhENM), published
+  2026-08-06.
+- The other two Featured story title/video pairings were not independently
+  confirmed in this pass. Existing Featured data labels those headlines and
+  descriptions as provisional editorial copy; keep that distinction unless
+  each source video is verified.
+- Social platform pages were not consistently readable in this research
+  session. Treat the current Instagram/TikTok handles as unconfirmed, and do
+  not present third-party audience estimates as official analytics. Existing
+  dated/source-attributed stats and fan-made disclaimer remain important.
+
+### Verification
+
+- **VERIFIED:** Full unit suite, 68/68 passed. Focused interaction tests,
+  32/32 passed. The test environment printed existing jsdom
+  `Window.scrollTo()` not-implemented notices; tests still completed green.
+- **VERIFIED:** `npm run lint` passed; `npm run build` passed (includes the
+  TypeScript build check); targeted Playwright `e2e/interaction-feedback.spec.ts`
+  passed 5/5 after rebuilding the preview; `git diff --check` passed.
+- **NOT RUN:** Full Playwright suite for this task.
+- **NOT CHANGED:** Portfolio copy/data based on unverified research leads.
+
+### Change state and commit verdict
+
+- No commit, push, or deployment was performed.
+- **Commit verdict: No for the whole worktree.** This checkout contains other
+  pending work unrelated to this interaction/research task. The interaction
+  changes passed their focused checks, but stage only their intended files if
+  committing separately.
+- Suggested commit message: `fix: clarify menu focus and share failures`
+
+## Footer scale refinement from approved reference — October 26, 2026
+
+### Objective and scope
+
+Match the selected compact footer reference more closely: center the panel,
+reduce its overall width and height, and scale down the wordmark and social
+icons while preserving the existing content, destinations, theme tokens, and
+mobile layout.
+
+### Changes
+
+- `src/components/footer/Footer.module.css`: cap the centered panel at 82% of
+  its available width or 100rem, whichever is smaller; reduce desktop vertical
+  padding, wordmark size, separators, and social icons. Restore the prior
+  gutter-based width on narrow mobile screens.
+- `e2e/app.spec.ts`: update the Footer geometry expectations and verify its
+  fluid width at 1440px, 1920px, and 2048px, using the page's responsive root
+  font size for the 100rem cap.
+- No markup, copy, links, dependencies, or image assets changed.
+
+### Verification
+
+- **Verified:** `npm run build` passed (includes TypeScript); `npm run lint`
+  passed; `npx playwright test e2e/app.spec.ts --grep 'Footer' --workers=4`
+  passed 10/10.
+- The focused browser coverage checks footer content in EN/FR/ES, no horizontal
+  overflow and no overlapping links at 320px and 390px, plus row alignment at
+  768px, 1024px, 1440px, 1920px, and 2048px in all three languages.
+- **Verified rendered UI:** local Chromium at 1440px showed a centered
+  1180.8px × 144.6px footer panel with no horizontal overflow. Dark and light
+  theme captures were inspected. No new asset or JavaScript bundle weight.
+- **Not run:** full Playwright suite, physical iPhone/Safari, or deployed-site
+  validation.
+- The first two focused browser runs exposed overly rigid new test assumptions
+  (brand inset and a fixed 16px root-font cap), not a layout regression. The
+  assertions now measure the fluid layout and final run passed 10/10.
+
+### Change state and commit verdict
+
+- No commit, push, or deployment was performed.
+- **Commit verdict: No for the whole worktree.** Other unrelated pending
+  changes are present; keep them out of a footer-only commit.
+- Suggested commit message: `style: compact and balance the footer`
+
+## Footer wordmark alignment — October 26, 2026
+
+### Objective and scope
+
+Center the footer's CarterPCs wordmark within its existing desktop left column
+and move it slightly lower, without changing the navigation, social links, copy,
+or tablet/mobile placement.
+
+### Changes
+
+- `src/components/footer/Footer.module.css`: at desktop widths only, center the
+  wordmark in its existing first grid column and nudge it down by 0.25rem.
+- `e2e/app.spec.ts`: verify the brand is centered in that column and sits about
+  4px below the row center; retain responsive checks at 768px and 1024px.
+- No markup, content, links, or dependencies changed.
+
+### Verification
+
+- **VERIFIED:** `npm run build` passed; `npm run lint` passed.
+- **VERIFIED:** focused footer Playwright tests passed 10/10, including EN/FR/ES,
+  mobile widths 320px and 390px, and desktop/tablet widths 768px–2048px.
+- **VERIFIED:** `npx prettier --check src/components/footer/Footer.module.css`
+  and `git diff --check` passed.
+- **PRE-EXISTING:** Prettier check for the full `e2e/app.spec.ts` fails on the
+  committed baseline too; this change's added lines were checked against
+  Prettier's output and match its formatting.
+- **NOT RUN:** full Playwright suite, physical iPhone/Safari, and deployed-site
+  validation.
+
+### Change state and commit verdict
+
+- No commit, push, or deployment was performed.
+- **Commit verdict: No for the whole worktree.** Other unrelated pending changes
+  are present; include only the intended footer CSS and regression test if
+  committing separately.
+- Suggested commit message: `style: center footer wordmark`
+
+## Footer wordmark placement correction — October 26, 2026
+
+### Objective and scope
+
+Restore the CarterPCs footer wordmark to its original left-aligned inset. The
+previous centering/nudge was not requested. Preserve the compact frame and the
+social-link layout.
+
+### Files changed
+
+- `src/components/footer/Footer.module.css` — restored the original responsive
+  left inset and removed the desktop-only centering and vertical transform.
+- `e2e/app.spec.ts` — replaced the centered-wordmark assertion with checks for
+  its inset and original vertical alignment.
+- `AI_REPORT.md` — recorded the correction and verification.
+
+### Verification
+
+- **Verified:** `npm run typecheck`, `npm run lint`, `npm run build`,
+  `npx prettier --check src/components/footer/Footer.module.css e2e/app.spec.ts`,
+  and `git diff --check` passed.
+- **Verified:** focused Footer Playwright tests passed **10/10** after rebuilding
+  the preview, across EN/FR/ES and 320–2048px coverage.
+- **Failed, then resolved:** the first browser run used a stale existing preview
+  build and failed the placement assertion. Rebuilding and rerunning the same
+  suite passed 10/10.
+- No content, social links, dependencies, or unrelated files were changed.
+
+### Commit verdict
+
+**No for the whole working tree.** Numerous unrelated changes remain. Nothing
+was staged, committed, pushed, or deployed.
+
+Suggested commit message: `style: restore footer wordmark placement`
+
+## Match local footer wordmark position to production — October 26, 2026
+
+### Objective and scope
+
+Match the local footer's wordmark position to the live production reference.
+The previous comparison checked only the wordmark's inset within its row and
+missed that the local footer card itself was narrower and farther right.
+
+### Files changed
+
+- `src/components/footer/Footer.module.css` — matched the wide desktop card's
+  page-edge gutter, interior padding, and wordmark scale/vertical rhythm to
+  production. Mobile sizing remains unchanged.
+- `e2e/app.spec.ts` — assert the desktop card gutter and the wordmark's
+  horizontal/vertical placement and scale, preventing these mismatches from
+  returning.
+
+### Verification
+
+- **Verified before change:** at 1722px, local card began at x=155px and the
+  wordmark at x=200px; production card began at x=72px and wordmark at x=124px.
+  The row inset alone matched, but the actual on-screen position did not.
+- **Verified after change:** at 1722px, local and production both place the
+  footer card at x=72.3px and the wordmark at x=123.8px, y=6628.9px; the
+  wordmark size is 170.8×50.8px on both.
+- **Verified:** at 1440px, the wordmark's x/y/size also matches production
+  (x=104.0px, y=5294.0px, 140.0×48.0px).
+- **Verified:** typecheck, lint, build, and the focused footer layout test
+  passed. `git diff --check` passed.
+- **Failed, then corrected:** the first focused E2E run exposed an outdated
+  compact-footer height bound. Updated that assertion for the reference-sized
+  footer; the rerun passed.
+- **Formatting caveat:** Prettier reports that `AI_REPORT.md` is not formatted;
+  its full-file formatting state predates this entry, so the file was not
+  reformatted wholesale.
+
+### Commit verdict
+
+**No for the entire worktree.** Numerous unrelated changes remain.
+Nothing was staged, committed, pushed, or deployed.
+
+## Footer social-link alignment — October 26, 2026
+
+### Objective and scope
+
+Spread YouTube, Instagram, and TikTok evenly across the footer's social column:
+YouTube left, Instagram centered, TikTok right. Keep the narrow mobile layout.
+
+### Files changed
+
+- `src/components/footer/Footer.module.css` — use three equal desktop/tablet
+  slots and restore the existing flex layout on narrow mobile screens.
+- `e2e/app.spec.ts` — check the three link centers are evenly distributed
+  across the social column while retaining mobile overflow/tap-target checks.
+- `AI_REPORT.md` — record this task and its verification.
+
+### Verification
+
+- **Verified:** `npm run typecheck`, `npm run lint`, `npm run build`,
+  Prettier on the changed CSS and E2E test, and `git diff --check` passed.
+- **Verified:** all Footer-focused Playwright tests passed **10/10** including
+  desktop/tablet widths 768–2048px in EN/FR/ES and mobile 320/390px.
+- **Failed, then resolved:** the first E2E attempt used a stale preview build;
+  after rebuilding, the Footer suite passed 10/10.
+
+### Commit verdict
+
+**No for the entire worktree.** Numerous unrelated changes remain. Nothing was
+staged, committed, pushed, or deployed.
+
+## Combined implementation verification and commit record — October 26, 2026
+
+### Scope
+
+Committed the pending scoped changes for localized story headlines and
+publishing claims, share-sheet error feedback, keyboard focus in preference
+menus, section-arrival motion and responsive layout checks, and footer sizing
+and social-link alignment. The Creator layout regression test is in its own
+test commit. This was a local commit-and-push task; no deployment was performed.
+
+### Verification
+
+- **Verified:** `npm run typecheck` and `npm run lint` passed.
+- **Verified:** `npm run test:run` passed — 68 tests across 6 files.
+- **Verified:** `npm run build` passed; output included a 390.43 kB JavaScript
+  bundle (131.41 kB gzip) and 64.59 kB CSS (11.68 kB gzip).
+- **Verified:** `npm run test:e2e` passed — 91/91 Playwright tests.
+- **Verified:** `git diff --check` passed before commits.
+- **Not run:** full-file Prettier check. The report's known formatting caveat
+  remains; changed UI and E2E files had prior focused formatting checks.
+
+### Separate commits
+
+- `77a4129 fix: report share failures accurately`
+- `aaf201d fix: move focus into opened navigation menus`
+- `4563abe feat: replay section arrival motion`
+- `2fd0e16 fix: localize featured story headlines`
+- `cee2621 test: cover creator stacked layouts`
+- `3b5af24 style: balance footer sizing and social links`
+- This verification record is committed separately as documentation.
+
+### Commit verdict
+
+**Yes — the scoped changes passed the checks above and are committed locally.**
+Push status is reported after remote verification.
