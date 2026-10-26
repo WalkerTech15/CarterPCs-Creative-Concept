@@ -13,10 +13,10 @@ test('Hero loads with heading, subhead, and navigation', async ({ page }) => {
   await expect(
     page.getByRole('heading', {
       level: 1,
-      name: /^carterpcs — built different$/i,
+      name: en.hero.headlineLabel,
     }),
   ).toBeVisible()
-  await expect(page.getByText(/making tech interesting\./i)).toBeVisible()
+  await expect(page.getByText(en.hero.support)).toBeVisible()
   await expect(page.getByRole('navigation', { name: /primary/i })).toBeVisible()
 })
 
@@ -100,6 +100,66 @@ test('Creator stacked layouts keep the workshop image below all copy', async ({
       `${viewport.width}x${viewport.height}: media must follow copy`,
     ).toBeGreaterThanOrEqual(layout.footerBottom)
     expect(layout.pageWidth).toBeLessThanOrEqual(layout.viewportWidth)
+  }
+})
+
+test('generated editorial images disclose their illustrative nature in every locale', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  let currentLanguage = en
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport)
+
+    for (const language of [en, fr, es]) {
+      if (language !== currentLanguage) {
+        await page
+          .getByRole('button', {
+            name: currentLanguage.a11y.chooseLanguage,
+          })
+          .click()
+        await page
+          .locator(
+            `[data-language-flag="${language === fr ? 'fr' : language === es ? 'es' : 'en'}"]`,
+          )
+          .locator('xpath=..')
+          .click()
+        currentLanguage = language
+      }
+
+      const disclosures = page.getByText(language.creator.imageDisclosure, {
+        exact: true,
+      })
+      await expect(disclosures).toHaveCount(3)
+      await expect(page.locator('#hero-image-disclosure')).toHaveText(
+        language.hero.imageDisclosure,
+      )
+      await expect(page.locator('#hero figure')).toHaveAttribute(
+        'aria-describedby',
+        'hero-image-disclosure',
+      )
+      for (const caption of await disclosures.all()) {
+        await expect(caption).toBeVisible()
+        const bounds = await caption.boundingBox()
+        const figureBounds = await caption.locator('xpath=..').boundingBox()
+        expect(bounds).not.toBeNull()
+        expect(figureBounds).not.toBeNull()
+        expect(bounds!.x).toBeGreaterThanOrEqual(figureBounds!.x)
+        expect(bounds!.y).toBeGreaterThanOrEqual(figureBounds!.y)
+        expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(
+          figureBounds!.x + figureBounds!.width,
+        )
+        expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(
+          figureBounds!.y + figureBounds!.height,
+        )
+      }
+    }
   }
 })
 
@@ -708,7 +768,11 @@ for (const [language, dictionary] of [
         }),
       ).toBeVisible()
       await expect(page.getByText(dictionary.hero.support)).toBeVisible()
-      await expect(page.getByText(dictionary.hero.statsTitle)).toBeVisible()
+      await expect(
+        page
+          .locator('#hero')
+          .getByRole('link', { name: dictionary.hero.ctaSecondary }),
+      ).toHaveAttribute('href', '#featured')
 
       // Creator → Content Universe, walked in document order so each section's
       // ScrollTrigger fires the way it would for a visitor.
@@ -1137,7 +1201,7 @@ test('light theme: the primary Hero CTA label is readable on its pill', async ({
 
   const measured = await page.evaluate(() => {
     const cta = document.querySelector<HTMLElement>(
-      '#hero a[href="#content-universe"]',
+      '#hero a[class*="ctaPrimary"]',
     )!
     const parse = (value: string) =>
       value
@@ -1338,6 +1402,14 @@ for (const language of ['en', 'fr', 'es'] as const) {
     await closing.scrollIntoViewIfNeeded()
     // The reveal is one-shot; the resting state is what matters.
     await page.waitForTimeout(1600)
+
+    const image = closing.locator('img')
+    await expect(image).toBeVisible()
+    const mediaRatio = await image.evaluate((element) => {
+      const { width, height } = element.getBoundingClientRect()
+      return width / height
+    })
+    expect(mediaRatio).toBeCloseTo(16 / 9, 2)
 
     // Directly after Content Universe.
     expect(
@@ -1707,9 +1779,30 @@ for (const width of [320, 390]) {
           }
         }
 
+        const groupCenter = (selector: string) => {
+          const rects = [...footer.querySelectorAll(selector)].map((el) =>
+            el.getBoundingClientRect(),
+          )
+          const left = Math.min(...rects.map((rect) => rect.left))
+          const right = Math.max(...rects.map((rect) => rect.right))
+          return (left + right) / 2
+        }
+        const canvasRect = canvas.getBoundingClientRect()
+        const canvasCenter = (canvasRect.left + canvasRect.right) / 2
+        const brandRect = footer
+          .querySelector('[class*="brand"]')!
+          .getBoundingClientRect()
+
         return {
           pastCanvas,
           overlaps,
+          brandCenter: (brandRect.left + brandRect.right) / 2,
+          canvasCenter,
+          navCenter: groupCenter('nav a'),
+          socialCenter: groupCenter('ul[aria-label] a'),
+          metadataAlignment: getComputedStyle(
+            footer.querySelector('[class*="metaRow"]')!,
+          ).textAlign,
           smallest: Math.min(
             ...links.map((a) => {
               const r = a.getBoundingClientRect()
@@ -1727,6 +1820,19 @@ for (const width of [320, 390]) {
         `${language} footer copy runs outside the canvas at ${width}px`,
       ).toBeLessThanOrEqual(0.5)
       expect(measured.overlaps, 'footer links overlap').toBe(0)
+      expect(
+        Math.abs(measured.brandCenter - measured.canvasCenter),
+        `${language} wordmark should be centered at ${width}px`,
+      ).toBeLessThan(2)
+      expect(
+        Math.abs(measured.navCenter - measured.canvasCenter),
+        `${language} section links should be centered at ${width}px`,
+      ).toBeLessThan(2)
+      expect(
+        Math.abs(measured.socialCenter - measured.canvasCenter),
+        `${language} social links should be centered at ${width}px`,
+      ).toBeLessThan(2)
+      expect(measured.metadataAlignment).toBe('center')
       expect(
         measured.smallest,
         'smallest footer target',
@@ -1812,6 +1918,18 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
             ),
           ].map((rule) => rule.getBoundingClientRect().left),
           nav: box('nav'),
+          navItems: (() => {
+            const rects = [...footer.querySelectorAll('nav a')].map((link) =>
+              link.getBoundingClientRect(),
+            )
+            return {
+              left: Math.min(...rects.map((rect) => rect.left)),
+              right: Math.max(...rects.map((rect) => rect.right)),
+            }
+          })(),
+          disclaimerAlignment: getComputedStyle(
+            footer.querySelector('[class*="disclaimer"]')!,
+          ).textAlign,
           social: box('ul[aria-label]'),
           socialItemCenters: (() => {
             const items = [
@@ -1910,6 +2028,16 @@ test('tablet and desktop: the footer groups stay in their intended rows in every
         expect(layout.nav.right).toBeLessThan(layout.social.left)
       } else {
         expect(layout.nav.top).toBeGreaterThan(layout.brand.top + 20)
+        if (width <= 1150) {
+          const navItemsCenter =
+            (layout.navItems.left + layout.navItems.right) / 2
+          const navCenter = (layout.nav.left + layout.nav.right) / 2
+          expect(
+            Math.abs(navItemsCenter - navCenter),
+            `${language} section links should be centered at ${width}px`,
+          ).toBeLessThan(2)
+          expect(layout.disclaimerAlignment).toBe('center')
+        }
       }
     }
   }

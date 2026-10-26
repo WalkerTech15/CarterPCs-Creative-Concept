@@ -43,8 +43,16 @@ test('Enter and Space move focus into the menu they open', async ({ page }) => {
   await page.goto('/')
 
   const cases = [
-    { triggerName: en.a11y.chooseTheme, key: 'Enter', itemRole: 'menuitemradio' },
-    { triggerName: en.a11y.chooseLanguage, key: 'Space', itemRole: 'menuitemradio' },
+    {
+      triggerName: en.a11y.chooseTheme,
+      key: 'Enter',
+      itemRole: 'menuitemradio',
+    },
+    {
+      triggerName: en.a11y.chooseLanguage,
+      key: 'Space',
+      itemRole: 'menuitemradio',
+    },
     { triggerName: en.a11y.chooseSections, key: 'Enter', itemRole: 'menuitem' },
   ] as const
 
@@ -104,7 +112,7 @@ test('Hero story cards expose their hover cue when reached by keyboard', async (
   await page.goto('/')
 
   const tile = page.getByRole('link', { name: /Custom Builds/ })
-  const arrow = tile.locator('span[aria-hidden="true"]')
+  const arrow = tile.locator('[class*="tileArrow"]')
 
   for (let attempt = 0; attempt < 24; attempt += 1) {
     if (await tile.evaluate((element) => element === document.activeElement))

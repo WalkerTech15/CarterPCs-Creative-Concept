@@ -229,7 +229,7 @@ describe('localization', () => {
         screen.getByRole('button', { name: dictionary.a11y.chooseTheme }),
       ).toBeInTheDocument()
 
-      // Hero — headline, CTAs, both cards, tiles, disclaimer
+      // Hero — live headline, real CTA destinations, tiles and disclosure.
       expect(
         screen.getByRole('heading', {
           level: 1,
@@ -238,25 +238,26 @@ describe('localization', () => {
       ).toBeInTheDocument()
       expect(screen.getByText(dictionary.hero.support)).toBeInTheDocument()
       expect(
-        screen.getByRole('link', {
-          name: new RegExp(dictionary.hero.ctaPrimary, 'i'),
-        }),
+        within(document.querySelector('#hero') as HTMLElement).getByRole(
+          'link',
+          {
+            name: new RegExp(dictionary.hero.ctaPrimary, 'i'),
+          },
+        ),
       ).toBeInTheDocument()
-      expect(screen.getByText(dictionary.hero.statsTitle)).toBeInTheDocument()
       expect(
-        screen.getByText(dictionary.hero.stats.subscribers),
-      ).toBeInTheDocument()
+        within(document.querySelector('#hero') as HTMLElement).getByRole(
+          'link',
+          {
+            name: new RegExp(dictionary.hero.ctaSecondary, 'i'),
+          },
+        ),
+      ).toHaveAttribute('href', '#featured')
       expect(
-        screen.getByText(dictionary.hero.tiles.universe.body),
+        screen.getByText(dictionary.hero.tiles.universe.title),
       ).toBeInTheDocument()
       expect(screen.getByText(dictionary.hero.disclaimer)).toBeInTheDocument()
-
-      // Public tracker estimates are shared across locales, not retyped.
-      expect(screen.getByText('3.8M+')).toBeInTheDocument()
-      expect(screen.getByText('10.0B+')).toBeInTheDocument()
-
-      // The dated provenance line beneath them IS localized.
-      expect(screen.getByText(dictionary.hero.statsSource)).toBeInTheDocument()
+      expect(document.querySelector('#hero aside')).not.toBeNull()
 
       // Creator / Featured / Hardware / Content Universe section copy
       expect(

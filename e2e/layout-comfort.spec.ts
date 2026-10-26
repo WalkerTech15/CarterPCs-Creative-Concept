@@ -28,10 +28,10 @@ test('phone Hero stays compact, readable, and clear of the navigation in every l
         const hero = document.querySelector('#hero')!
         const nav = document.querySelector('nav')!
         const headline = hero.querySelector('h1')!
-        const source = hero.querySelector('[class*="statsSource"]')!
+        const source = hero.querySelector('#hero-image-disclosure')!
         const firstTile = hero.querySelector('a[class*="tile_"]')!
         const tileBody = firstTile.querySelector('[class*="tileBody"]')!
-        const firstTileText = firstTile.querySelector('[class*="tileText"]')!
+        const firstTileText = firstTile.querySelector('[class*="tileTitle"]')!
 
         return {
           heroHeight: hero.getBoundingClientRect().height,
@@ -154,86 +154,53 @@ test('wide Featured lead video stays left of its story copy inside the panel', a
   expect(geometry.copy.right).toBeLessThanOrEqual(geometry.panel.right)
 })
 
-test('the metrics source sits with its figures and clears the lower tile rail', async ({
+test('Hero copy, actions and lower tiles stay separated on desktop and tablet', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.setViewportSize({ width: 1280, height: 720 })
-
-  for (const language of ['en', 'fr', 'es'] as const) {
-    await page.addInitScript((locale) => {
-      window.localStorage.setItem('carterpcs-language', locale)
-      window.localStorage.setItem('carterpcs-theme', 'dark')
-    }, language)
-    await page.goto('/')
-
-    const relation = await page.evaluate(() => {
-      const stats = document.querySelector('#hero [data-stats]')!
-      const source = stats.querySelector('[class*="statsSource"]')!
-      const lower = document.querySelector('#hero [class*="lower"]')!
-
-      return {
-        sourceFontSize: Number.parseFloat(getComputedStyle(source).fontSize),
-        cardGap:
-          lower.getBoundingClientRect().top -
-          stats.getBoundingClientRect().bottom,
-        pageOverflow: document.documentElement.scrollWidth - innerWidth,
-      }
-    })
-
-    expect(
-      relation.sourceFontSize,
-      `${language} source size`,
-    ).toBeGreaterThanOrEqual(11)
-    expect(
-      relation.cardGap,
-      `${language} metrics-to-tiles gap`,
-    ).toBeGreaterThanOrEqual(0)
-    expect(relation.pageOverflow, `${language} page overflow`).toBe(0)
-  }
-})
-
-test('tablet metrics source stays below the stat labels without overlapping', async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-
   for (const [width, height] of [
     [768, 1024],
     [1024, 768],
-  ] as const) {
+    [1280, 720],
+    [1440, 900],
+  ]) {
     await page.setViewportSize({ width, height })
-    await page.goto('/')
-
-    const spacing = await page.evaluate(() => {
-      const list = document.querySelector('#hero [class*="statsList"]')!
-      const source = document.querySelector('#hero [class*="statsSource"]')!
-      const lower = document.querySelector('#hero [class*="lower"]')!
-      const stats = document.querySelector('#hero [data-stats]')!
-
-      return {
-        sourceGap:
-          source.getBoundingClientRect().top -
-          list.getBoundingClientRect().bottom,
-        cardGap:
-          lower.getBoundingClientRect().top -
-          stats.getBoundingClientRect().bottom,
-        overflow: document.documentElement.scrollWidth - innerWidth,
-      }
-    })
-
-    expect(
-      spacing.sourceGap,
-      `${width}px stat/source gap`,
-    ).toBeGreaterThanOrEqual(0)
-    expect(spacing.cardGap, `${width}px card/rail gap`).toBeGreaterThanOrEqual(
-      0,
-    )
-    expect(spacing.overflow, `${width}px page overflow`).toBe(0)
+    for (const language of ['en', 'fr', 'es']) {
+      await page.addInitScript(
+        (locale) => localStorage.setItem('carterpcs-language', locale),
+        language,
+      )
+      await page.goto('/')
+      const geometry = await page.locator('#hero').evaluate((el) => {
+        const actions = el
+          .querySelector('[class*="actions"]')!
+          .getBoundingClientRect()
+        const tiles = el
+          .querySelector('[class*="tiles"]')!
+          .getBoundingClientRect()
+        const caption = el
+          .querySelector('#hero-image-disclosure')!
+          .getBoundingClientRect()
+        return {
+          gap: tiles.top - actions.bottom,
+          captionGap: caption.top - tiles.bottom,
+          overflow: document.documentElement.scrollWidth - innerWidth,
+        }
+      })
+      expect(
+        geometry.gap,
+        `${width}/${language} actions/tiles gap`,
+      ).toBeGreaterThanOrEqual(20)
+      expect(
+        geometry.captionGap,
+        `${width}/${language} disclosure gap`,
+      ).toBeGreaterThanOrEqual(0)
+      expect(geometry.overflow).toBe(0)
+    }
   }
 })
 
-test('Hero source and legal notes retain readable contrast in both themes', async ({
+test('Hero disclosure text tokens meet contrast against the base palette in both themes', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -270,8 +237,8 @@ test('Hero source and legal notes retain readable contrast in both themes', asyn
         return (lighter + 0.05) / (darker + 0.05)
       }
       const background = getComputedStyle(document.body).backgroundColor
-      const source = document.querySelector('#hero [class*="statsSource"]')!
-      const disclaimer = document.querySelector('#hero [class*="disclaimer"]')!
+      const source = document.querySelector('#hero-image-disclosure')!
+      const disclaimer = source.previousElementSibling!
 
       return [
         ratio(getComputedStyle(source).color, background),
@@ -281,7 +248,7 @@ test('Hero source and legal notes retain readable contrast in both themes', asyn
 
     expect(
       ratios[0],
-      `${theme} metrics source contrast`,
+      `${theme} image disclosure token contrast`,
     ).toBeGreaterThanOrEqual(4.5)
     expect(ratios[1], `${theme} disclaimer contrast`).toBeGreaterThanOrEqual(
       4.5,

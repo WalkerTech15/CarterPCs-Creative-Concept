@@ -61,10 +61,10 @@ describe('App', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /^carterpcs — built different$/i,
+        name: en.hero.headlineLabel,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByText(/making tech interesting\./i)).toBeInTheDocument()
+    expect(screen.getByText(en.hero.support)).toBeInTheDocument()
   })
 
   // #creator has two intentional entries with honestly-related labels: the
@@ -117,6 +117,17 @@ describe('App', () => {
     const creator = within(document.querySelector('#creator') as HTMLElement)
     expect(creator.getByText(/tiktok/i)).toBeInTheDocument()
     expect(creator.getByText(/youtube shorts/i)).toBeInTheDocument()
+  })
+
+  it('labels the generated Creator, Hardware, and Closing artwork as illustrative', () => {
+    render(<App />)
+
+    const disclosures = screen.getAllByText(en.creator.imageDisclosure)
+    expect(disclosures).toHaveLength(3)
+    disclosures.forEach((disclosure) => {
+      expect(disclosure.tagName).toBe('FIGCAPTION')
+      expect(disclosure.closest('[aria-hidden="true"]')).toBeNull()
+    })
   })
 
   // "Work" is the Featured entry — asserted through the disclosure, the
@@ -243,7 +254,7 @@ describe('App', () => {
     // The visible headline is art-directed onto two lines and hidden from
     // the a11y tree; the h1's aria-label keeps the CarterPCs identity
     // intact rather than exposing only the editorial phrase.
-    expect(h1s[0]).toHaveAccessibleName(/^carterpcs — built different$/i)
+    expect(h1s[0]).toHaveAccessibleName(en.hero.headlineLabel)
 
     // One h2 per major section (Creator, Featured, Hardware, Content
     // Universe, Closing) — not a duplicate.
@@ -285,7 +296,7 @@ describe('App', () => {
     expect(h2s.at(-1)).toHaveAccessibleName(/^good tech\. no guesswork\.$/i)
   })
 
-  it('renders the Closing section with its statement, workshop image, disclaimer, and section links', () => {
+  it('renders the Closing section with its statement, creator image, disclaimer, and section links', () => {
     render(<App />)
 
     const closing = document.querySelector('#closing')
@@ -441,78 +452,40 @@ describe('App', () => {
     expect(digits).toEqual(['2026', '15', '2023'])
   })
 
-  it('claims no press coverage in the Hero — the row at its foot is the real channels, not publications', () => {
+  it('matches the studio Hero reference without invented social proof', () => {
     render(<App />)
-
     const hero = document.querySelector('#hero') as HTMLElement
-
-    // The six wordmarks that used to sit under a "Featured in" label are
-    // gone, in every form: visible text, accessibility text, and markup. An
-    // `aria-hidden` on that row was never enough — a sighted visitor reads a
-    // list of publication names under "Featured in" as a claim, and this
-    // project has no source for any of them.
-    for (const name of [
-      'Featured in',
-      'Forbes',
-      'The Verge',
-      'HYPEBEAST',
-      'Linus Tech Tips',
-      'uncrate',
-    ]) {
-      expect(hero.innerHTML).not.toMatch(new RegExp(name, 'i'))
-    }
-    expect(hero.querySelectorAll('img[src*="apple"]')).toHaveLength(0)
-
-    // What replaced it goes to the same three real destinations the footer
-    // uses, from the same shared list — and is NOT hidden from assistive
-    // tech, because unlike the row it replaced it is real.
-    const external = Array.from(
-      hero.querySelectorAll('a[href^="http"]'),
-    ) as HTMLAnchorElement[]
-    expect(external.map((a) => a.href)).toEqual([
-      'https://www.youtube.com/@actuallycarterpcs',
-      'https://www.instagram.com/carterpcs_/?hl=en',
-      'https://www.tiktok.com/@carterpcs?lang=en',
-    ])
-    external.forEach((link) => {
-      expect(link).toHaveAttribute('target', '_blank')
-      expect(link).toHaveAttribute('rel', 'noreferrer')
-      expect(link.closest('[aria-hidden="true"]')).toBeNull()
-    })
-
-    // The unofficial/non-affiliation message stays exactly where it was.
-    expect(screen.getByText(en.hero.disclaimer)).toBeInTheDocument()
-  })
-
-  it('shows conservative dated public-tracker figures and omits unsupported audience/build claims', () => {
-    render(<App />)
-
-    const hero = document.querySelector('#hero') as HTMLElement
-    const stats = document.querySelector('#hero aside:last-of-type')
-      ?.textContent as string
-
-    // Conservative floors from the 24 Oct 2026 public-tracker snapshot.
-    expect(stats).toContain('3.8M+')
-    expect(stats).toContain('10.0B+')
-    expect(hero.textContent).not.toContain('Custom PCs Built')
-    expect(hero.textContent).not.toContain('Dozens')
-
-    // And the figures carry their date somewhere a visitor can read it, not
-    // only in a source comment. It sits in the Hero's fine-print row rather
-    // than in the card itself — see Hero.tsx for the measured reason.
-    expect(screen.getByText(en.hero.statsSource)).toBeInTheDocument()
-
-    // Only the two sourced channel metrics are presented as statistics.
-    const values = Array.from(
-      document.querySelectorAll(
-        '#hero aside:last-of-type li > span:first-child',
+    expect(hero.querySelectorAll('aside')).toHaveLength(1)
+    expect(hero.textContent).not.toMatch(/Featured in|Forbes|Dozens/i)
+    expect(
+      within(hero).getByRole('link', { name: /Explore the Universe/ }),
+    ).toHaveAttribute('href', '#content-universe')
+    expect(
+      within(hero).getByRole('link', { name: /Watch the Shorts/ }),
+    ).toHaveAttribute('href', '#featured')
+    expect(
+      Array.from(hero.querySelectorAll('a[class*="tile_"]')).map((a) =>
+        a.getAttribute('href'),
       ),
-    ).map((el) => el.textContent)
-    expect(values).toEqual(['3.8M+', '10.0B+'])
-
-    const aboutCard = document.querySelector('#hero [data-about]')
-    expect(aboutCard?.querySelector('img')).toBeNull()
-    expect(aboutCard?.textContent).not.toMatch(/millions across platforms/i)
+    ).toEqual(['#hardware', '#featured', '#content-universe'])
+    expect(hero.querySelectorAll('img')).toHaveLength(4)
+    expect(within(hero).getByText(en.hero.eyebrow)).toBeInTheDocument()
+    expect(within(hero).getByText(en.hero.statsSource)).toBeInTheDocument()
+    for (const tile of Object.values(en.hero.tiles)) {
+      expect(within(hero).getByText(tile.body)).toBeInTheDocument()
+    }
+    expect(
+      within(hero).getByRole('link', { name: /YouTube —/ }),
+    ).toHaveAttribute('target', '_blank')
+    expect(within(hero).getByText(en.hero.disclaimer)).toBeInTheDocument()
+    expect(within(hero).getByText(en.hero.imageDisclosure)).toHaveAttribute(
+      'id',
+      'hero-image-disclosure',
+    )
+    expect(hero.querySelector('figure')).toHaveAttribute(
+      'aria-describedby',
+      'hero-image-disclosure',
+    )
   })
 
   it('points the Content Universe media slots at real Shorts rather than placeholders', () => {
@@ -578,10 +551,10 @@ describe('App', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: /^carterpcs — built different$/i,
+        name: en.hero.headlineLabel,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByText(/making tech interesting\./i)).toBeInTheDocument()
+    expect(screen.getByText(en.hero.support)).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { level: 2, name: /hardware knowledge/i }),
     ).toBeInTheDocument()
