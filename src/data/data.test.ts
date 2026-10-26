@@ -62,6 +62,33 @@ describe('content data', () => {
     }
   })
 
+  it('localizes editorial headlines instead of repeating English in translated views', () => {
+    const english = getFeaturedStories('en')
+    const french = getFeaturedStories('fr')
+    const spanish = getFeaturedStories('es')
+
+    for (const index of english.keys()) {
+      expect(french[index].headlineLines.join(' ')).not.toBe(
+        english[index].headlineLines.join(' '),
+      )
+      expect(spanish[index].headlineLines.join(' ')).not.toBe(
+        english[index].headlineLines.join(' '),
+      )
+    }
+  })
+
+  it('does not promise same-day coverage without a verified publishing cadence', () => {
+    for (const category of getContentCategories('en')) {
+      expect(category.description.toLowerCase()).not.toContain('same day')
+    }
+    for (const category of getContentCategories('fr')) {
+      expect(category.description.toLowerCase()).not.toContain('le jour même')
+    }
+    for (const category of getContentCategories('es')) {
+      expect(category.description.toLowerCase()).not.toContain('el mismo día')
+    }
+  })
+
   it('links Content Universe media slots only to Featured stories that exist', () => {
     const indexes = new Set(getFeaturedStories('en').map((s) => s.index))
     for (const category of getContentCategories('en')) {

@@ -56,8 +56,8 @@ const featuredStorySources: FeaturedStorySource[] = [
     },
     headlineLines: {
       en: ['What’s the best PC', 'you can get for', '$250k??'],
-      fr: ['What’s the best PC', 'you can get for', '$250k??'],
-      es: ['What’s the best PC', 'you can get for', '$250k??'],
+      fr: ['Quel est le meilleur PC', 'pour 250 000 $ ?'],
+      es: ['¿Cuál es el mejor PC', 'que puedes comprar por', '250.000 $?'],
     },
     support: {
       en: 'A quick look at the most extreme PC budget CarterPCs has explored.',
@@ -84,8 +84,8 @@ const featuredStorySources: FeaturedStorySource[] = [
     },
     headlineLines: {
       en: ['What has Apple copied', 'from Samsung??'],
-      fr: ['What has Apple copied', 'from Samsung??'],
-      es: ['What has Apple copied', 'from Samsung??'],
+      fr: ['Qu’est-ce qu’Apple a repris', 'à Samsung ?'],
+      es: ['¿Qué ha copiado Apple', 'de Samsung?'],
     },
     support: {
       en: 'Carter compares Apple and Samsung features through the question of who introduced them first.',
@@ -112,8 +112,8 @@ const featuredStorySources: FeaturedStorySource[] = [
     },
     headlineLines: {
       en: ['The Lenovo ThinkPad', 'is the Toyota', 'of laptops..'],
-      fr: ['The Lenovo ThinkPad', 'is the Toyota', 'of laptops..'],
-      es: ['The Lenovo ThinkPad', 'is the Toyota', 'of laptops..'],
+      fr: ['Le Lenovo ThinkPad,', 'la Toyota des ordinateurs'],
+      es: ['El Lenovo ThinkPad', 'es el Toyota de los portátiles'],
     },
     support: {
       en: 'A quick case for why this reliable laptop has earned its everyday-car reputation.',

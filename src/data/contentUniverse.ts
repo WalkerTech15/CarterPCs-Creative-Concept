@@ -129,9 +129,9 @@ const contentCategorySources: ContentCategorySource[] = [
       es: 'Controversias',
     },
     description: {
-      en: 'Policy shifts and corporate missteps, covered the same day they happen.',
-      fr: 'Virages réglementaires et faux pas des entreprises, couverts le jour même.',
-      es: 'Giros normativos y tropiezos corporativos, cubiertos el mismo día.',
+      en: 'Quick context on policy shifts and corporate missteps.',
+      fr: 'Un éclairage rapide sur les évolutions réglementaires et les faux pas des entreprises.',
+      es: 'Contexto rápido sobre cambios normativos y errores corporativos.',
     },
     tags: {
       en: ['Policy Shifts', 'Corporate Fallout', 'Quick Reaction'],

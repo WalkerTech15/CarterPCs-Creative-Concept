@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-This research dossier provides a factual, evidence-based breakdown of **CarterPCs** (Carter Ryan Smith), one of the most prominent short-form technology content creators on digital platforms. Operating across TikTok, YouTube Shorts, and Instagram Reels, CarterPCs has amassed over **10.8 million total followers** and over **7 billion cumulative video views**. 
+This research dossier provides a factual, evidence-based breakdown of **CarterPCs** (Carter Ryan Smith), a short-form technology content creator on digital platforms. Platform figures change frequently and should always be treated as dated snapshots, not current totals. A public YouTube tracker reported **3.8M+ subscribers and 10.0B+ views on October 24, 2026**; this is a third-party public-counter estimate, not private YouTube Analytics. Cross-platform totals are not stated here as current because the cited follower snapshots have not been refreshed to the same date.
 
 
 
@@ -34,7 +34,7 @@ His core value proposition is *"making tech less of a snooze fest"* through high
 
   * **TikTok (`@carterpcs`):** ~6.8 Million followers | 864.7M+ likes | 9.2K+ uploads
 
-  * **YouTube (`@actuallycarterpcs`):** ~3.07 Million subscribers | 6.8B+ views | 4,500+ videos
+  * **YouTube (`@actuallycarterpcs`):** 3.8M+ subscribers | 10.0B+ views (TubeLeader public tracker snapshot, October 24, 2026; third-party estimate)
 
   * **Instagram (`@carterpcs_`):** ~1.0 Million followers
 
@@ -208,7 +208,7 @@ His core value proposition is *"making tech less of a snooze fest"* through high
 
 | **September 2024** | **Relocation to Los Angeles:** Relocated from Michigan to Los Angeles, California to expand studio capabilities and networking. | Official video *"Packing all my tech for my move.."*. | High | [YouTube / Wikitubia](https://youtube.fandom.com/wiki/CarterPCs) |
 
-| **2025 – 2026** | **3 Million YouTube Subs & 6.8M TikTok Followers:** Reaches 3.07M subscribers on YouTube and 6.8M on TikTok, surpassing 6.8 Billion views total. | Public platform media kit data verified by YouTube API and Viewstats. | High | [Pillar Media Kit](https://pillar.io/carterpcs/mediakit) |
+| **October 24, 2026** | **YouTube public-counter snapshot:** 3.8M+ subscribers and 10.0B+ views reported by a third-party tracker. | Public tracker reading; not private YouTube Analytics. Counts are a dated snapshot and may change. | Medium | [TubeLeader](https://tubeleader.com/youtube-channel/actuallycarterpcs) |
 
 
 
@@ -342,7 +342,7 @@ His core value proposition is *"making tech less of a snooze fest"* through high
 
 * **The LA Creator Journey:** Tracing his growth from a 14-year-old Michigan creator to an LA-based tech personality.
 
-* **Cross-Platform Reach:** Showcasing his 10.8M+ follower ecosystem.
+* **Cross-Platform Reach:** Show the platforms where CarterPCs publishes; do not present an aggregate follower total until the underlying platform counts have been refreshed and dated together.
 
 
 
@@ -398,7 +398,7 @@ His core value proposition is *"making tech less of a snooze fest"* through high
 
 4. **Chapter 4: Heading West to LA (Late 2024):** Moving out to Los Angeles and upgrading to a dedicated studio space.
 
-5. **Chapter 5: The 10-Million Digital Empire (2025–2026):** Amassing 10.8M+ followers and 7B+ views as a leading short-form tech voice.
+5. **Chapter 5: Growing Across Platforms:** Present platform-specific, dated figures only. The October 24, 2026 YouTube tracker snapshot is documented above; avoid an undated cross-platform aggregate.
 
 
 
