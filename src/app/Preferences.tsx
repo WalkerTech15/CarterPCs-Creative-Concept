@@ -41,15 +41,39 @@ interface PreferencesValue {
 
 const PreferencesContext = createContext<PreferencesValue | null>(null)
 
+function readPreference(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function storePreference(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {
+    // Persistence is optional: preferences still work in memory when storage
+    // is denied or full. Never prevent the application from rendering.
+  }
+}
+
 function readStoredLanguage(): Language {
-  const value = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
-  // Anything unrecognised (a stale key, a hand-edited value) falls back to
-  // English rather than indexing the dictionary map with garbage.
-  return isLanguage(value) ? value : DEFAULT_LANGUAGE
+  const value = readPreference(LANGUAGE_STORAGE_KEY)
+  if (isLanguage(value)) return value
+  // Browser language preferences are more useful than physical location and
+  // need neither geolocation permission nor a third-party IP lookup.
+  for (const locale of navigator.languages?.length
+    ? navigator.languages
+    : [navigator.language]) {
+    const language = locale.toLowerCase().split(/[-_]/)[0]
+    if (isLanguage(language)) return language
+  }
+  return DEFAULT_LANGUAGE
 }
 
 function readStoredTheme(): ThemePreference {
-  const value = window.localStorage.getItem(THEME_STORAGE_KEY)
+  const value = readPreference(THEME_STORAGE_KEY)
   return THEME_PREFERENCES.includes(value as ThemePreference)
     ? (value as ThemePreference)
     : 'system'
@@ -107,11 +131,11 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute('content', t.meta.description)
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+    storePreference(LANGUAGE_STORAGE_KEY, language)
   }, [language, t])
 
   useEffect(() => {
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    storePreference(THEME_STORAGE_KEY, theme)
   }, [theme])
 
   const value = useMemo(
