@@ -6,7 +6,7 @@ import {
 } from '../../animations/gsap'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { usePreferences } from '../../app/Preferences'
-import workshop from '../../assets/creator/creator-build-session.webp'
+import creatorFilming from '../../assets/closing/creator-filming-devices.webp'
 import styles from './Closing.module.css'
 
 /**
@@ -17,12 +17,6 @@ import styles from './Closing.module.css'
  * The closing beat pairs a compact editorial statement and two internal
  * destinations with the existing workshop photograph. It keeps the site's
  * dark editorial register while giving the page a clear, useful ending.
- *
- * The "06" is the same environmental-numeral device Hardware (04) and Content
- * Universe (05) already use: a large, low-contrast glyph in its own layer
- * behind the type, aria-hidden and purely compositional. It is the only
- * element here that is not copy the brief asked for, and it carries no
- * information — the numeral is visual language, not a new claim.
  *
  * COPY
  * Copy comes from the dictionary except the identity, the proper noun
@@ -104,12 +98,6 @@ function Closing() {
     <section id="closing" className={styles.closing} ref={rootRef}>
       <span className={styles.seam} aria-hidden="true" />
 
-      {/* Environmental "06" — same device as Hardware's and Content
-          Universe's section numerals. Decorative, never a label. */}
-      <div className={styles.backdrop} aria-hidden="true">
-        <span className={styles.backdropNumeral}>06</span>
-      </div>
-
       <div className={styles.canvas}>
         {/* Proper noun, not translated — see the file comment. The dot is the
             same restrained violet indicator the nav bar sets beside it. */}
@@ -153,20 +141,23 @@ function Closing() {
         </p>
       </div>
 
-      {/* Reuse the already-approved workshop image as illustrative atmosphere,
-          not as evidence of Carter or a specific build. This same asset has
-          an explicit decorative-image rationale in Creator.tsx. */}
-      <div className={styles.media} aria-hidden="true" data-reveal-stage>
+      {/* Generated editorial illustration, not documentary evidence. The
+          visible figcaption discloses that distinction; the image itself
+          remains decorative for assistive technology. */}
+      <figure className={styles.media} data-reveal-stage>
         <img
           className={styles.mediaImage}
-          src={workshop}
+          src={creatorFilming}
           alt=""
-          width={1448}
-          height={1086}
+          width={1672}
+          height={941}
           loading="lazy"
           decoding="async"
         />
-      </div>
+        <figcaption className={styles.mediaDisclosure}>
+          {t.closing.imageDisclosure}
+        </figcaption>
+      </figure>
     </section>
   )
 }

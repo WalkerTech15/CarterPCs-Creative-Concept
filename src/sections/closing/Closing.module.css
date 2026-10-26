@@ -41,30 +41,6 @@
   );
 }
 
-/* ===== Environmental numeral =====
-   Same layer model as Hardware's "04" and Content Universe's split "05": its
-   own layer behind the type, at token opacity so it tracks the theme. */
-
-.backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding-inline-end: 2%;
-  pointer-events: none;
-}
-
-.backdropNumeral {
-  font-family: var(--font-family-display);
-  font-size: clamp(9rem, 5rem + 26vw, 22rem);
-  font-weight: 700;
-  line-height: 0.8;
-  letter-spacing: -0.04em;
-  color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-}
-
 /* ===== Canvas =====
    The shared 96rem composition frame, left-aligned on the same rail the five
    sections above hold. */
@@ -208,7 +184,8 @@
   position: relative;
   z-index: 1;
   min-width: 0;
-  aspect-ratio: 4 / 3;
+  margin: 0;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border: 1px solid
     color-mix(in srgb, var(--color-text-primary) 14%, transparent);
@@ -228,6 +205,21 @@
   object-position: left center;
 }
 
+.mediaDisclosure {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  inset-block-end: 0.75rem;
+  z-index: 1;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-bg-base) 88%, transparent);
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+  line-height: 1.2;
+}
+
 @media (max-width: 1023px) {
   .closing {
     grid-template-columns: minmax(0, 1fr);
@@ -242,11 +234,7 @@
 
   .media {
     grid-row: 2;
-    aspect-ratio: 4 / 3;
-  }
-
-  .backdropNumeral {
-    font-size: clamp(8rem, 36vw, 14rem);
+    aspect-ratio: 16 / 9;
   }
 }
 
