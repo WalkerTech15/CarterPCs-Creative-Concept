@@ -36,11 +36,24 @@ describe('shareLink', () => {
     expect(writeText).not.toHaveBeenCalled()
   })
 
-  it('treats a dismissed share sheet as silence, not a failure', async () => {
+  it('treats an AbortError from a dismissed share sheet as cancellation', async () => {
     const nav = {
-      share: vi.fn().mockRejectedValue(new Error('AbortError')),
+      share: vi.fn().mockRejectedValue(
+        Object.assign(new Error('Share dismissed'), { name: 'AbortError' }),
+      ),
     } as unknown as Navigator
-    await expect(shareLink(title, url, nav)).resolves.toBe('shared')
+    await expect(shareLink(title, url, nav)).resolves.toBe('cancelled')
+  })
+
+  it('reports a non-cancellation share-sheet rejection as a share failure', async () => {
+    const nav = {
+      share: vi.fn().mockRejectedValue(
+        Object.assign(new Error('Permission denied'), {
+          name: 'NotAllowedError',
+        }),
+      ),
+    } as unknown as Navigator
+    await expect(shareLink(title, url, nav)).resolves.toBe('share-failed')
   })
 
   it('copies the URL when there is no share sheet', async () => {
@@ -54,8 +67,8 @@ describe('shareLink', () => {
     const refused = {
       clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
     } as unknown as Navigator
-    await expect(shareLink(title, url, refused)).resolves.toBe('failed')
-    await expect(shareLink(title, url, {} as Navigator)).resolves.toBe('failed')
-    await expect(shareLink(title, url, undefined)).resolves.toBe('failed')
+    await expect(shareLink(title, url, refused)).resolves.toBe('copy-failed')
+    await expect(shareLink(title, url, {} as Navigator)).resolves.toBe('copy-failed')
+    await expect(shareLink(title, url, undefined)).resolves.toBe('copy-failed')
   })
 })

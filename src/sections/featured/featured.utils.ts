@@ -20,10 +20,20 @@ export async function shareLink(
   if (nav?.share) {
     try {
       await nav.share({ title, url })
-    } catch {
-      // Dismissing a platform share sheet is not a failure.
+      return 'shared'
+    } catch (error) {
+      // Web Share uses AbortError when the visitor dismisses the sheet. Other
+      // rejections (for example permission or platform errors) are failures.
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'name' in error &&
+        error.name === 'AbortError'
+      ) {
+        return 'cancelled'
+      }
+      return 'share-failed'
     }
-    return 'shared'
   }
 
   try {
@@ -33,6 +43,6 @@ export async function shareLink(
     await nav.clipboard.writeText(url)
     return 'copied'
   } catch {
-    return 'failed'
+    return 'copy-failed'
   }
 }

@@ -4,14 +4,19 @@
  */
 
 /** How a share attempt ended — see `shareLink()` in featured.utils.ts. */
-export type ShareOutcome = 'shared' | 'copied' | 'failed'
+export type ShareOutcome =
+  | 'shared'
+  | 'cancelled'
+  | 'copied'
+  | 'copy-failed'
+  | 'share-failed'
 
 /**
  * Result of the last share, shown next to the rail it came from and
- * announced through that panel's own live region. Only clipboard outcomes
- * produce one: a platform share sheet reports its own result.
+ * announced through that panel's own live region. Successful platform shares
+ * and cancellations stay quiet; failures and clipboard success are explicit.
  */
 export interface ShareNotice {
   id: string
-  copied: boolean
+  outcome: Extract<ShareOutcome, 'copied' | 'copy-failed' | 'share-failed'>
 }

@@ -316,6 +316,54 @@ describe('Featured', () => {
     ).toBeInTheDocument()
   })
 
+  it('reports platform share failures separately from clipboard failures', async () => {
+    const user = userEvent.setup()
+    Object.defineProperty(navigator, 'share', {
+      value: vi.fn().mockRejectedValue(
+        Object.assign(new Error('Permission denied'), {
+          name: 'NotAllowedError',
+        }),
+      ),
+      configurable: true,
+    })
+
+    renderFeatured()
+
+    const [first] = getFeaturedStories('en')
+    await user.click(
+      screen.getByRole('button', {
+        name: `${en.featured.actions.share} — ${title(first)}`,
+      }),
+    )
+
+    expect(
+      await screen.findByText(en.featured.actions.shareFailed),
+    ).toHaveAttribute('role', 'status')
+  })
+
+  it('keeps a cancelled platform share silent', async () => {
+    const user = userEvent.setup()
+    Object.defineProperty(navigator, 'share', {
+      value: vi.fn().mockRejectedValue(
+        Object.assign(new Error('Share dismissed'), { name: 'AbortError' }),
+      ),
+      configurable: true,
+    })
+
+    renderFeatured()
+
+    const [first] = getFeaturedStories('en')
+    await user.click(
+      screen.getByRole('button', {
+        name: `${en.featured.actions.share} — ${title(first)}`,
+      }),
+    )
+
+    expect(screen.getAllByRole('status').every((status) => !status.textContent)).toBe(
+      true,
+    )
+  })
+
   it('hands off to the platform share sheet when there is one, and copies nothing', async () => {
     const user = userEvent.setup()
     const share = vi.fn().mockResolvedValue(undefined)

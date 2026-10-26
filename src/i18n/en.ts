@@ -168,6 +168,7 @@ export const en = {
       /** Announced and shown after the URL reaches the clipboard. */
       linkCopied: 'Link copied',
       copyFailed: 'Could not copy the link',
+      shareFailed: 'Could not open the share sheet',
     },
     a11y: {
       /** Prefix for the iframe's title attribute. */

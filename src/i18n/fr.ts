@@ -114,6 +114,7 @@ export const fr: Dictionary = {
       watch: 'Voir sur YouTube',
       linkCopied: 'Lien copié',
       copyFailed: 'Impossible de copier le lien',
+      shareFailed: 'Impossible d’ouvrir le partage',
     },
     a11y: {
       player: 'Lecteur YouTube',

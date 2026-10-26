@@ -38,12 +38,14 @@ export function useFeaturedActions() {
         clearTimeout(shareTimer.current)
         shareTimer.current = null
       }
+      setShareNotice(null)
       const outcome = await shareLink(title, url)
-      // The share sheet reports its own outcome; the page does not double up.
-      if (outcome === 'shared') {
+      // A successful share sheet reports its own outcome; cancellation is
+      // intentionally quiet. Actual share/copy failures get distinct notices.
+      if (outcome === 'shared' || outcome === 'cancelled') {
         return
       }
-      setShareNotice({ id, copied: outcome === 'copied' })
+      setShareNotice({ id, outcome })
       shareTimer.current = setTimeout(() => setShareNotice(null), 4000)
     },
     [],

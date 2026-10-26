@@ -151,9 +151,11 @@ function FeaturedActionRail({
         which watch existing regions for changes. */}
       <p className={styles.actionNotice} role="status">
         {notice
-          ? notice.copied
+          ? notice.outcome === 'copied'
             ? t.featured.actions.linkCopied
-            : t.featured.actions.copyFailed
+            : notice.outcome === 'copy-failed'
+              ? t.featured.actions.copyFailed
+              : t.featured.actions.shareFailed
           : ''}
       </p>
     </div>
