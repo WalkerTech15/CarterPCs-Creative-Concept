@@ -45,11 +45,11 @@ export const fr: Dictionary = {
 
   hero: {
     eyebrow: 'Ordinateurs cinématiques',
-    headlineLabel: 'CarterPCs — Créé autrement',
+    headlineLabel: 'CarterPCs — Créé autrement.',
     headlineLineOne: 'Créé',
     headlineLineTwo: 'autrement',
     support:
-      'La tech rendue intéressante. Montages PC, matériel et les décisions technologiques du quotidien.',
+      'La tech rendue intéressante. Montages PC, matériel et décisions technologiques du quotidien.',
     ctaPrimary: 'Explorer l’univers',
     // Names the three real Shorts this button scrolls to. "Voir la vidéo"
     // implied a single showreel that does not exist.
@@ -83,7 +83,8 @@ export const fr: Dictionary = {
     // introduced a list of publications this project cannot substantiate.
     channelsLabel: 'À regarder sur',
     disclaimer:
-      'Concept non officiel. Aucune affiliation ni approbation implicite.',
+      'Concept indépendant de fan. Sans affiliation avec CarterPCs.',
+    imageDisclosure: 'Image illustrative.',
   },
 
   creator: {
@@ -96,6 +97,7 @@ export const fr: Dictionary = {
     bodyTwo:
       'Les sujets vont des comparatifs et conseils pratiques au matériel PC, aux commentaires de créateur et parfois aux jeux vidéo.',
     tags: 'Matériel PC — Tech mobile — Tech grand public — Anti-arnaques',
+    imageDisclosure: 'Illustration conceptuelle',
     platforms: 'TikTok · YouTube Shorts · Instagram Reels',
   },
 
@@ -131,6 +133,7 @@ export const fr: Dictionary = {
     support:
       'Chaque composant jugé sur ce qu’il fait, pas sur ce que promet la boîte.',
     tags: 'PC sur mesure — Test de composants — Sur mesure vs préassemblé',
+    imageDisclosure: 'Illustration conceptuelle',
   },
 
   contentUniverse: {
@@ -152,6 +155,7 @@ export const fr: Dictionary = {
       'Des PC sur mesure aux appareils du quotidien, découvrez les détails, les compromis et les conseils pratiques derrière la technologie.',
     exploreStories: 'Explorer les histoires',
     meetCreator: 'Rencontrer le créateur',
+    imageDisclosure: 'Illustration conceptuelle',
   },
 
   /* `copyright` is the name only — the "©" and the year are composed in

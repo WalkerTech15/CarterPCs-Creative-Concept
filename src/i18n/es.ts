@@ -45,11 +45,11 @@ export const es: Dictionary = {
 
   hero: {
     eyebrow: 'Ordenadores cinemáticos',
-    headlineLabel: 'CarterPCs — Hecho diferente',
+    headlineLabel: 'CarterPCs — Hecho diferente.',
     headlineLineOne: 'Hecho',
     headlineLineTwo: 'diferente',
     support:
-      'Tecnología que engancha. Montajes de PC, hardware y las decisiones tecnológicas del día a día.',
+      'La tecnología se vuelve interesante. Montajes de PC, hardware y decisiones tecnológicas del día a día.',
     ctaPrimary: 'Explorar el universo',
     // Names the three real Shorts this button scrolls to. "Ver el vídeo"
     // implied a single showreel that does not exist.
@@ -82,7 +82,8 @@ export const es: Dictionary = {
     // Labels the real channel row. Replaced `featuredIn` ("Aparece en"),
     // which introduced publications this project cannot substantiate.
     channelsLabel: 'Ver en',
-    disclaimer: 'Concepto no oficial. No implica afiliación ni respaldo.',
+    disclaimer: 'Concepto independiente de un fan. Sin afiliación con CarterPCs.',
+    imageDisclosure: 'Imagen ilustrativa.',
   },
 
   creator: {
@@ -95,6 +96,7 @@ export const es: Dictionary = {
     bodyTwo:
       'Los temas van desde comparativas y consejos prácticos hasta hardware de PC, comentarios de creador y, a veces, videojuegos.',
     tags: 'Hardware de PC — Tecnología móvil — Tecnología de consumo — Antiestafas',
+    imageDisclosure: 'Imagen conceptual ilustrativa',
     platforms: 'TikTok · YouTube Shorts · Instagram Reels',
   },
 
@@ -130,6 +132,7 @@ export const es: Dictionary = {
     support:
       'Cada componente juzgado por lo que hace, no por lo que promete la caja.',
     tags: 'PC a medida — Prueba de componentes — A medida vs. preensamblado',
+    imageDisclosure: 'Imagen conceptual ilustrativa',
   },
 
   contentUniverse: {
@@ -151,6 +154,7 @@ export const es: Dictionary = {
       'Desde PC personalizados hasta dispositivos cotidianos: descubre los detalles, las ventajas y los consejos prácticos que hay detrás de la tecnología.',
     exploreStories: 'Explorar las historias',
     meetCreator: 'Conocer al creador',
+    imageDisclosure: 'Imagen conceptual ilustrativa',
   },
 
   /* `copyright` is the name only — the "©" and the year are composed in

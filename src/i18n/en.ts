@@ -70,7 +70,7 @@ export const en = {
   hero: {
     eyebrow: 'Cinematic Computers',
     /** h1 accessible name — the visible two-line headline is aria-hidden. */
-    headlineLabel: 'CarterPCs — Built Different',
+    headlineLabel: 'CarterPCs — Built Different.',
     headlineLineOne: 'Built',
     /** The period is a separate styled span in Hero.tsx and is not part of this string. */
     headlineLineTwo: 'Different',
@@ -115,7 +115,8 @@ export const en = {
      * press coverage this project has no source for — see data/channels.ts.
      */
     channelsLabel: 'Watch on',
-    disclaimer: 'Unofficial concept. No affiliation or endorsement implied.',
+    disclaimer: 'Independent fan concept. Not affiliated with CarterPCs.',
+    imageDisclosure: 'Illustrative image.',
   },
 
   creator: {
@@ -128,17 +129,15 @@ export const en = {
     bodyTwo:
       'Topics range from product comparisons and practical tech advice to PC hardware, creator commentary and occasional gaming stories.',
     tags: 'PC Hardware — Mobile Tech — Consumer Tech — Scam-Busting',
+    imageDisclosure: 'Illustrative concept image',
     /** Proper nouns — identical in every language, kept per-locale only so the separator can move. */
     platforms: 'TikTok · YouTube Shorts · Instagram Reels',
   },
 
   /**
    * The three Shorts are click-to-play: nothing is fetched from YouTube until
-   * a visitor asks for it. Only the INTERFACE is translated here. The
-   * editorial headlines stay in English in every language (see
-   * data/featured.ts). They are not represented as verified published titles;
-   * two title/video pairs remain unconfirmed. Translating the editorial
-   * headlines would change the selected English concept copy.
+   * a visitor asks for it. Interface strings are translated here; localized
+   * editorial headlines and summaries live beside each video in data/featured.ts.
    *
    * Each accessible name is composed as `${visible label} — ${title}`, so the
    * visible label always STARTS the accessible name (WCAG 2.5.3 Label in Name)
@@ -191,6 +190,7 @@ export const en = {
     support:
       'Every component judged on what it does, not what the box promises.',
     tags: 'Custom Builds — Component Testing — Value vs. Prebuilt',
+    imageDisclosure: 'Illustrative concept image',
   },
 
   contentUniverse: {
@@ -212,6 +212,7 @@ export const en = {
       'From custom PC builds to everyday devices, explore the details, trade-offs, and practical advice behind the tech.',
     exploreStories: 'Explore the stories',
     meetCreator: 'Meet the creator',
+    imageDisclosure: 'Illustrative concept image',
   },
 
   /**
