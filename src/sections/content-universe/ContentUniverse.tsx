@@ -41,14 +41,6 @@ function ContentUniverse() {
         </div>
 
         <div className={styles.field}>
-          {/* Subtle section numeral, decorative only. */}
-          <span className={styles.digitZero} aria-hidden="true">
-            0
-          </span>
-          <span className={styles.digitFive} aria-hidden="true">
-            5
-          </span>
-
           {/* Retain a quiet guide line when the field becomes a phone stack. */}
           <span className={styles.spine} aria-hidden="true" />
 
