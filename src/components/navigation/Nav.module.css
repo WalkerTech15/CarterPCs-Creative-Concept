@@ -335,15 +335,16 @@
   transform: translate(0.125rem, -0.125rem);
 }
 
-/* The reference's square theme utility. Disabled until a light theme
-   exists — matched visually, never a dead interactive control. */
+/* Theme preference control shares the language utility's visual treatment. */
 .theme {
   pointer-events: auto;
-  display: grid;
-  place-items: center;
-  width: 2.375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
   height: 2.375rem;
-  padding: 0;
+  padding: 0 0.75rem;
   border-radius: 0.75rem;
   border: 1px solid
     color-mix(in srgb, var(--color-text-primary) 8%, transparent);
@@ -352,15 +353,18 @@
     var(--color-text-primary) 3%,
     transparent
   );
-  color: color-mix(in srgb, var(--color-text-primary) 62%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 72%, transparent);
+  font-size: 0.875rem;
 }
 
 .language {
-  display: grid;
-  place-items: center;
-  width: 2.375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
   height: 2.375rem;
-  padding: 0;
+  padding: 0 0.75rem;
   border: 1px solid
     color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   border-radius: 0.75rem;
@@ -370,7 +374,26 @@
     transparent
   );
   color: color-mix(in srgb, var(--color-text-primary) 72%, transparent);
-  font-size: 1.1rem;
+  font-size: 0.875rem;
+}
+.language svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+.language .languageChevron {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+@media (max-width: 1139px) {
+  .language {
+    width: 2.375rem;
+    padding: 0;
+  }
+  .languageCode,
+  .language .languageChevron {
+    display: none;
+  }
 }
 
 .theme:disabled {
@@ -378,8 +401,31 @@
 }
 
 .theme svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+.theme .themeChevron {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.menu button > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+.themeCheck {
+  margin-inline-start: auto;
+}
+@media (max-width: 1279px) {
+  .theme {
+    width: 2.375rem;
+    padding: 0;
+  }
+  .themeLabel,
+  .theme .themeChevron {
+    display: none;
+  }
 }
 
 /* Sections disclosure trigger — the compact header's entry to the centre
@@ -504,9 +550,10 @@
     border-radius: 0.75rem;
   }
 
-  .theme,
+  .theme {
+    height: 2.625rem;
+  }
   .language {
-    width: 2.625rem;
     height: 2.625rem;
   }
 
@@ -577,6 +624,16 @@
    canvas value above it. See the band above for why it starts at the frame
    rather than at 1024. */
 @media (min-width: 1240px) {
+  .nav {
+    inset-block-start: clamp(0.875rem, 1.55vw, 1.5rem);
+    inset-inline: clamp(0.75rem, 3.7vw, 4rem);
+  }
+
+  .bar {
+    max-width: 92rem;
+    padding-block: 0.625rem;
+  }
+
   .sections {
     translate: max(-3.125rem, -3.26vw) 0;
   }

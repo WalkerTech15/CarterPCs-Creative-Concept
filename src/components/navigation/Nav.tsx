@@ -9,6 +9,7 @@ import {
   type RefObject,
 } from 'react'
 import styles from './Nav.module.css'
+import { ThemeIcon } from './ThemeIcon'
 import { SECTION_HREFS } from './sections'
 import {
   usePreferences,
@@ -354,20 +355,20 @@ function Nav() {
               }
               onKeyDown={handleTriggerKeyDown('theme')}
             >
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="3"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-                <path
-                  d="M8 1v1.6M8 13.4V15M15 8h-1.6M2.6 8H1M12.95 3.05l-1.13 1.13M4.18 11.82l-1.13 1.13M12.95 12.95l-1.13-1.13M4.18 4.18 3.05 3.05"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
+              <ThemeIcon theme={theme} />
+              <span className={styles.themeLabel} aria-hidden="true">
+                {t.nav.themes[theme]}
+              </span>
+              <svg
+                className={styles.themeChevron}
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="m4 6 4 4 4-4" />
               </svg>
             </button>
             <div
@@ -396,7 +397,13 @@ function Nav() {
                   className={theme === value ? styles.menuActive : undefined}
                   onClick={() => select('theme', () => setTheme(value))}
                 >
+                  <ThemeIcon theme={value} />
                   {t.nav.themes[value]}
+                  {theme === value && (
+                    <span className={styles.themeCheck} aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -422,7 +429,32 @@ function Nav() {
               }
               onKeyDown={handleTriggerKeyDown('language')}
             >
-              <span aria-hidden="true">◎</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <ellipse cx="12" cy="12" rx="4" ry="9" />
+                <path d="M3 12h18M5 6.5c4 2 10 2 14 0M5 17.5c4-2 10-2 14 0" />
+              </svg>
+              <span className={styles.languageCode} aria-hidden="true">
+                {language.toUpperCase()}
+              </span>
+              <svg
+                className={styles.languageChevron}
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="m4 6 4 4 4-4" />
+              </svg>
             </button>
             <div
               className={
