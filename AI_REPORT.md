@@ -1,5 +1,12 @@
 # CarterPCs AI Report — QA pass on the committed Featured/data refactor
 
+## Rights notice update — 27 October 2026
+
+- User requested an all-rights-reserved repository notice. Existing LICENSE was MIT, present since initial commit 2157260; prior grants cannot be erased by changing the file.
+- Changed LICENSE and README.md to reserve rights for new original contributions from this date only, explicitly preserving prior MIT grants, third-party licenses, statutory exceptions and GitHub platform terms. Added LICENSE-MIT-PRIOR-VERSIONS preserving original MIT wording and copyright holder.
+- Verified documentation diff and whitespace check. No runtime changes; build/browser/tests not rerun. No claim of ownership of third-party identities or materials and no legal enforceability guarantee.
+- User subsequently authorized separate commits and push to origin/main. Grouping: license notices together, README rights summary separately, and this verification report separately. Documentation-only checks passed; runtime tests not required. Push completion is verified against the remote after the report commit.
+
 ## Objective
 
 QA-only verification of the Featured/data/tests refactor now on `main` (commits `5e4f153`, `bf73ed9`, `59540a6`). No features added, no redesign, no PDF or screenshot matrix — text diagnostics and DOM measurements per the updated `AI_WORKFLOW.md` "Efficient visual evidence" rule.
