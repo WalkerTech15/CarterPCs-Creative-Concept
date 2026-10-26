@@ -1,21 +1,29 @@
-MIT License
+Copyright (c) 2026 Noah Walker (WalkerTech15). All rights reserved.
 
-Copyright (c) 2026 Noah Walker
+Effective for new original contributions from 27 October 2026.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Except as permitted by applicable law, an existing license, or the terms of
+the hosting platform, no permission is granted to use, copy, modify,
+distribute, sublicense, or sell original code, design, or documentation
+owned by the copyright holder without prior written permission.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+PRIOR MIT RELEASES
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This repository previously distributed its code under the MIT License.
+This notice does not revoke, restrict, or replace permissions already
+granted under that license. Previously MIT-licensed material remains
+available under those terms, including when included in a later version.
+The prior MIT notice and terms are preserved in LICENSE-MIT-PRIOR-VERSIONS.
+
+THIRD-PARTY MATERIALS
+
+Dependencies, fonts, third-party code, images, trademarks, and other materials
+remain subject to their respective owners' rights and applicable licenses.
+This notice does not claim ownership of CarterPCs' name, likeness, branding,
+or third-party media, and grants no rights to them. Preserve their notices.
+
+PUBLIC REPOSITORY
+
+Viewing and forking rights provided by GitHub's terms are not restricted by
+this notice. This project is an independent fan-made concept and is not
+affiliated with or endorsed by CarterPCs.
