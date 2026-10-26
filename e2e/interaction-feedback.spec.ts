@@ -38,6 +38,32 @@ test('preference menu animates briefly and remains keyboard-operable', async ({
   await expect(trigger).toBeFocused()
 })
 
+test('Enter and Space move focus into the menu they open', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  const cases = [
+    { triggerName: en.a11y.chooseTheme, key: 'Enter', itemRole: 'menuitemradio' },
+    { triggerName: en.a11y.chooseLanguage, key: 'Space', itemRole: 'menuitemradio' },
+    { triggerName: en.a11y.chooseSections, key: 'Enter', itemRole: 'menuitem' },
+  ] as const
+
+  for (const { triggerName, key, itemRole } of cases) {
+    const trigger = page.getByRole('button', { name: triggerName })
+    const menuId = await trigger.getAttribute('aria-controls')
+    expect(menuId).toBeTruthy()
+    const menu = page.locator(`#${menuId}`)
+
+    await trigger.focus()
+    await page.keyboard.press(key)
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    await expect(menu.getByRole(itemRole).first()).toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expect(trigger).toBeFocused()
+  }
+})
+
 test('reduced motion keeps menus usable without a visible transition', async ({
   page,
 }) => {

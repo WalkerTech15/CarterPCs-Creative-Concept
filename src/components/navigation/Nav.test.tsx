@@ -203,4 +203,28 @@ describe('preference menus', () => {
       'false',
     )
   })
+
+  it.each([
+    ['Enter', en.a11y.chooseTheme, en.nav.themes.dark],
+    ['Space', en.a11y.chooseLanguage, en.nav.languages.en],
+    ['Enter', en.a11y.chooseSections, en.nav.sections[0]],
+  ])(
+    'moves focus into the %s-opened menu for %s',
+    async (key, triggerName, itemName) => {
+      const user = userEvent.setup()
+      render(<App />)
+
+      const menuTrigger = trigger(triggerName)
+      menuTrigger.focus()
+      await user.keyboard(key === 'Space' ? ' ' : '{Enter}')
+
+      const menuItem =
+        triggerName === en.a11y.chooseSections
+          ? screen.getByRole('menuitem', { name: itemName, hidden: true })
+          : menuOption(itemName)
+
+      await waitFor(() => expect(menuItem).toHaveFocus())
+      expect(menuTrigger).toHaveAttribute('aria-expanded', 'true')
+    },
+  )
 })

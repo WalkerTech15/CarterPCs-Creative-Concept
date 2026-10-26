@@ -228,7 +228,7 @@ function Nav() {
     list[wrapped].focus()
   }
 
-  /** Opens the menu and lands on an item in the same tick as the keypress. */
+  /** Opens the menu, then lands on an item after the DOM update. */
   const openAt = (id: MenuId, edge: 'first' | 'last') => {
     setOpenMenu(id)
     // The closed menu is visibility:hidden until the state lands, so focus
@@ -240,7 +240,13 @@ function Nav() {
 
   const handleTriggerKeyDown =
     (id: MenuId) => (event: KeyboardEvent<HTMLButtonElement>) => {
-      if (event.key === 'ArrowDown') {
+      if (event.key === 'Enter' || event.key === ' ') {
+        // Match the arrow-key entry path and the menu-button pattern: opening
+        // a menu moves focus into it instead of leaving keyboard users on the
+        // trigger while the menu is already expanded.
+        event.preventDefault()
+        openAt(id, 'first')
+      } else if (event.key === 'ArrowDown') {
         event.preventDefault()
         openAt(id, 'first')
       } else if (event.key === 'ArrowUp') {
