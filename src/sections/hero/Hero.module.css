@@ -1,1188 +1,525 @@
-/**
- * Hero — 1:1 recreation of the approved reference composition.
- *
- * Layer model (bottom → top):
- *   0  .env      near-black canvas, subtle light wash, one huge dark
- *                soft-edged environmental disc behind the portrait
- *   1  .stage    the Carter portrait region (empty until the approved
- *                image is supplied — see Hero.tsx's media contract)
- *   2  .inner    eyebrow + headline + support + CTAs
- *   3  .about / .stats   the two right-side glass cards
- *   4  .lower    three content tiles + the channel row
- *
- * Desktop positions are percentages taken from the reference frame
- * (1536×1024, mapped onto a 1440-wide viewport): content column at 11%,
- * right cards inset 3.4% from the right edge, About card top at 24.5%
- * and stats card at 53% of section height.
- *
- * The reference's decorative left progress rail is intentionally omitted.
- */
-
+/* Reference composition. Flow owns the copy and tiles, so zoom and
+   translations grow the frame instead of overlapping absolute layers. */
 .hero {
   position: relative;
-  overflow: clip;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   isolation: isolate;
+  overflow: clip;
+  background: var(--color-bg-base);
+  --hero-ink: #f5f5f3;
+  --hero-muted: #c8cbd2;
+  --hero-tile: rgb(10 13 17 / 94%);
 }
-
-/* THE SHARED COMPOSITION CANVAS — 96rem (1536px), the reference frame's
-   exact width, centred. Every major element (type column, portrait,
-   disc, cards, tiles, channel row — and the nav via its own .bar)
-   is positioned against this one frame, so viewports wider than the
-   canvas keep the composition intact instead of spreading it apart.
-   Only the environmental wash and the seam stay full-bleed. */
+.stage {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+.media {
+  position: absolute;
+  z-index: -2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(3 6 10 / 48%), transparent 65%),
+    linear-gradient(0deg, rgb(3 6 10 / 80%), transparent 32%);
+}
 .canvas {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  width: 100%;
-  max-width: 96rem;
+  width: min(100%, 100rem);
+  min-height: max(48rem, 100svh);
   margin-inline: auto;
+  padding: 10rem 3.4% 3rem;
 }
-
-/* ===== 0 — Environment ===== */
-
-/* Near-black, not flat black: a soft neutral light field upper-right
-   (what the disc and portrait read against) and one restrained violet
-   contamination low-right. No cyan anywhere — the reference has none. */
-.env {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  /* Sampled from the reference frame: corners sit at ~rgb(3,4,6) with
-     NO broad top wash — the only light is a tight graphite halo hugging
-     the figure's upper-left (peak ~rgb(32,34,40) near x950,y170, a
-     softer lobe to its right, a faint under-glow at the shoulder) plus
-     one restrained violet contamination low-right. */
-  background:
-    radial-gradient(
-      21% 19% at 64.5% 21.5%,
-      rgb(60 62 68 / 95%) 0%,
-      rgb(12 13 16 / 40%) 55%,
-      transparent 75%
-    ),
-    radial-gradient(
-      30% 34% at 67% 30%,
-      rgb(24 25 30 / 70%) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      14% 20% at 53% 33%,
-      rgb(28 29 34 / 75%) 0%,
-      transparent 72%
-    ),
-    radial-gradient(
-      30% 26% at 88% 72%,
-      color-mix(in srgb, var(--color-accent-secondary) 4%, transparent) 0%,
-      transparent 64%
-    ),
-    linear-gradient(180deg, #050608 0%, #030406 60%);
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-block-end: 1.5rem;
 }
-
-/* The enormous dark circular form behind Carter — darker than the light
-   field around it, edges fully dissolved. Environmental geometry, never
-   a container or portrait frame. Canvas-locked (child of .canvas). */
-.envDisc {
-  position: absolute;
-  z-index: 0;
-  inset-block-start: 12%;
-  inset-inline-start: 39%;
-  width: 41%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  pointer-events: none;
-  /* Soft dark mass whose top-left arc crosses ~x757 at y165, exactly as
-     scanned in the reference — present, but weak enough that the halo
-     behind the head still reads through it. */
-  background: radial-gradient(
-    circle at 48% 42%,
-    rgb(0 0 0 / 38%) 0%,
-    rgb(0 0 0 / 30%) 48%,
-    rgb(0 0 0 / 16%) 64%,
-    transparent 78%
-  );
-}
-
-/* ===== 1 — Carter portrait =====
-   The production asset is cropped to the subject's alpha bounds, so the
-   image box IS the figure: cap top sits at 0% of its height, chin at
-   46.7%, head centre at 40.6% of its width. Every placement value below
-   is expressed against those landmarks, which is what lets the head land
-   where the reference puts it at any viewport height.
-
-   The asset carries its own alpha — there is no rectangle, no backdrop
-   and no key applied at runtime. Only the lower torso is dissolved, by
-   the mask below. */
-
-.stage {
-  position: relative;
-  z-index: 1;
-  order: 2;
-  width: 100%;
-  /* Phone/tablet: a purposeful crop rather than the desktop framing
-     squeezed down — the wide shoulders are cropped away so the head
-     stays dominant. */
-  aspect-ratio: 4 / 3.4;
-  /* Positive, not negative: the stage follows the CTAs in the stacked
-     order, and a pulled-up stage put the cap underneath the Watch Reel
-     button at both 768 and 390. */
-  margin-block-start: var(--space-2);
-  pointer-events: none;
-}
-
-.media {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* 41% ≈ the head's horizontal centre in the asset. */
-  object-position: 41% 0%;
-  /* Lower torso dissolves into the canvas, as in the reference — never
-     a hard bottom crop. The face and shoulders stay fully solid. */
-  mask-image: linear-gradient(
-    to bottom,
-    rgb(0 0 0) 0%,
-    rgb(0 0 0) 62%,
-    rgb(0 0 0 / 62%) 82%,
-    transparent 100%
-  );
-}
-
-/* ===== 2 — Type column ===== */
-
 .inner {
-  position: relative;
-  z-index: 2;
-  order: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  /* The six-link bar wraps onto extra rows below 768 — the type column
-     clears the tallest wrapped state, never slides under it. */
-  padding: 12rem var(--container-padding-inline) 0;
+  min-width: 0;
+  width: 44%;
 }
-
 .eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  font-size: 0.71875rem;
-  font-weight: 600;
-  letter-spacing: 0.345em;
+  margin-block-end: 1.25rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text-primary) 56%, transparent);
+  color: var(--hero-muted);
 }
-
-.eyebrowDot {
-  width: 0.25rem;
-  height: 0.25rem;
-  border-radius: 50%;
-  background-color: var(--color-accent-secondary);
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 54%;
+  gap: 1rem;
+  min-width: 0;
 }
-
-/* "Built / Different." — enormous, white, heavy, tight. Reference scale:
-   ~117px at 1440, two lines, the second significantly wider, white
-   terminal period. */
+.factCard {
+  padding: 1rem;
+  border: 1px solid rgb(201 213 228 / 24%);
+  border-radius: 1rem;
+  background: var(--hero-tile);
+  color: var(--hero-ink);
+}
+.factCard h2 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.factIndex {
+  color: var(--color-accent-secondary);
+  margin-inline: 0.25rem;
+}
+.factCard p {
+  margin-block-start: 1rem;
+  color: var(--hero-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.factCard a {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+  font-size: 0.875rem;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-block-start: 0.875rem;
+}
+.stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.375rem;
+}
+.stats dt {
+  font-size: 0.6875rem;
+  color: var(--hero-muted);
+}
+.stats dd {
+  font-size: clamp(1.25rem, 1.8vw, 2rem);
+  font-weight: 700;
+}
+.factCard .statsSource {
+  border-block-start: 1px solid rgb(201 213 228 / 24%);
+  padding-block-start: 0.625rem;
+  font-size: 0.6875rem;
+}
 .headline {
   display: flex;
   flex-direction: column;
-  margin-block-start: var(--space-3);
   font-family: var(--font-family-display);
-  font-size: clamp(3.5rem, 0.9rem + 9vw, 7.3125rem);
+  font-size: clamp(3.5rem, 6.6vw, 6.8rem);
   font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.032em;
-  color: var(--color-text-primary);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  color: var(--hero-ink);
 }
-
-/* Clip box for the masked vertical reveal — each line rises out of its
-   own band. The padding/negative-margin pair keeps descenders from being
-   shaved while the box still hugs the type at rest. */
-.lineMask {
+.headline span {
   display: block;
-  overflow: hidden;
-  padding-block-end: 0.09em;
-  margin-block-end: -0.09em;
 }
-
-.line {
-  display: block;
-  will-change: transform;
-}
-
-/* White in this reference — the accent lives only on the tiny indices. */
-.period {
-  color: inherit;
-}
-
-/* Three muted lines at the reference's width and rhythm — the width is
-   set so the approved copy breaks onto exactly three lines at the
-   reference text-block's measured ink width (~358px). */
 .support {
-  max-width: 22.5rem;
-  margin-block-start: var(--space-4);
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  color: color-mix(in srgb, var(--color-text-primary) 62%, transparent);
+  max-width: 33rem;
+  margin-block-start: 0.75rem;
+  font-size: clamp(1.0625rem, 1.35vw, 1.375rem);
+  line-height: 1.35;
+  color: var(--hero-muted);
+  text-wrap: pretty;
 }
-
-/* ===== CTAs ===== */
-
 .actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  /* Reference: 34px between the primary pill and the secondary. */
-  gap: 2rem;
-  margin-block-start: var(--space-4);
+  gap: 0.75rem;
+  margin-block-start: 1.25rem;
 }
-
 .cta {
   display: inline-flex;
   align-items: center;
-  /* Reference ink: primary pill 213px wide with ~138px of label,
-     secondary "Watch Reel" label 72px — both resolve to 14px text. */
-  font-size: 0.875rem;
-  text-decoration: none;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.875rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 0.75rem;
-  transition:
-    background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.cta:active {
-  transform: scale(0.985);
-}
-
-/* White rounded-rectangle, black text, thin-outlined circular arrow at
-   the right — matched to the supplied reference. */
-.ctaPrimary {
-  gap: 0.6875rem;
-  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-  /* Sampled: the reference pill sits at ~rgb(251,251,251). */
-  background-color: #fcfcfc;
-  color: var(--color-bg-base);
-  border: 1px solid #fcfcfc;
   font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
 }
-
-.ctaPrimary:hover,
-.ctaPrimary:focus-visible {
-  background-color: #fff;
-  border-color: #fff;
+.ctaPrimary {
+  min-width: 12rem;
+  background-color: #fcfcfc;
+  color: #11131a;
 }
-
+.ctaSecondary {
+  min-width: 12rem;
+  background-color: rgb(17 20 24 / 90%);
+  color: #f5f5f3;
+}
+.cta:hover {
+  transform: translateY(-2px);
+}
+.cta:active {
+  transform: scale(0.98);
+}
+.ctaSecondary:hover {
+  background-color: #24272d;
+}
 .ctaBadge {
   display: grid;
   place-items: center;
-  width: 2.125rem;
-  height: 2.125rem;
+  width: 2.625rem;
+  height: 2.625rem;
+  border: 1px solid #b9bec9;
   border-radius: 50%;
-  /* Derived from the pill's own ink rather than from --color-bg-base. In the
-     dark theme the two are the same colour, so this is byte-identical there;
-     in light mode bg-base is near-white and the ring vanished into the white
-     pill. currentcolor tracks whatever the label is set to. */
-  border: 1px solid color-mix(in srgb, currentcolor 36%, transparent);
-  font-size: 0.8125rem;
-  line-height: 1;
-  transition: transform var(--duration-base) var(--ease-out);
 }
-
-.cta:hover .ctaBadge,
-.cta:focus-visible .ctaBadge {
-  transform: translateX(0.1875rem);
-}
-
-/* Dark translucent secondary with the small play triangle — the
-   reference floats the triangle 39px right of the label. */
-.ctaSecondary {
-  gap: 2.4375rem;
-  padding: 0.875rem 1.375rem;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 6%,
-    transparent
-  );
-  color: var(--color-text-primary);
-  border: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-  font-weight: 500;
-}
-
-.ctaSecondary:hover,
-.ctaSecondary:focus-visible {
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 11%,
-    transparent
-  );
-  border-color: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
-}
-
 .play {
   width: 0;
   height: 0;
-  border-block: 0.28125rem solid transparent;
-  border-inline-start: 0.4375rem solid currentcolor;
-  opacity: 0.85;
+  border-block: 0.3125rem solid transparent;
+  border-inline-start: 0.5rem solid currentcolor;
 }
-
-/* ===== 3 — Right-side glass cards =====
-   Reference material: extremely dark, slightly translucent, 1px border,
-   soft inset top light, moderate radius, no drop shadow, no glow. */
-
-/* Mobile: the rail dissolves and the two cards flow in the canvas's
-   stacked order. Desktop overrides this into the anchored column. */
-.cards {
-  display: contents;
-}
-
-.about,
-.stats {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  border-radius: 1rem;
-  /* Border brightness sampled from the reference's card edges
-     (~rgb(15,16,18) against the dark field). */
-  border: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 7%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--color-bg-surface) 55%,
-    transparent
-  );
-  backdrop-filter: blur(1.25rem) saturate(1.1);
-  box-shadow: inset 0 1px 0
-    color-mix(in srgb, var(--color-text-primary) 4%, transparent);
-  transition:
-    border-color var(--duration-base) var(--ease-out),
-    background-color var(--duration-base) var(--ease-out);
-}
-
-.about {
-  order: 3;
-  gap: 0.75rem;
-  margin: var(--space-4) var(--container-padding-inline) 0;
-  padding: 1.25rem 1.375rem;
-}
-
-.about:hover,
-.stats:hover {
-  border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--color-bg-surface) 64%,
-    transparent
-  );
-}
-
-.cardMeta {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--color-text-primary);
-}
-
-.cardIndex {
-  font-size: 0.9375rem;
-  letter-spacing: 0.1em;
-  color: var(--color-accent-secondary);
-}
-
-/* The reference's About card seats its index in a soft violet-tinted
-   rounded chip; the Numbers card's index stays plain. */
-.about .cardIndex {
-  align-self: center;
-  padding: 0.125rem 0.3125rem;
-  border-radius: 0.375rem;
-  background-color: color-mix(
-    in srgb,
-    var(--color-accent-secondary) 16%,
-    transparent
-  );
-}
-
-.aboutText {
-  /* Sized so the approved copy holds the reference's four-line block
-     inside the card's fixed 246px width (line advance 21.3px). */
-  font-size: 0.84375rem;
-  line-height: 1.58;
-  color: color-mix(in srgb, var(--color-text-primary) 58%, transparent);
-}
-
-/* 19.5px tall — under WCAG 2.2 AA 2.5.8's 24px minimum for a standalone
-   link. Enlarged with an overlay, not padding: the card's interior rows are
-   ink-calibrated to the reference (link baseline at y433) and padding would
-   move them. See Nav.module.css's .link for the same technique. */
-.aboutLink {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4375rem;
-  align-self: flex-start;
-  margin-block-start: 1rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  text-decoration: none;
-  transition: opacity var(--duration-fast) var(--ease-out);
-}
-
-.aboutLink::after {
-  content: '';
-  position: absolute;
-  inset-block: -0.1875rem;
-  inset-inline: 0;
-}
-
-.aboutLink:hover,
-.aboutLink:focus-visible {
-  opacity: 0.72;
-}
-
-.aboutArrow {
-  transition: transform var(--duration-base) var(--ease-out);
-}
-
-.aboutLink:hover .aboutArrow,
-.aboutLink:focus-visible .aboutArrow {
-  transform: translate(0.125rem, -0.125rem);
-}
-
-/* By The Numbers — reference geometry for the sourced public-channel metrics. */
-.stats {
-  order: 4;
-  gap: 1.125rem;
-  margin: var(--space-3) var(--container-padding-inline) 0;
-  padding: 1.25rem 1.375rem;
-}
-
-.statsList {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.875rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  /* Reference: 21px from value ink bottom to label ink top. */
-  gap: 0.75rem;
-}
-
-/* Keep abbreviated channel metrics in the same visual register. */
-.statValue {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: var(--color-text-primary);
-}
-
-.statLabel {
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  letter-spacing: 0.005em;
-  color: color-mix(in srgb, var(--color-text-primary) 52%, transparent);
-}
-
-/* ===== 4 — Lower rail: tiles + channel row ===== */
-
-.lower {
-  position: relative;
-  z-index: 4;
-  order: 5;
-  margin-block-start: auto;
-  padding: var(--space-5) var(--container-padding-inline) var(--space-3);
-}
-
 .tiles {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+  margin-block-start: auto;
 }
-
-/* Wide editorial module: media region left, content right, circular
-   arrow lower-right. A specific Hero rail, not a generic card grid. */
 .tile {
   position: relative;
   display: grid;
-  grid-template-columns: 42% 1fr;
-  gap: 0.875rem;
-  padding: 0.625rem;
-  border-radius: 0.875rem;
-  border: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--color-bg-surface) 24%,
-    transparent
-  );
+  grid-template-columns: 46% minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 1.125rem;
+  min-width: 0;
+  border: 1px solid rgb(201 213 228 / 24%);
+  border-radius: 1rem;
+  background: var(--hero-tile);
+  color: var(--hero-ink);
   text-decoration: none;
   transition:
-    border-color var(--duration-base) var(--ease-out),
-    background-color var(--duration-base) var(--ease-out);
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
-
-.tile:hover,
-.tile:focus-visible {
-  border-color: color-mix(in srgb, var(--color-text-primary) 17%, transparent);
-  background-color: color-mix(
-    in srgb,
-    var(--color-bg-surface) 60%,
-    transparent
-  );
-}
-
-/* Tile media — temporary reference assets (see Hero.tsx's TILES note),
-   swapped for approved photography later. The gradient doubles as the
-   pre-load fallback behind the image. */
 .tileMedia {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 7.5rem;
+  aspect-ratio: 232 / 187;
   object-fit: cover;
-  border-radius: 0.5625rem;
-  background: linear-gradient(
-    152deg,
-    color-mix(in srgb, var(--color-bg-surface) 88%, var(--color-bg-base)) 0%,
-    var(--color-bg-base) 82%
-  );
+  border-radius: 0.375rem;
 }
-
 .tileBody {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0.375rem 0.25rem 0.375rem 0;
+  min-width: 0;
+  padding-block: 0.5rem 3rem;
 }
-
 .tileIndex {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
   color: var(--color-accent-secondary);
 }
-
 .tileIndex::after {
   content: '';
-  width: 1.5rem;
+  width: 2rem;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-accent-secondary) 55%, transparent),
-    transparent
-  );
+  background: currentcolor;
 }
-
 .tileTitle {
-  margin-block-start: 0.5625rem;
-  font-size: 0.90625rem;
+  display: block;
+  margin-block-start: 1.375rem;
+  font-size: clamp(0.9375rem, 1.3vw, 1.375rem);
   font-weight: 600;
-  color: var(--color-text-primary);
+  line-height: 1.3;
 }
-
-.tileText {
-  margin-block-start: 0.4375rem;
-  padding-inline-end: 2.125rem;
-  font-size: 0.78125rem;
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--color-text-primary) 54%, transparent);
-}
-
 .tileArrow {
   position: absolute;
-  inset-block-end: 0.75rem;
-  inset-inline-end: 0.75rem;
+  inset-inline-end: 1.125rem;
+  inset-block-end: 1.5rem;
   display: grid;
   place-items: center;
-  width: 1.875rem;
-  height: 1.875rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid #b3bac4;
   border-radius: 50%;
-  border: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 16%, transparent);
-  font-size: 0.75rem;
-  line-height: 1;
-  color: color-mix(in srgb, var(--color-text-primary) 82%, transparent);
-  transition:
-    background-color var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out),
-    border-color var(--duration-base) var(--ease-out);
+  font-size: 1.25rem;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
-
-.tile:hover .tileArrow,
-.tile:focus-visible .tileArrow {
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 9%,
-    transparent
-  );
-  border-color: color-mix(in srgb, var(--color-text-primary) 34%, transparent);
-  transform: translateX(0.125rem);
+.tileDescription {
+  display: block;
+  margin-block-start: 0.625rem;
+  color: var(--hero-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
 }
-
-/* Channel row — the real destinations, in the compositional slot the
-   reference's "Featured in" wordmark row used to hold (see Hero.tsx and
-   data/channels.ts). The row keeps that slot's restraint: one small
-   label, quiet ink, one baseline. What changed is that every entry is now
-   a link rather than a typographic imitation of a publication's logo. */
-.strip {
-  display: flex;
-  flex-wrap: wrap;
-  /* Label and links share one baseline. */
-  align-items: baseline;
-  gap: 0.75rem 2.5rem;
-  margin-block-start: var(--space-4);
+.channels {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  align-items: center;
+  margin-block-start: 2rem;
+  padding-block: 1.25rem;
+  border-block-start: 1px solid rgb(160 170 185 / 35%);
+  color: var(--hero-ink);
+  font-size: 1rem;
 }
-
-.stripLabel {
-  font-size: 0.65625rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
+.channels > span {
+  text-align: center;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text-primary) 38%, transparent);
-  /* The reference floats the label ~2px above the marks' baseline. */
-  translate: 0 -0.125rem;
+  letter-spacing: 0.2em;
+  font-size: 0.8125rem;
 }
-
-.stripSlots {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  /* Three real links, not six imitation wordmarks: they sit together at
-     the start of the row rather than being justified across its full
-     width, which at three items would read as three isolated labels
-     rather than one row. */
-  gap: 0.625rem 2rem;
-  margin: 0;
+.channels ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 0;
+  margin: 0;
   list-style: none;
 }
-
-.stripSlot {
-  white-space: nowrap;
+.channels li {
+  display: flex;
+  justify-content: center;
+  border-inline-start: 1px solid rgb(160 170 185 / 35%);
 }
-
-.stripLink {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.3125rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+.channels svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+}
+.channels a > span {
+  margin-inline-start: 0.5rem;
+}
+.channels a {
+  color: inherit;
   text-decoration: none;
-  color: color-mix(in srgb, var(--color-text-primary) 62%, transparent);
-  transition: color var(--duration-fast) var(--ease-standard);
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  gap: 0.875rem;
 }
-
-.stripLink:hover,
-.stripLink:focus-visible {
-  color: var(--color-text-primary);
+.channels a:focus-visible,
+.factCard a:focus-visible {
+  outline: 3px solid var(--color-accent-primary);
+  outline-offset: 4px;
 }
-
-.stripArrow {
-  font-size: 0.6875rem;
-  /* The one moving part, and it moves only under a pointer/focus: a
-     hairline nudge along the direction the link actually goes. */
-  transition: translate var(--duration-fast) var(--ease-standard);
+.tile:hover {
+  background: #171b22;
+  border-color: #b3bac4;
 }
-
-.stripLink:hover .stripArrow,
-.stripLink:focus-visible .stripArrow {
-  translate: 0.125rem -0.125rem;
+.tile:hover .tileArrow,
+.tile:focus-visible .tileArrow {
+  transform: translateX(2px);
 }
-
-.disclaimer {
-  margin-block-start: var(--space-2);
-  font-size: 0.6875rem;
-  line-height: 1.5;
-  letter-spacing: 0.02em;
-  text-align: center;
-  color: var(--color-text-muted);
+.tile:active {
+  background: #242933;
 }
-
-/* The provenance line sits directly below the By The Numbers figures.
-   It stays visually secondary while remaining readable and easy to locate. */
-.statsSource {
-  margin-block-start: -1.375rem;
-  padding-block-start: 0.5rem;
-  border-block-start: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 12%, transparent);
-  max-width: 100%;
+.cta:focus-visible,
+.tile:focus-visible {
+  outline: 3px solid var(--color-accent-primary);
+  outline-offset: 4px;
+}
+.disclosures {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 2rem;
+  margin-block-start: 0.5rem;
+  color: var(--hero-muted);
   font-size: 0.75rem;
-  line-height: 1.45;
-  letter-spacing: 0.005em;
-  text-align: start;
-  color: var(--color-text-muted);
+  line-height: 1.5;
 }
-
-/* Hero → Creator transition: unchanged hairline motif, picked up by
-   Creator's matching top seam. */
-.seam {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: var(--container-padding-inline);
-  height: 1px;
-  z-index: 5;
-  background-color: color-mix(
-    in srgb,
-    var(--color-text-primary) 14%,
-    transparent
-  );
+.disclosures p {
+  margin: 0;
 }
-
-/* ===== Tablet / narrow desktop =====
-   The reference's absolute composition needs ~1240px of width (and a
-   ≥896px canvas) before the right card rail, portrait and tile row can
-   coexist without collisions — below that the deliberate stacked flow
-   holds, which is a breakpoint-specific correction, never a compromise
-   of the primary 1536×1024 frame. */
-
-@media (min-width: 768px) and (max-width: 1239px) {
-  .inner {
-    /* Keep the stacked tablet layout clear of the wrapped nav without
-       carrying desktop-sized top whitespace into a shorter viewport. */
-    padding-block-start: clamp(9.5rem, 15vh, 11rem);
-  }
-
-  .about,
-  .stats {
-    width: min(26rem, 100%);
-  }
-
-  .statsSource {
-    margin-block-start: -0.5rem;
-  }
+/* Light palette: isolate dark text from the photograph, retain right subject. */
+:global(html[data-theme='light']) .hero {
+  --hero-ink: #151516;
+  --hero-muted: #474950;
+  --hero-tile: rgb(248 248 245 / 97%);
 }
-
-/* Keep the opening mobile frame from becoming a long stack of oversized
-   gaps. Content and tap targets stay intact; only the editorial whitespace
-   tightens at phone widths. */
-@media (max-width: 767px) {
-  .inner {
-    /* The mobile nav is compact; reserve its clearance, but avoid a large
-       dead band before the headline on short iPhone viewports. */
-    padding-block-start: clamp(8.75rem, 18vh, 9.5rem);
-  }
-
-  .stage {
-    margin-block-start: var(--space-1);
-  }
-
-  .about {
-    margin-block-start: 1.5rem;
-  }
-
-  .stats {
-    margin-block-start: 1.25rem;
-    padding-block-end: 1rem;
-  }
-
-  .statsSource {
-    margin-block-start: -0.625rem;
-  }
-
-  .lower {
-    padding-block: 2rem 1rem;
-  }
-
-  .tiles {
-    gap: 0.75rem;
-  }
-
-  .strip {
-    margin-block-start: 1.5rem;
-  }
+:global(html[data-theme='light']) .shade {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(250 250 247 / 99%) 0%,
+      rgb(250 250 247 / 94%) 30%,
+      rgb(250 250 247 / 40%) 52%,
+      transparent 72%
+    ),
+    linear-gradient(0deg, #f5f5f1, transparent 35%);
 }
-
-/* ===== Desktop — the reference frame ===== */
-
-@media (min-width: 1240px) {
-  .hero {
-    display: block;
-    min-height: max(100vh, 56rem);
-  }
-
+:global(html[data-theme='light']) .tile {
+  border-color: #8d9099;
+}
+:global(html[data-theme='light']) .tile:hover {
+  background: #fff;
+}
+@media (max-width: 1023px) {
   .canvas {
-    display: block;
-    min-height: max(100vh, 56rem);
+    padding-block-start: 12rem;
+    min-height: 56rem;
   }
-
-  .inner {
-    order: initial;
-    /* Reference geometry: content column at 11% of the canvas, type
-       clear of the right-side portrait/cards region. Top padding puts
-       the eyebrow at the reference's y (~17% of the frame). */
-    padding: clamp(8.5rem, 17vh, 10.875rem) 44% 0 11%;
-  }
-
-  .headline {
-    position: relative;
-    z-index: 2;
-    /* The tail of "Different." enters the disc's field, exactly as in
-       the reference — the column is allowed to break. Ink-calibrated to
-       the reference's measured glyph boxes (Inter 800): "Built"
-       277×105 at (170,224), "Different." to x749, line tops 128 apart.
-       Trust the screenshot, not the number. */
-    width: max-content;
-    max-width: 165%;
-    font-size: clamp(4.5rem, 9.115vw, 8.75rem);
-    line-height: 0.915;
-    /* Ink-shift: "B" carries ~5px of side bearing at this size, and the
-       cap ink must start 3px higher than the box flow puts it. */
-    margin-block-start: 1.3125rem;
-    margin-inline-start: -0.3125rem;
-  }
-
-  .support {
-    /* Ink-calibrated: block ink y505→577 (three lines, advance ≈30px),
-       longest line to x526, landing the CTA row on the reference's
-       y615. */
-    margin-block-start: 1.875rem;
-    line-height: 1.75;
-  }
-
-  /* The reference's second line runs a touch looser than the first —
-     its ink reaches x749 where -0.032em stops ~5px short. */
-  .lineMask:last-of-type .line {
-    letter-spacing: -0.0285em;
-  }
-
-  .actions {
-    margin-block-start: 1.75rem;
-  }
-
-  /* Portrait: sized by HEIGHT so the reference's vertical landmarks (cap
-     top, chin, the line where the tiles cross the torso) hold as the
-     frame's proportions change; width follows from the asset's aspect.
-     At 1440×900 this resolves to a 797×702 figure at (504, 112) —
-     cap top 112, chin 440, head centre x 827. */
-  /* Calibrated by measuring the SAME skin-tone bounding box in the
-     reference and in the render, rather than by eye: reference face box
-     is 237×342 at centre x=1004, top y=201 (in the 1536×1024 frame).
-     The previous 78%/35% build rendered 312×443 at cx=899, top 156 —
-     1.30× oversized, 105px left and 45px high. These three values put
-     the measured face box on the reference's. */
-  .stage {
-    position: absolute;
-    inset-block-start: 17.5%;
-    inset-inline-start: 47.3%;
-    height: 60%;
-    width: auto;
-    aspect-ratio: 1018 / 897;
-    order: initial;
-    margin: 0;
-  }
-
-  /* Silhouette control, fully non-destructive: the vertical mask
-     dissolves the lower hoodie, and the horizontal mask darkens the
-     OUTER shoulders away so the figure reads narrower and more upright,
-     exactly like the reference — the head band (12%–69%, centred on the
-     head at 41%) stays fully solid. Never scaleX, never a crop of the
-     face. The two masks intersect. */
-  .media {
-    object-fit: fill;
-    object-position: 50% 50%;
-    mask-image:
-      linear-gradient(
-        to bottom,
-        rgb(0 0 0) 0%,
-        rgb(0 0 0) 58%,
-        rgb(0 0 0 / 65%) 78%,
-        transparent 97%
-      ),
-      linear-gradient(
-        to right,
-        transparent 4%,
-        rgb(0 0 0) 18%,
-        rgb(0 0 0) 67%,
-        transparent 84%
-      );
-    mask-composite: intersect;
-  }
-
-  /* Right card rail — one anchored column, so the About and Numbers
-     cards space themselves and can never collide when the viewport is
-     shorter than the 1024 reference frame. At the 1536×1024 frame the
-     gap resolves so the cards land exactly on the reference boxes:
-     About 245×~260 at (1238, 258), Numbers 362×~155 at (1121, 545). */
-  .cards {
-    position: absolute;
-    z-index: 3;
-    /* Border-detected reference edges: About top border at y252
-       (24.6%), Numbers top border at y544 — the gap closes the
-       difference. */
-    inset-block-start: 24.6%;
-    inset-inline-end: 3.45%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: clamp(1.125rem, 2.42vh, 1.5625rem);
-    width: clamp(19rem, 23.6%, 22.625rem);
-  }
-
-  /* About Carter — floating over Carter's shoulder environment. Fixed
-     width keeps the copy at the reference's four lines everywhere.
-     Interior ink-calibrated: title 286, body 322→397, link 433,
-     avatars 469→499 (frame-absolute rows). */
-  .about {
-    position: relative;
-    order: initial;
-    width: 15.375rem;
-    margin: 0;
-    /* Reference interior: body ink starts 18px in from the left border,
-       ~20px from the right. */
-    padding: 1.75rem 1.25rem 1.5rem 1.125rem;
-    gap: 0.625rem;
-  }
-
-  /* By The Numbers — beneath it, full rail width, overlapping the
-     lower-right torso. */
-  .stats {
-    position: relative;
-    order: initial;
-    width: 100%;
-    margin: 0;
-    padding: 1.75rem 1.5rem 0.875rem;
-    gap: 1.875rem;
-  }
-
-  /* Give both localized metric labels equal room now that the unsupported
-     build-count column has been removed. */
-  .statsList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1rem;
-  }
-
-  /* 9px, not 10px. These labels are `nowrap` inside fixed grid columns, so a
-     label wider than its column does not wrap or clip — it runs straight
-     into its neighbour, and at 10px it did, in all three languages: measured
-     ink-to-ink gaps of -6px (en), -11px (fr) and -5px (es) at 1240–1280,
-     with fr still touching at exactly 0px at 1440. The labels' own lengths
-     are fixed by the dictionary and the column widths by the reference
-     composition, so type size is the only term left to move. At 9px the
-     worst case (fr @1240) clears by 6px and every other case by more. */
-  .statLabel {
-    font-size: 0.5625rem;
-    letter-spacing: 0;
-    white-space: nowrap;
-  }
-
-  /* Lower rail pinned to the canvas base, tiles spanning from the
-     content column's left edge to the cards' right edge. Reference:
-     tiles 194 tall at y727, strip text at ~y984. */
-  .lower {
-    position: absolute;
-    inset-block-end: 0;
-    inset-inline: 0;
-    order: initial;
-    margin: 0;
-    padding: 0 3.45% 0.375rem 11.1%;
-  }
-
-  .tiles {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.375rem;
-  }
-
-  .tile {
-    min-height: clamp(11rem, 19vh, 12.125rem);
-    /* Reference tile anatomy: 12px frame padding, media column 208px of
-       the 423px module (52%), and a wide 32px gutter before the text. */
-    grid-template-columns: 52% 1fr;
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
     gap: 2rem;
+  }
+  .inner {
+    max-width: 38rem;
+    width: 100%;
+  }
+  .facts {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .headline {
+    font-size: clamp(3.25rem, 8.3vw, 5.5rem);
+  }
+  .support {
+    max-width: 27rem;
+  }
+  .tile {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
     padding: 0.75rem;
   }
-
+  .tileMedia {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
   .tileBody {
-    padding: 0.625rem 0.25rem 0.375rem 0;
+    padding: 0 0 3rem;
   }
-
   .tileTitle {
-    margin-block-start: 1.4375rem;
+    margin-block-start: 0.625rem;
   }
-
-  .tileText {
-    margin-block-start: 0.5rem;
-    padding-inline-end: 0.25rem;
-  }
-
-  .tileMedia {
-    min-height: 0;
-  }
-
-  .strip {
-    /* Thin divider between the 03–05 tile rail and the channel row,
-       matching the supplied reference's section break. */
-    margin-block-start: 1.5rem;
-    padding-block-start: 1.75rem;
-    border-block-start: 1px solid
-      color-mix(in srgb, var(--color-text-primary) 11%, transparent);
-    /* Left inset adds to .lower's own 11.1%, so the label's ink starts on
-       the tile rail's left edge. The right inset the reference needed is
-       gone with the wordmarks: it existed to pull a justified six-item row
-       in off the frame edge, and three left-aligned links do not reach it. */
-    padding-inline: 2.44% 0;
-    gap: 0.75rem 4rem;
-  }
-
-  .disclaimer {
-    margin-block-start: 0.375rem;
+  .tileArrow {
+    inset-block-end: 0.75rem;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }
-
-/* Wide-screen art direction (≥1537px only — the 1536×1024 reference
-   frame is frozen): with the root rem scaling the composition, Carter
-   is height-driven (stage height %) while text/cards are width-driven,
-   so the portrait gains a small deliberate boost to hold its rank
-   against the enlarged headline. */
-@media (min-width: 1537px) {
-  .stage {
-    inset-block-start: 16.3%;
-    height: 62%;
-  }
-}
-
-/* Desktop windows shorter than their scaled reference frame: compress
-   the type column and the right rail so nothing can reach the tile
-   row. Band 1 is the original short-desktop case (896px canvas at
-   1280×720). The wide bands are the short-WIDE cases (e.g. 2048×1015,
-   1920×1080, 2560×1080): they follow the large-screen rem scale's
-   growth curve (compression is required whenever viewport height
-   < ~996 × scale), each band's height limit sitting just above the
-   requirement at its widest point, so no width/height combination can
-   fall through uncompressed into a collision. In these bands the
-   canvas also gives up its scaled minimum height so the composition
-   fits the fold exactly. */
-@media (min-width: 1240px) and (max-height: 999px),
-  (min-width: 1537px) and (max-height: 1063px),
-  (min-width: 1728px) and (max-height: 1139px),
-  (min-width: 1990px) and (max-height: 1209px),
-  (min-width: 2208px) and (max-height: 1279px),
-  (min-width: 2432px) and (max-height: 1329px) {
-  .inner {
-    padding-block-start: clamp(6.5rem, 13vh, 10.875rem);
-  }
-
-  .headline {
-    font-size: clamp(4rem, 8.1vw, 8.75rem);
-  }
-
-  .support {
-    margin-block-start: 1.25rem;
-    line-height: 1.6;
-  }
-
-  .actions {
-    margin-block-start: 1.25rem;
-  }
-
-  .cards {
-    inset-block-start: clamp(8.5rem, 18%, 12rem);
+@media (max-width: 599px) {
+  .channels {
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
-
-  .about {
-    padding: 1.125rem;
-    gap: 0.75rem;
+  .channels li:first-child {
+    border-inline-start: 0;
   }
-
-  .aboutLink {
-    margin-block-start: 0.375rem;
+  .channels a {
+    gap: 0.375rem;
+    font-size: 0.8125rem;
   }
-
-  .stats {
-    padding: 1.25rem;
-    gap: 1rem;
-    padding-block-end: 0.625rem;
+  .channels svg {
+    width: 1.125rem;
+    height: 1.125rem;
   }
-
-  .statsSource {
-    margin-block-start: -0.5rem;
-    padding-block-start: 0.375rem;
-    font-size: 0.6875rem;
-    line-height: 1.35;
+  .channels a > span {
+    margin-inline-start: 0;
   }
-
-  .stat {
-    gap: 0.5rem;
-  }
-}
-
-/* Short-WIDE bands only (never the pre-approved 1240–1536 short
-   band): the scaled composition trades its scaled minimum canvas
-   height for an exact-fold fit, and shaves the headline cap and card
-   top slightly — sized so 2048×1015 rests with ~15px of air. */
-@media (min-width: 1537px) and (max-height: 1063px),
-  (min-width: 1728px) and (max-height: 1139px),
-  (min-width: 1990px) and (max-height: 1209px),
-  (min-width: 2208px) and (max-height: 1279px),
-  (min-width: 2432px) and (max-height: 1329px) {
-  .hero,
   .canvas {
-    min-height: max(100vh, 50rem);
+    min-height: auto;
+    padding: 10rem 1.25rem 1.25rem;
   }
-
+  .media {
+    object-position: 63% top;
+    height: 34rem;
+  }
+  .shade {
+    background: linear-gradient(
+      0deg,
+      #080b10 0%,
+      #080b10 42%,
+      rgb(3 6 10 / 75%) 75%,
+      rgb(3 6 10 / 15%)
+    );
+  }
+  .inner {
+    width: 100%;
+    padding: 0;
+    margin-block-end: 2rem;
+  }
+  .facts {
+    grid-template-columns: 1fr;
+  }
   .headline {
-    font-size: clamp(4rem, 8.1vw, 8.4375rem);
+    font-size: clamp(2.625rem, 10.1vw, 3.75rem);
+    line-height: 0.98;
   }
-
-  .cards {
-    inset-block-start: clamp(10rem, 20.5%, 13rem);
+  .support {
+    max-width: 25rem;
+    font-size: 1.0625rem;
   }
-}
-
-/* ===== Narrow phones — simplify, never shrink ===== */
-
-@media (max-width: 380px) {
   .actions {
-    align-self: stretch;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .cta {
-    justify-content: space-between;
-  }
-
-  .ctaSecondary {
-    justify-content: center;
-  }
-
-  .tile {
-    /* A compact image-and-copy row avoids giving every thumbnail a full
-       screen-width intrinsic height at 320px. The copy still has enough
-       measure to wrap cleanly in the longer locales. */
-    grid-template-columns: 38% minmax(0, 1fr);
     gap: 0.75rem;
   }
-
-  .tileMedia {
-    min-height: 5rem;
+  .cta {
+    flex: 1 1 13rem;
+    font-size: 0.9375rem;
+    min-height: 3.25rem;
   }
-
-  .tileText {
-    padding-inline-end: 1rem;
-    font-size: 0.75rem;
-    line-height: 1.45;
+  .ctaBadge {
+    width: 2.125rem;
+    height: 2.125rem;
+  }
+  .tiles {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .tile {
+    grid-template-columns: 42% minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .tileBody {
+    padding-block-start: 0.375rem;
+  }
+  .tileTitle {
+    font-size: 1.0625rem;
+  }
+  .tileIndex {
+    font-size: 0.8125rem;
+  }
+  .disclosures {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  :global(html[data-theme='light']) .shade {
+    background: linear-gradient(
+      0deg,
+      #f5f5f1 0%,
+      #f5f5f1 42%,
+      rgb(250 250 247 / 96%) 75%,
+      rgb(250 250 247 / 30%)
+    );
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .tile,
+  .tileArrow {
+    transition: none;
+  }
+  .cta:hover,
+  .cta:active,
+  .tile:hover .tileArrow {
+    transform: none;
   }
 }

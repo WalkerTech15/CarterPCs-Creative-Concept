@@ -10,9 +10,9 @@
  * split `channels.ts` uses for Hero's channel row.
  */
 
-import tileBuilds from '../assets/hero/tile-media-builds.webp'
-import tileStudio from '../assets/hero/tile-media-studio.webp'
-import tileUniverse from '../assets/hero/tile-media-universe.webp'
+import tileBuilds from '../assets/hero/hero-reference-builds.webp'
+import tileStudio from '../assets/hero/hero-content-creation.webp'
+import tileUniverse from '../assets/hero/hero-reference-universe.webp'
 
 /**
  * Lower editorial tiles, matched to the reference's three modules.
@@ -28,19 +28,19 @@ import tileUniverse from '../assets/hero/tile-media-universe.webp'
  */
 export const HERO_TILES = [
   {
-    index: '03',
+    index: '01',
     copy: 'builds',
     href: '#hardware',
     media: tileBuilds,
   },
   {
-    index: '04',
+    index: '02',
     copy: 'content',
     href: '#featured',
     media: tileStudio,
   },
   {
-    index: '05',
+    index: '03',
     copy: 'universe',
     href: '#content-universe',
     media: tileUniverse,
